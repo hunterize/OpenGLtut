@@ -72,8 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>D:\Projects\SDL Project\SDL_Tutorial\Dependency\Include\GLEW;D:\Projects\SDL Project\SDL_Tutorial\Dependency\Include\SDL;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Projects\SDL Project\SDL_Tutorial\Dependency\Lib\GLEW;D:\Projects\SDL Project\SDL_Tutorial\Dependency\Lib\SDL;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Dependency\Include\GLEW;$(SolutionDir)Dependency\Include\SDL;$(SolutionDir)Dependency\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependency\Lib\GLEW;$(SolutionDir)Dependency\Lib\SDL;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -156,7 +156,9 @@ xcopy /y "$(ProjectDir)awesomeface.png" "$(OutDir)"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SDLCoordinate2D.cpp" />
     <ClCompile Include="SDLTexture.cpp" />
+    <ClCompile Include="SDLTransform.cpp" />
     <ClCompile Include="SDLVertexEBO.cpp" />
     <ClCompile Include="SDLVertexVAO.cpp" />
     <ClCompile Include="SDLVertex.cpp" />

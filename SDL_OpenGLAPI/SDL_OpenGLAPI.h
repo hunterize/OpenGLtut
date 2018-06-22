@@ -5,8 +5,6 @@
 
 #include <iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
-
 enum class GAMESTATE
 {
 	RUNNING,
@@ -22,3 +20,5 @@ void SDLVAO();
 void SDLVertexImmediate();
 void SDLEBO();
 void SDLTexture();
+void SDLTransform();
+void SDLCoordinate2D();

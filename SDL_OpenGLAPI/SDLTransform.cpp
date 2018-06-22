@@ -1,16 +1,17 @@
 #include "SDL_OpenGLAPI.h"
 
-
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
 
 extern GAMESTATE STATE;
 
-void SDLTexture()
+void SDLTransform()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	SDL_Window* window = SDL_CreateWindow("Texture Windows", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 700, 500, SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("Transform Windows", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 700, 500, SDL_WINDOW_OPENGL);
 
 	SDL_GLContext context = SDL_GL_CreateContext(window);
 
@@ -54,7 +55,7 @@ void SDLTexture()
 	}
 	else
 	{
-		std::cout << "Image load failed" << std::endl;	
+		std::cout << "Image load failed" << std::endl;
 	}
 
 	stbi_image_free(data);
@@ -77,7 +78,7 @@ void SDLTexture()
 	}
 	else
 	{
-		std::cout << "Image load failed" << std::endl;	
+		std::cout << "Image load failed" << std::endl;
 	}
 
 	stbi_image_free(data);
@@ -91,24 +92,13 @@ void SDLTexture()
 		"layout (location = 2) in vec2 vertexUV;\n"
 		"out vec3 textureColor;\n"
 		"out vec2 textureCoord;\n"
+		"uniform mat4 transform;\n"
 		"void main()\n"
 		"{\n"
-		"gl_Position = vec4(vertexPos.x, vertexPos.y, 0, 1.0);\n"
+		"gl_Position = transform * vec4(vertexPos.x, vertexPos.y, 0, 1.0);\n"
 		"textureColor = vertexColor;\n"
 		"textureCoord = vertexUV;\n"
 		"}\0";
-
-	/* only one texture, don't need to assign uniform sampler, it's the default texture unit for some drivers
-	const char *pFragmentShader = "#version 330\n"
-		"in vec3 textureColor;\n"
-		"in vec2 textureCoord;\n"
-		"out vec4 color;\n"
-		"uniform sampler2D sampler;\n"
-		"void main()\n"
-		"{\n"
-		"color = texture(sampler, textureCoord) * vec4(textureColor, 1.0);\n"
-		"}\0";
-	*/
 
 	// for multiple textures
 	const char *pFragmentShader = "#version 330\n"
@@ -119,7 +109,7 @@ void SDLTexture()
 		"uniform sampler2D sampler2;\n"
 		"void main()\n"
 		"{\n"
-		"color = mix(texture(sampler1, textureCoord), texture(sampler2, textureCoord), 0.3);\n"
+		"color = mix(texture(sampler1, textureCoord), texture(sampler2, textureCoord), 0.3) * vec4(textureColor, 1.0f);\n"
 		"}\0";
 
 	//shader log
@@ -184,12 +174,13 @@ void SDLTexture()
 	GLuint vao = 0;
 	GLuint ebo = 0;
 
-	GLfloat vertice[] = { 
-		//Pos         //color           //uv
-		-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0, 0.0,
-		-1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0, 1.0,
-		0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0, 1.0,
-		0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0, 0.0 
+	//the rectangle 
+	GLfloat vertice[] = {
+		//Pos          //color            //uv
+		-1.0f, -1.0f,  1.0f, 0.0f, 0.0f, 0.0, 0.0,  //bottom left
+		-1.0f,  0.0f,  0.0f, 1.0f, 0.0f, 0.0, 1.0,  //top left
+		 0.0f,  0.0f,  0.0f, 0.0f, 1.0f, 1.0, 1.0,  //top right
+		 0.0f, -1.0f,  1.0f, 1.0f, 0.0f, 1.0, 0.0   //bottom right
 	};
 	GLuint indices[] = { 0, 1, 2, 2, 3, 0 };
 
@@ -217,32 +208,34 @@ void SDLTexture()
 
 	//it's allowed, vbo is stored as vao's registered buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//DO NOT unbind element array buffer while vao is active
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
 	//unbind ebo after unbinding vao is allowed
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-
-
 	while (STATE != GAMESTATE::EXIT)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		ProcessInput();
+		
+		//create tranfrom matrix
+		glm::mat4 transform;
+		//translate
+		transform = glm::translate(transform, glm::vec3(0.5f, 0.5f, 0.0f));
+		//rotate
+		transform = glm::rotate(transform, (float)SDL_GetTicks()/1000.0f, glm::vec3(0.0, 0.0, 1.0));
+		//scale
+		transform = glm::scale(transform, glm::vec3(0.5, 0.5, 0.5));
+		//translate to origin (0,0)
+		transform = glm::translate(transform, glm::vec3(0.5, 0.5, 0));
 
 		glUseProgram(shaderProgram);
 
-		/* this is for only one texture
+		//assign transform location
+		GLuint location = glGetUniformLocation(shaderProgram, "transform");
+		glUniformMatrix4fv(location, 1, GL_FALSE, &transform[0][0]);
+
 		//bind texture
-		//dont need to active texture0, texture0 is default texture assigned to the default texture unit
-		//glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture1);
-
-		*/
-
-		//for two textures
-
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
@@ -250,7 +243,7 @@ void SDLTexture()
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
 
-
+		//draw vertices
 		glBindVertexArray(vao);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
