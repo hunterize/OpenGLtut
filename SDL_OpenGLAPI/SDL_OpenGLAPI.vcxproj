@@ -157,6 +157,7 @@ xcopy /y "$(ProjectDir)awesomeface.png" "$(OutDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="SDLCoordinate2D.cpp" />
+    <ClCompile Include="SDLCoordinate3D.cpp" />
     <ClCompile Include="SDLTexture.cpp" />
     <ClCompile Include="SDLTransform.cpp" />
     <ClCompile Include="SDLVertexEBO.cpp" />

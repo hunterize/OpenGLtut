@@ -22,3 +22,4 @@ void SDLEBO();
 void SDLTexture();
 void SDLTransform();
 void SDLCoordinate2D();
+void SDLCoordinate3D();
