@@ -23,3 +23,7 @@ void SDLTexture();
 void SDLTransform();
 void SDLCoordinate2D();
 void SDLCoordinate3D();
+void SDLCoordinate3DMultiple();
+void SDLCameraOrb();
+void SDLCameraStrafe();
+void SDLCameraFPS();
