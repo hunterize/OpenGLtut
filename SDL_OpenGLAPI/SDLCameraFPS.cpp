@@ -11,7 +11,7 @@ namespace
 {
 	void GetInput();
 	//camera 
-	GLfloat cameraSpeed = 5.0f;
+	GLfloat cameraSpeed = 150.0f;
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 50.0f);
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -19,8 +19,14 @@ namespace
 	//time span
 	GLfloat previousTime = SDL_GetTicks() / 1000.0f;
 	GLfloat deltaTime = 0.0f;
+	bool isFirstMove = true;
 
 	GLfloat rotationAngle = 0.0f;
+
+	GLfloat yaw = -90.0f; //pointing to the nagtive Z axis as initial cameraFront (0, 0, -1)
+	GLfloat pitch = 0.0f;
+	GLfloat fov = 45.0f;
+
 
 }
 
@@ -295,18 +301,18 @@ void SDLCameraFPS()
 		GLfloat currentTime = SDL_GetTicks() / 1000.0f;
 		deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
-		cameraSpeed = deltaTime * 70.0f;
+		//cameraSpeed = deltaTime * 170.0f;
 		rotationAngle += (2.0f) * deltaTime;
 
-		std::cout << "delta time: " << deltaTime << std::endl;
-		std::cout << "camera speed: " << cameraSpeed << std::endl;
+		//std::cout << "delta time: " << deltaTime << std::endl;
+		//std::cout << "camera speed: " << cameraSpeed << std::endl;
 
 		//handle input and update 
 		::GetInput();
 
 		//create projection matrix, 
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(45.0f), (float)700 / 500, 1.0f, 1000.0f);
+		projection = glm::perspective(glm::radians(fov), (float)700 / 500, 1.0f, 1000.0f);
 
 		glUseProgram(shaderProgram);
 
@@ -323,6 +329,14 @@ void SDLCameraFPS()
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
+		//create camera matrix
+		glm::mat4 view;
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+		//assign view location
+		GLuint viewlocation = glGetUniformLocation(shaderProgram, "view");
+		glUniformMatrix4fv(viewlocation, 1, GL_FALSE, &view[0][0]);
+
 		for (int i = 0; i < sizeof(obj_pos) / sizeof(glm::vec3); i++)
 		{
 			//create tranfrom matrix
@@ -337,15 +351,6 @@ void SDLCameraFPS()
 			//assign transform location
 			GLuint location = glGetUniformLocation(shaderProgram, "model");
 			glUniformMatrix4fv(location, 1, GL_FALSE, &model[0][0]);
-
-
-			//create camera matrix
-			glm::mat4 view;
-			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
-			//assign view location
-			GLuint viewlocation = glGetUniformLocation(shaderProgram, "view");
-			glUniformMatrix4fv(viewlocation, 1, GL_FALSE, &view[0][0]);
 
 			//draw vertices
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -368,31 +373,51 @@ namespace
 	{
 		SDL_Event event;
 
+		//SDL_WarpMouseInWindow(NULL, 700 / 2, 500 / 2);
+		//lastX = 700 / 2;
+		//lastY = 500 / 2;
+
 		while (SDL_PollEvent(&event))
 		{
+
 			switch (event.type)
 			{
 			case SDL_QUIT:
 				STATE = GAMESTATE::EXIT;
 				break;
+
+			case SDL_WINDOWEVENT:
+
+				switch (event.window.event)
+				{
+				case SDL_WINDOWEVENT_LEAVE:
+					std::cout << "Focus lost" << std::endl;
+					isFirstMove = true;
+				default:
+					break;
+				}
+
+
+				break;
+			
 			case SDL_KEYDOWN:
-				std::cout << event.key.keysym.sym << std::endl;
+				//std::cout << event.key.keysym.sym << std::endl;
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_ESCAPE:
 					STATE = GAMESTATE::EXIT;
 					break;
 				case SDLK_a:
-					cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+					cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
 					break;
 				case SDLK_s:
-					cameraPos -= cameraFront * cameraSpeed;
+					cameraPos -= cameraFront * cameraSpeed * deltaTime;
 					break;
 				case SDLK_d:
-					cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+					cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * deltaTime;
 					break;
 				case SDLK_w:
-					cameraPos += cameraFront * cameraSpeed;
+					cameraPos += cameraFront * cameraSpeed * deltaTime;
 					break;
 				}
 				break;
@@ -412,8 +437,58 @@ namespace
 				break;
 			case SDL_MOUSEMOTION:
 				//std::cout << event.motion.x << " " << event.motion.y << std::endl;
+
+				if (isFirstMove)
+				{
+					SDL_WarpMouseInWindow(NULL, 700 / 2, 500 / 2);
+					isFirstMove = false;
+				}
+				else
+				{
+
+					GLfloat offsetX, offsetY;
+
+					offsetX = event.motion.x - 700 / 2;
+					offsetY = event.motion.y - 500 / 2;
+
+					std::cout << offsetX << " " << offsetY << std::endl;
+
+					yaw += offsetX * 180 / 700;
+					pitch -= offsetY * 180 / 500;
+
+					pitch = pitch > 89.0f ? 89.0f : pitch;
+					pitch = pitch < -89.0f ? -89.0f : pitch;
+
+					glm::vec3 direction;
+
+					direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+					direction.y = sin(glm::radians(pitch));
+					direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+					cameraFront = glm::normalize(direction);
+
+				}
+				SDL_WarpMouseInWindow(NULL, 700 / 2, 500 / 2);
+				break;
+
+			case SDL_MOUSEWHEEL:
+				if (fov >= 1.0f && fov <= 45.0f)
+				{
+					fov -= event.wheel.y;
+				}
+
+				if (fov <= 1.0f)
+				{
+					fov = 1.0f;
+				}
+
+				if (fov >= 45.0f)
+				{
+					fov = 45.0f;
+				}
 				break;
 			}//end of switch
 		}//end of while
+
 	}
 }
