@@ -20,10 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{C97E42CD-3308-4B3C-8B98-09DB16EE9220}</ProjectGuid>
+    <ProjectGuid>{4ED24230-01C7-463C-8196-1E62257F930D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>SDLOpenGLAPI</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <RootNamespace>SDLOpenGLGLSL</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -72,8 +72,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)Dependency\Include\GLEW;$(SolutionDir)Dependency\Include\SDL;$(SolutionDir)Dependency\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Dependency\Lib\GLEW;$(SolutionDir)Dependency\Lib\SDL;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)Dependency\Include\GLEW\;$(solutiondir)Dependency\Include\glm\;$(solutiondir)Dependency\Include\SDL\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(solutiondir)Dependency\Lib\GLEW\;$(solutiondir)Dependency\Lib\SDL\;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -81,9 +81,9 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)Dependency\Include\GLEW;$(SolutionDir)Dependency\Include\SDL;$(SolutionDir)Dependency\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Dependency\lib\GLEW;$(SolutionDir)Dependency\lib\SDL;$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
+    <IncludePath>$(solutiondir)Dependency\Include\GLEW\;$(solutiondir)Dependency\Include\glm\;$(solutiondir)Dependency\Include\SDL\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(solutiondir)Dependency\Lib\GLEW\;$(solutiondir)Dependency\Lib\SDL\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -105,8 +105,8 @@
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
-xcopy /y "$(ProjectDir)wall.jpg" "$(OutDir)"
-xcopy /y "$(ProjectDir)awesomeface.png" "$(OutDir)"</Command>
+
+xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -144,8 +144,8 @@ xcopy /y "$(ProjectDir)awesomeface.png" "$(OutDir)"</Command>
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
-xcopy /y "$(ProjectDir)wall.jpg" "$(OutDir)"
-xcopy /y "$(ProjectDir)awesomeface.png" "$(OutDir)"</Command>
+
+xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,34 +167,18 @@ xcopy /y "$(ProjectDir)awesomeface.png" "$(OutDir)"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SDLCameraFPS.cpp" />
-    <ClCompile Include="SDLCameraOrb.cpp" />
-    <ClCompile Include="SDLCameraStrafe.cpp" />
-    <ClCompile Include="SDLCoordinate2D.cpp" />
-    <ClCompile Include="SDLCoordinate3D.cpp" />
-    <ClCompile Include="SDLCoordinate3DMultiple.cpp" />
-    <ClCompile Include="SDLTexture.cpp" />
-    <ClCompile Include="SDLTransform.cpp" />
-    <ClCompile Include="SDLVertexEBO.cpp" />
-    <ClCompile Include="SDLVertexVAO.cpp" />
-    <ClCompile Include="SDLVertex.cpp" />
-    <ClCompile Include="SDLVertexImmediate.cpp" />
-    <ClCompile Include="SDLWindow.cpp" />
-    <ClCompile Include="SDL_OpenGLAPI.cpp" />
+    <ClInclude Include="CShader.h" />
+    <ClInclude Include="SDL_OpenGLGLSL.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SDL_OpenGLAPI.h" />
-    <ClInclude Include="stb_image.h" />
+    <ClCompile Include="BasicShaderProgram.cpp" />
+    <ClCompile Include="CShader.cpp" />
+    <ClCompile Include="SDL_OpenGLGLSL.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="awesomeface.png">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-    </Image>
-    <Image Include="wall.jpg">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-    </Image>
+    <None Include="cpp.hint" />
+    <None Include="Shaders\BasicFragmentShader.frag" />
+    <None Include="Shaders\BasicVertexShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

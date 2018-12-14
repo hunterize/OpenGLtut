@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_Tutorial_Texture", "SDL
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLAPI", "SDL_OpenGLAPI\SDL_OpenGLAPI.vcxproj", "{C97E42CD-3308-4B3C-8B98-09DB16EE9220}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLGLSL", "SDL_OpenGLGLSL\SDL_OpenGLGLSL.vcxproj", "{4ED24230-01C7-463C-8196-1E62257F930D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -51,6 +53,14 @@ Global
 		{C97E42CD-3308-4B3C-8B98-09DB16EE9220}.Release|x64.Build.0 = Release|x64
 		{C97E42CD-3308-4B3C-8B98-09DB16EE9220}.Release|x86.ActiveCfg = Release|Win32
 		{C97E42CD-3308-4B3C-8B98-09DB16EE9220}.Release|x86.Build.0 = Release|Win32
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Debug|x64.ActiveCfg = Debug|x64
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Debug|x64.Build.0 = Debug|x64
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Debug|x86.ActiveCfg = Debug|Win32
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Debug|x86.Build.0 = Debug|Win32
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Release|x64.ActiveCfg = Release|x64
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Release|x64.Build.0 = Release|x64
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Release|x86.ActiveCfg = Release|Win32
+		{4ED24230-01C7-463C-8196-1E62257F930D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

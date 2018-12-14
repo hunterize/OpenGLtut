@@ -11,7 +11,7 @@ namespace
 {
 	void GetInput();
 	//camera 
-	GLfloat cameraSpeed = 150.0f;
+	GLfloat cameraSpeed = 250.0f;
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 50.0f);
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -27,6 +27,7 @@ namespace
 	GLfloat pitch = 0.0f;
 	GLfloat fov = 45.0f;
 
+	GLfloat cameraMoveFactor = 0.3f;
 
 }
 
@@ -453,8 +454,8 @@ namespace
 
 					std::cout << offsetX << " " << offsetY << std::endl;
 
-					yaw += offsetX * 180 / 700;
-					pitch -= offsetY * 180 / 500;
+					yaw += offsetX * 180 / 700 * cameraMoveFactor;
+					pitch -= offsetY * 180 / 500 * cameraMoveFactor;
 
 					pitch = pitch > 89.0f ? 89.0f : pitch;
 					pitch = pitch < -89.0f ? -89.0f : pitch;
