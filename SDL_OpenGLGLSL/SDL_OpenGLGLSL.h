@@ -6,7 +6,13 @@
 #include <iostream>
 
 #include "CShader.h"
+#include "CTimer.h"
 
-void BasicShaderProgram();
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
 
-void ProcessInput();
+namespace BasicShaderProgram
+{
+	void BasicShaderProgram();
+}
+//void ProcessInput();

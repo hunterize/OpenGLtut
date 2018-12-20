@@ -167,16 +167,19 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CInputManager.h" />
     <ClInclude Include="CShader.h" />
+    <ClInclude Include="CTimer.h" />
     <ClInclude Include="SDL_OpenGLGLSL.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BasicShaderProgram.cpp" />
+    <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
+    <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="SDL_OpenGLGLSL.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
     <None Include="Shaders\BasicFragmentShader.frag" />
     <None Include="Shaders\BasicVertexShader.vert" />
   </ItemGroup>

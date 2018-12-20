@@ -49,15 +49,29 @@ void CShader::AttachShader(const char* vertexShaderFilePath, const char* fragmen
 
 }
 
-GLint CShader::GetUniformLocation(const std::string& uniformName)
+void CShader::SetUniformInt(const std::string& name, int value) const
 {
-	GLint location = glGetUniformLocation(m_iProgramID, uniformName.c_str());
-	if (location == GL_INVALID_INDEX)
-	{
-		std::cout << "Get Uniform Location Failed" << std::endl;
-	}
-
-	return location;
+	glUniform1i(glGetUniformLocation(m_iProgramID, name.c_str()), value);
+}
+void CShader::SetUniformFloat(const std::string& name, float value) const
+{
+	glUniform1f(glGetUniformLocation(m_iProgramID, name.c_str()), value);
+}
+void CShader::SetUniformVec2(const std::string& name, glm::vec2& value) const
+{
+	glUniform2fv(glGetUniformLocation(m_iProgramID, name.c_str()), 1, &value[0]);
+}
+void CShader::SetUniformVec3(const std::string& name, glm::vec3& value) const
+{
+	glUniform3fv(glGetUniformLocation(m_iProgramID, name.c_str()), 1, &value[0]);
+}
+void CShader::SetUniformVec4(const std::string& name, glm::vec4& value) const
+{
+	glUniform4fv(glGetUniformLocation(m_iProgramID, name.c_str()), 1, &value[0]);
+}
+void CShader::SetUniformMat4(const std::string& name, glm::mat4& value) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_iProgramID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
 
 void CShader::Use()

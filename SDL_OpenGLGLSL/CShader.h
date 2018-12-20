@@ -7,6 +7,8 @@
 #include <sstream>
 #include <iostream>
 
+#include <glm.hpp>
+
 enum class SHADERTYPE
 {
 	PROGRAM,
@@ -32,7 +34,13 @@ public:
 	~CShader();
 
 	void AttachShader(const char* vertexShaderFilePath, const char* fragmentShaderPath);
-	GLint GetUniformLocation(const std::string& uniformName);
+
+	void SetUniformInt(const std::string& name, int value) const;
+	void SetUniformFloat(const std::string& name, float value) const;
+	void SetUniformVec2(const std::string& name, glm::vec2& value) const;
+	void SetUniformVec3(const std::string& name, glm::vec3& value) const;
+	void SetUniformVec4(const std::string& name, glm::vec4& value) const;
+	void SetUniformMat4(const std::string& name, glm::mat4& value) const;
 
 	void Use();
 	void Unuse();

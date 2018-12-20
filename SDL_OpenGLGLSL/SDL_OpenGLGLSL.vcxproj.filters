@@ -20,6 +20,12 @@
     <ClInclude Include="CShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CInputManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDL_OpenGLGLSL.cpp">
@@ -31,6 +37,12 @@
     <ClCompile Include="BasicShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CInputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BasicFragmentShader.frag">
@@ -39,6 +51,5 @@
     <None Include="Shaders\BasicVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
