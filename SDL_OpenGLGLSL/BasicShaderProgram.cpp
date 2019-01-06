@@ -8,11 +8,14 @@ namespace BasicShaderProgram
 	int screenWidth = 800;
 	int screenHeight = 600;
 
+	CInputManager inputManager;
 
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 50.0f);
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	GLfloat fov = 45.0f;
+
+	bool isFirstMove = true;
 
 	void BasicShaderProgram()
 	{
@@ -25,6 +28,14 @@ namespace BasicShaderProgram
 
 		//initialize shader instance
 		CShader shader;
+
+		//initialize timer
+		CTimer timer(60);
+
+		//initialize camera
+		CCamera3D camera(screenWidth, screenHeight,
+			glm::vec3(0.0f, 0.0f, 50.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f));
 
 		window = SDL_CreateWindow("Basic GLSL Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
@@ -132,16 +143,18 @@ namespace BasicShaderProgram
 
 		//end of set vertex
 
-		CTimer timer(60);
-
 		while (isRunning)
 		{
 			timer.Start();
 
-			unsigned int timespan = timer.GetTimeSpan();
-			//std::cout <<"time span: "<< timespan << std::endl;
+			float timespan = (float)timer.GetTimeSpan() / 1000;
+			std::cout <<"time span: "<< timespan << std::endl;
 
 			ProcessInput();
+
+			//update camera
+			camera.Update(inputManager,timespan);
+
 
 			//use shader
 			shader.Use();
@@ -153,7 +166,8 @@ namespace BasicShaderProgram
 
 			//create view matrix
 			glm::mat4 view;
-			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+			//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+			view = camera.GetCameraMatrix();
 			shader.SetUniformMat4("view", view);
 
 
@@ -201,6 +215,8 @@ namespace BasicShaderProgram
 
 		SDL_Event event;
 
+		inputManager.Update();
+
 		while (SDL_PollEvent(&event))
 		{
 			switch (event.type)
@@ -208,18 +224,47 @@ namespace BasicShaderProgram
 			case SDL_QUIT:
 				isRunning = false;
 				break;
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym)
+
+			case SDL_WINDOWEVENT:
+				switch (event.window.event)
 				{
-				case SDLK_ESCAPE:
-					isRunning = false;
+				case SDL_WINDOWEVENT_SHOWN:
+					SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+					break;
+				case SDL_WINDOWEVENT_LEAVE:
+					isFirstMove = true;
+					break;
+				default:
 					break;
 				}
+
+				break;
+			case SDL_KEYDOWN:
+				inputManager.PressKey(event.key.keysym.sym);
 				break;
 
-			default:
+			case SDL_KEYUP:
+				inputManager.Releasekey(event.key.keysym.sym);
+				break;
+
+			case SDL_MOUSEMOTION:
+				if (isFirstMove)
+				{
+					SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+					isFirstMove = false;
+				}
+				else
+				{
+					inputManager.SetMouseCoord(event.motion.x, event.motion.y);
+				}
+				SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
 				break;
 			}
+		}
+
+		if (inputManager.IskeyPressed(SDLK_ESCAPE))
+		{
+			isRunning = false;
 		}
 	}
 

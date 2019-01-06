@@ -167,6 +167,7 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CCamera3D.h" />
     <ClInclude Include="CInputManager.h" />
     <ClInclude Include="CShader.h" />
     <ClInclude Include="CTimer.h" />
@@ -174,6 +175,7 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BasicShaderProgram.cpp" />
+    <ClCompile Include="CCamera3D.cpp" />
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CTimer.cpp" />

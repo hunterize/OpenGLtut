@@ -26,6 +26,9 @@
     <ClInclude Include="CTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CCamera3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SDL_OpenGLGLSL.cpp">
@@ -41,6 +44,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCamera3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

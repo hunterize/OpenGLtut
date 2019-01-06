@@ -2,7 +2,7 @@
 
 
 
-CInputManager::CInputManager()
+CInputManager::CInputManager() : m_cMouseCoord(-1.0f)
 {
 }
 
@@ -11,6 +11,16 @@ CInputManager::~CInputManager()
 {
 }
 
+glm::vec2 CInputManager::GetMouseCoord() const 
+{
+	return m_cMouseCoord;
+}
+
+void CInputManager::SetMouseCoord(float x, float y)
+{
+	m_cMouseCoord.x = x;
+	m_cMouseCoord.y = y;
+}
 
 void CInputManager::Update()
 {
@@ -30,18 +40,18 @@ void CInputManager::Releasekey(unsigned int key)
 }
 
 //key's current status, like press and hold
-bool CInputManager::IsKeyDown(unsigned int key)
+bool CInputManager::IsKeyDown(unsigned int key) const
 {
 	return CheckKeyState(key, m_cKeyMap);
 }
 
 //key is pressed for the first time
-bool CInputManager::IskeyPressed(unsigned int key)
+bool CInputManager::IskeyPressed(unsigned int key) const 
 {
 	return CheckKeyState(key, m_cKeyMap) && !CheckKeyState(key, m_cPreviousKeyMap);
 }
 
-bool CInputManager::CheckKeyState(unsigned int key, std::unordered_map<unsigned int, bool>& map)
+bool CInputManager::CheckKeyState(unsigned int key, const std::unordered_map<unsigned int, bool>& map) const
 {
 	auto it = map.find(key);
 	if (it != map.end())
