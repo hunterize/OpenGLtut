@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <iostream>
 
 class CTimer
 {
@@ -13,6 +14,8 @@ public:
 	//return fps
 	float End();
 
+	bool IsReadyForDraw();
+
 	unsigned int GetTimeSpan();
 
 private:
@@ -24,6 +27,7 @@ private:
 	unsigned int m_iFrameTick;
 
 	unsigned int m_iStartTicks;
+	unsigned int m_iCurrentTicks;
 
 };
 

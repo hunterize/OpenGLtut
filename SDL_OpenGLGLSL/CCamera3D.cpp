@@ -11,7 +11,7 @@ CCamera3D::CCamera3D(
 	m_cFront = front;
 	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	m_fSpeed = 30.0f;
-	m_fSensitivity = 0.075f;
+	m_fSensitivity = 30.0f;
 
 	m_cWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	m_fPitch = 0.0f;
@@ -58,8 +58,8 @@ void CCamera3D::Update(const CInputManager& input, float timeSpan)
 		float offsetX = input.GetMouseCoord().x - m_fScreenWidth / 2;
 		float offsetY = input.GetMouseCoord().y - m_fScreenHeight / 2;
 	
-		m_fYaw += offsetX * m_fSensitivity;
-		m_fPitch -= offsetY * m_fSensitivity;
+		m_fYaw += offsetX * m_fSensitivity * timeSpan / 2.0f;
+		m_fPitch -= offsetY * m_fSensitivity * timeSpan / 2.0f;
 
 		m_fPitch = m_fPitch > 89.0f ? 89.0 : m_fPitch;
 		m_fPitch = m_fPitch < -89.0f ? -89.0f : m_fPitch;

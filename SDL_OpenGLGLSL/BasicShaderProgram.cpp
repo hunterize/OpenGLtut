@@ -7,13 +7,9 @@ namespace BasicShaderProgram
 	bool isRunning = true;
 	int screenWidth = 800;
 	int screenHeight = 600;
+	float fov = 45.0f;
 
 	CInputManager inputManager;
-
-	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 50.0f);
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	GLfloat fov = 45.0f;
 
 	bool isFirstMove = true;
 
@@ -30,7 +26,7 @@ namespace BasicShaderProgram
 		CShader shader;
 
 		//initialize timer
-		CTimer timer(60);
+		//CTimer timer(60);
 
 		//initialize camera
 		CCamera3D camera(screenWidth, screenHeight,
@@ -143,68 +139,108 @@ namespace BasicShaderProgram
 
 		//end of set vertex
 
+		Uint32 previousTick = SDL_GetTicks();
+		float frameTime = 1.0 / 60.0;
+		double updateTimer = 1.0;
+
+		Uint32 fps = 0;
+		double fpsTimeCounter = 0.0;
+
 		while (isRunning)
 		{
-			timer.Start();
+			bool shouldRender = false;
+			//timer.Start();
 
-			float timespan = (float)timer.GetTimeSpan() / 1000;
-			std::cout <<"time span: "<< timespan << std::endl;
+			//float timespan = (float)timer.GetTimeSpan() / 1000;
+			//std::cout <<"time span: "<< timespan << std::endl;
 
-			ProcessInput();
+			Uint32 currentTick = SDL_GetTicks();
+			Uint32 timespan = currentTick - previousTick;
 
-			//update camera
-			camera.Update(inputManager,timespan);
+			//std::cout << timespan << std::endl;
+			previousTick = currentTick;
+			updateTimer += (double)timespan / 1000.0f;
+			fpsTimeCounter += (double)timespan / 1000.0f;
 
-
-			//use shader
-			shader.Use();
-
-			//create projection matrix
-			glm::mat4 projection;
-			projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 1.0f, 1000.0f);
-			shader.SetUniformMat4("projection", projection);
-
-			//create view matrix
-			glm::mat4 view;
-			//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-			view = camera.GetCameraMatrix();
-			shader.SetUniformMat4("view", view);
-
-
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			glBindVertexArray(vao);
-
-			//draw 
-
-			for (int i = 0; i < sizeof(obj_pos) / sizeof(glm::vec3); i++)
+			if (fpsTimeCounter >= 1.0f)
 			{
-				//create mode matrix, model = TRS
-				glm::mat4 model;
-				model = glm::translate(model, obj_pos[i]);
-				model = glm::rotate(model, i * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
-				model = glm::scale(model, glm::vec3(6, 6, 6));
-
-				shader.SetUniformMat4("model", model);
-
-				//draw the cube
-				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+				std::cout << fps << std::endl;
+				fpsTimeCounter = 0.0f;
+				fps = 0;
 			}
 
 
-			
-			glBindVertexArray(0);
+			ProcessInput();
 
-			//unuse shader
-			shader.Unuse();
+			while (updateTimer >= frameTime)
+			{
+				//update camera
+				camera.Update(inputManager, frameTime);
+				updateTimer -= frameTime;
+				shouldRender = true;
+			}
 
-			//SDL_Delay(100);
 
-			float fps = timer.End();
+			if (shouldRender)
+			{
 
-			//std::cout << fps << std::endl;
+				//use shader
+				shader.Use();
 
-			SDL_GL_SwapWindow(window);
+				//create projection matrix
+				glm::mat4 projection;
+				projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 1.0f, 1000.0f);
+				shader.SetUniformMat4("projection", projection);
+
+				//create view matrix
+				glm::mat4 view;
+				//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+				view = camera.GetCameraMatrix();
+				shader.SetUniformMat4("view", view);
+
+
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				glBindVertexArray(vao);
+
+				//draw 
+
+				for (int i = 0; i < sizeof(obj_pos) / sizeof(glm::vec3); i++)
+				{
+					//create mode matrix, model = TRS
+					glm::mat4 model;
+					model = glm::translate(model, obj_pos[i]);
+					model = glm::rotate(model, i * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+					model = glm::scale(model, glm::vec3(6, 6, 6));
+
+					shader.SetUniformMat4("model", model);
+
+					//draw the cube
+					glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+				}
+
+				glBindVertexArray(0);
+
+				//unuse shader
+				shader.Unuse();
+
+				//if (timespan < 16)
+				//{
+				//	SDL_Delay(16 - timespan);
+				//}
+				//float fps = timer.End();
+
+				//std::cout << fps << std::endl;
+				SDL_GL_SwapWindow(window);
+				fps++;
+
+			}
+			else
+			{
+				//SDL_Delay(1);
+			}
+
+
 		}
 
 		SDL_GL_DeleteContext(context);
@@ -256,8 +292,8 @@ namespace BasicShaderProgram
 				else
 				{
 					inputManager.SetMouseCoord(event.motion.x, event.motion.y);
+					SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
 				}
-				SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
 				break;
 			}
 		}

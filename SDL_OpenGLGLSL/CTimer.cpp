@@ -3,14 +3,16 @@
 CTimer::CTimer():
 	m_fFPS(0.0f),
 	m_fTargetFPS(0.0f),
-	m_iFrameTick(0)
+	m_iFrameTick(0),
+	m_iCurrentTicks(0)
 {
 }
 
 CTimer::CTimer(float fps):
 	m_fFPS(0.0f),
 	m_fTargetFPS(fps),
-	m_iFrameTick(0)
+	m_iFrameTick(0),
+	m_iCurrentTicks(0)
 {
 
 }
@@ -30,18 +32,20 @@ float CTimer::End()
 {
 	unsigned int ticks = SDL_GetTicks() - m_iStartTicks;
 	m_iFrameTick = ticks;
-	
-	AverageFPS();
+	m_iCurrentTicks += ticks;
 
 	if (m_fTargetFPS != 0.0f)
 	{
 		if (1000.0f / m_fTargetFPS > m_iFrameTick)
 		{
-			SDL_Delay(m_fTargetFPS - m_iFrameTick);
+			//SDL_Delay(m_fTargetFPS - m_iFrameTick);
 			m_fFPS = m_fTargetFPS;
-			m_iFrameTick = 1000.0f / m_fTargetFPS;
+			return m_fFPS;
+			// m_iFrameTick = 1000.0f / m_fTargetFPS;
 		}
 	}
+	
+	AverageFPS();
 
 	return m_fFPS;
 }
@@ -49,6 +53,25 @@ float CTimer::End()
 unsigned int CTimer::GetTimeSpan()
 {
 	return m_iFrameTick;
+}
+
+bool CTimer::IsReadyForDraw()
+{	
+	if (m_fTargetFPS != 0)
+	{
+		if (1000 / m_fTargetFPS > m_iCurrentTicks)
+		{
+			//SDL_Delay(m_fTargetFPS - m_iFrameTick);
+			return false;
+		}
+		else
+		{
+			m_iCurrentTicks = 0;
+			return true;
+		}
+	}
+
+	return true;
 }
 
 void CTimer::AverageFPS()
