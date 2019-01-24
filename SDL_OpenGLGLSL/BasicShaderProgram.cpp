@@ -46,8 +46,6 @@ namespace BasicShaderProgram
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		glEnable(GL_DEPTH_TEST);
 
-
-
 		//load vertex shader and fragment shader
 		shader.AttachShader("Shaders/BasicVertexShader.vert", "Shaders/BasicFragmentShader.frag");
 
@@ -139,107 +137,93 @@ namespace BasicShaderProgram
 
 		//end of set vertex
 
-		Uint32 previousTick = SDL_GetTicks();
-		float frameTime = 1.0 / 60.0;
-		double updateTimer = 1.0;
 
-		Uint32 fps = 0;
-		double fpsTimeCounter = 0.0;
+		Uint32 previous = SDL_GetTicks();
+		Uint32 lag = 0;
+		Uint32 MS_PER_FRAME = 8;
 
 		while (isRunning)
 		{
-			bool shouldRender = false;
 			//timer.Start();
+			Uint32 current = SDL_GetTicks();
 
-			//float timespan = (float)timer.GetTimeSpan() / 1000;
-			//std::cout <<"time span: "<< timespan << std::endl;
+			Uint32 elapsed = current - previous;
+			previous = current;
+			lag += elapsed;
 
-			Uint32 currentTick = SDL_GetTicks();
-			Uint32 timespan = currentTick - previousTick;
+			float timespan = (float)MS_PER_FRAME / 1000;
 
-			//std::cout << timespan << std::endl;
-			previousTick = currentTick;
-			updateTimer += (double)timespan / 1000.0f;
-			fpsTimeCounter += (double)timespan / 1000.0f;
-
-			if (fpsTimeCounter >= 1.0f)
-			{
-				std::cout << fps << std::endl;
-				fpsTimeCounter = 0.0f;
-				fps = 0;
-			}
-
-
+			//update input
 			ProcessInput();
 
-			while (updateTimer >= frameTime)
+			while (lag >= MS_PER_FRAME)
 			{
+				//update game
 				//update camera
-				camera.Update(inputManager, frameTime);
-				updateTimer -= frameTime;
-				shouldRender = true;
+				camera.Update(inputManager, timespan);
+				lag -= MS_PER_FRAME;
 			}
 
+			//synchronize the update and render
+			Uint32 step = lag % MS_PER_FRAME;
+			camera.Update(inputManager, (float)step / 1000);
 
-			if (shouldRender)
+			//render
+			//use shader
+			shader.Use();
+
+			//create projection matrix
+			glm::mat4 projection;
+			projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 1.0f, 1000.0f);
+			shader.SetUniformMat4("projection", projection);
+
+			//create view matrix
+			glm::mat4 view;
+			//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+			view = camera.GetCameraMatrix();
+			shader.SetUniformMat4("view", view);
+
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			glBindVertexArray(vao);
+
+			//draw 
+
+			for (int i = 0; i < sizeof(obj_pos) / sizeof(glm::vec3); i++)
 			{
+				//create mode matrix, model = TRS
+				glm::mat4 model;
+				model = glm::translate(model, obj_pos[i]);
+				model = glm::rotate(model, i * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+				model = glm::scale(model, glm::vec3(6, 6, 6));
 
-				//use shader
-				shader.Use();
+				shader.SetUniformMat4("model", model);
 
-				//create projection matrix
-				glm::mat4 projection;
-				projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 1.0f, 1000.0f);
-				shader.SetUniformMat4("projection", projection);
-
-				//create view matrix
-				glm::mat4 view;
-				//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-				view = camera.GetCameraMatrix();
-				shader.SetUniformMat4("view", view);
-
-
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-				glBindVertexArray(vao);
-
-				//draw 
-
-				for (int i = 0; i < sizeof(obj_pos) / sizeof(glm::vec3); i++)
-				{
-					//create mode matrix, model = TRS
-					glm::mat4 model;
-					model = glm::translate(model, obj_pos[i]);
-					model = glm::rotate(model, i * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
-					model = glm::scale(model, glm::vec3(6, 6, 6));
-
-					shader.SetUniformMat4("model", model);
-
-					//draw the cube
-					glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-				}
-
-				glBindVertexArray(0);
-
-				//unuse shader
-				shader.Unuse();
-
-				//if (timespan < 16)
-				//{
-				//	SDL_Delay(16 - timespan);
-				//}
-				//float fps = timer.End();
-
-				//std::cout << fps << std::endl;
-				SDL_GL_SwapWindow(window);
-				fps++;
-
+				//draw the cube
+				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			}
-			else
+
+			glBindVertexArray(0);
+
+			//unuse shader
+			shader.Unuse();
+			
+
+			//float fps = timer.End();
+
+			//std::cout << fps << std::endl;
+			SDL_GL_SwapWindow(window);
+
+			//limit FPS to 60
+			Uint32 last = SDL_GetTicks();
+			Uint32 span = last - current;
+
+			if (elapsed < 16)
 			{
-				//SDL_Delay(1);
+				SDL_Delay(16 - elapsed);
 			}
-
+			//std::cout << "elapsed tick: " << elapsed << " frame tick: " << span << std::endl;
 
 		}
 

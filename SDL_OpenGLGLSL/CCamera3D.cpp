@@ -10,8 +10,8 @@ CCamera3D::CCamera3D(
 	m_cPosition = position;
 	m_cFront = front;
 	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	m_fSpeed = 30.0f;
-	m_fSensitivity = 30.0f;
+	m_fSpeed = 10.0f;
+	m_fSensitivity = 8.0f;
 
 	m_cWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	m_fPitch = 0.0f;
