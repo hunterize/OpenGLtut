@@ -49,9 +49,20 @@ int main(int args, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	glEnable(GL_DEPTH_TEST);
 
+	//
+	// these shaders are for lighting calculating in world space
+	//
 	//load vertex shader and fragment shader
-	cubeShader.AttachShader("Shaders/BasicVertexShader.vert", "Shaders/BasicFragmentShader.frag");
+	//cubeShader.AttachShader("Shaders/BasicVertexShader.vert", "Shaders/BasicFragmentShader.frag");
+	//lightShader.AttachShader("Shaders/LightVertexShader.vert", "Shaders/LightFragmentShader.frag");
+
+	//
+	// these shaders are for lighting calculating in view space
+	//
+	//load vertex shader and fragment shader
+	cubeShader.AttachShader("Shaders/ObjectVertexShader.vert", "Shaders/ObjectFragmentShader.frag");
 	lightShader.AttachShader("Shaders/LightVertexShader.vert", "Shaders/LightFragmentShader.frag");
+
 
 	//initialize vertices for cube
 	GLuint vbo = 0;
@@ -213,14 +224,18 @@ int main(int args, char** argv)
 		//set object color and light color
 		glm::vec3 objColor(0.5f, 0.0f, 0.5f);
 		glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-		glm::vec3 eyePos = camera.GetPosition();
+
+		//eyePos is only for the lighting calculation in world space
+		//glm::vec3 eyePos = camera.GetPosition();
+		
 		float ambientStrength = 0.2;
 		float specularStrength = 1.0;
 		cubeShader.SetUniformVec3("fragmentColor", objColor);
 		cubeShader.SetUniformVec3("lightColor", lightColor);
 		cubeShader.SetUniformFloat("ambientStrength", ambientStrength);
 		cubeShader.SetUniformVec3("lightPos", lightPos);
-		cubeShader.SetUniformVec3("eysPos", eyePos);
+		//sysPos is for lighting calculation in world space
+		//cubeShader.SetUniformVec3("eysPos", eyePos);
 		cubeShader.SetUniformFloat("specularStrength", specularStrength);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

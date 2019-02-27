@@ -117,6 +117,11 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
       <AdditionalDependencies>sdl2.lib;sdl2main.lib;sdl2test.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
+xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
+xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,6 +156,8 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     <None Include="Shaders\BasicVertexShader.vert" />
     <None Include="Shaders\LightFragmentShader.frag" />
     <None Include="Shaders\LightVertexShader.vert" />
+    <None Include="Shaders\ObjectFragmentShader.frag" />
+    <None Include="Shaders\ObjectVertexShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

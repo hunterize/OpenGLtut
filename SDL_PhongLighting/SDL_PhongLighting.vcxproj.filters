@@ -64,5 +64,11 @@
     <None Include="Shaders\LightVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\ObjectFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ObjectVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
