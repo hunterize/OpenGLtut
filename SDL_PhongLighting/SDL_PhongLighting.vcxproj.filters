@@ -33,6 +33,12 @@
     <ClCompile Include="PhongLighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BasicLighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Materials.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -68,6 +74,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\ObjectVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\MaterialsVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\MaterialsFragmentShader.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -12,3 +12,13 @@
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+
+namespace BasicLighting
+{
+	void GLSLBasicLighting();
+}
+
+namespace Materials
+{
+	void GLSLMaterials();
+}

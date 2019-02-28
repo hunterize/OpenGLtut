@@ -138,10 +138,12 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BasicLighting.cpp" />
     <ClCompile Include="CCamera3D.cpp" />
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="Materials.cpp" />
     <ClCompile Include="PhongLighting.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +158,8 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     <None Include="Shaders\BasicVertexShader.vert" />
     <None Include="Shaders\LightFragmentShader.frag" />
     <None Include="Shaders\LightVertexShader.vert" />
+    <None Include="Shaders\MaterialsFragmentShader.frag" />
+    <None Include="Shaders\MaterialsVertexShader.vert" />
     <None Include="Shaders\ObjectFragmentShader.frag" />
     <None Include="Shaders\ObjectVertexShader.vert" />
   </ItemGroup>
