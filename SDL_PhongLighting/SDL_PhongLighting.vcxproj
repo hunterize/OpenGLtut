@@ -91,7 +91,8 @@
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
-xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
+xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
+xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -120,7 +121,8 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
-xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
+xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
+xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -170,6 +172,11 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     <None Include="Shaders\ObjectVertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="crate emission.png" />
+    <Image Include="Crate Specular.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </Image>
     <Image Include="crate.png">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>

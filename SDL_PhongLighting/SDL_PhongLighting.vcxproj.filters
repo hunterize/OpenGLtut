@@ -105,5 +105,11 @@
     <Image Include="crate.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Crate Specular.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="crate emission.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -61,7 +61,11 @@ namespace LightingMaps
 
 		//initialize textures
 		GLTexture cubeTexture;
+		GLTexture cubeSpecular;
+		GLTexture cubeEmission;
 		cubeTexture = CSTexture::LoadImage("crate.png");		
+		cubeSpecular = CSTexture::LoadImage("Crate Specular.png");
+		cubeEmission = CSTexture::LoadImage("crate emission.png");
 
 		//initialize vertices for cube
 		GLuint vbo = 0;
@@ -73,7 +77,7 @@ namespace LightingMaps
 
 		//the rectangle 
 		GLfloat vertices[] = {
-			//Pos                 //normal 
+			//Pos                 //normal              //texture coordinates
 			//front side
 			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 0.0f,	//bottom left
 			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 1.0f,	//top left
@@ -249,12 +253,16 @@ namespace LightingMaps
 
 			//set object texture
 			cubeShader.SetUniformInt("material.diffuse", 1);
+			cubeShader.SetUniformInt("material.specular", 2);
+			cubeShader.SetUniformInt("material.emission", 3);
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, cubeTexture.ID);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, cubeSpecular.ID);
+			glActiveTexture(GL_TEXTURE3);
+			glBindTexture(GL_TEXTURE_2D, cubeEmission.ID);
 
-			glm::vec3 objSpecular(0.5f, 0.5f, 0.5f);
 			float specularStrength = 32.0f;
-			cubeShader.SetUniformVec3("material.specular", objSpecular);
 			cubeShader.SetUniformFloat("material.shininess", specularStrength);
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -268,7 +276,7 @@ namespace LightingMaps
 				//create mode matrix, model = TRS
 				glm::mat4 model;
 				model = glm::translate(model, obj_pos[i]);
-				model = glm::rotate(model, SDL_GetTicks() / 1000.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+				model = glm::rotate(model, 0.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 				model = glm::scale(model, glm::vec3(15, 15, 15));
 
 				cubeShader.SetUniformMat4("model", model);
