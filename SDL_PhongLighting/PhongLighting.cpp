@@ -7,7 +7,9 @@ int main(int args, char** argv)
 {
 	//BasicLighting::GLSLBasicLighting();
 
-	Materials::GLSLMaterials();
+	//Materials::GLSLMaterials();
+
+	LightingMaps::GLSLLightingMaps();
 
 	return 1;
 }

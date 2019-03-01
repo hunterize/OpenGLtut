@@ -9,6 +9,7 @@
 #include "CTimer.h"
 #include "CInputManager.h"
 #include "CCamera3D.h"
+#include "CSTexture.h"
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -21,4 +22,9 @@ namespace BasicLighting
 namespace Materials
 {
 	void GLSLMaterials();
+}
+
+namespace LightingMaps
+{
+	void GLSLLightingMaps();
 }

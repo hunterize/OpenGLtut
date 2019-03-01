@@ -142,7 +142,9 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     <ClCompile Include="CCamera3D.cpp" />
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
+    <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="LightingMaps.cpp" />
     <ClCompile Include="Materials.cpp" />
     <ClCompile Include="PhongLighting.cpp" />
   </ItemGroup>
@@ -150,18 +152,28 @@ xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"</Command>
     <ClInclude Include="CCamera3D.h" />
     <ClInclude Include="CInputManager.h" />
     <ClInclude Include="CShader.h" />
+    <ClInclude Include="CSTexture.h" />
     <ClInclude Include="CTimer.h" />
     <ClInclude Include="PhongLighting.h" />
+    <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BasicFragmentShader.frag" />
     <None Include="Shaders\BasicVertexShader.vert" />
     <None Include="Shaders\LightFragmentShader.frag" />
+    <None Include="Shaders\LightingMapsFragmentShader.frag" />
+    <None Include="Shaders\LightingMapsVertexShader.vert" />
     <None Include="Shaders\LightVertexShader.vert" />
     <None Include="Shaders\MaterialsFragmentShader.frag" />
     <None Include="Shaders\MaterialsVertexShader.vert" />
     <None Include="Shaders\ObjectFragmentShader.frag" />
     <None Include="Shaders\ObjectVertexShader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="crate.png">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+    </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
