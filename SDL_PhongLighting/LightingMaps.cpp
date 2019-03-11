@@ -239,12 +239,12 @@ namespace LightingMaps
 
 			//set light color
 			glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-			float lightAmbientStrength = 0.1f;
+			float lightAmbientStrength = 0.2f;
 			float lightDisffuseStrength = 0.75f;
 			float lightSpecularStrength = 1.0f;
 			glm::vec3 lightAmbient = lightAmbientStrength * lightColor;
 			glm::vec3 lightDiffuse = lightDisffuseStrength * lightColor;
-			glm::vec3 lightSpecular(1.0f, 1.0f, 1.0f);
+			glm::vec3 lightSpecular = lightSpecularStrength * lightColor;
 
 			cubeShader.SetUniformVec3("light.position", lightPos);
 			cubeShader.SetUniformVec3("light.ambient", lightAmbient);

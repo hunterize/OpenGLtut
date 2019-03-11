@@ -28,3 +28,8 @@ namespace LightingMaps
 {
 	void GLSLLightingMaps();
 }
+
+namespace LightingCasters
+{
+	void GLSLLightingCasters();
+}

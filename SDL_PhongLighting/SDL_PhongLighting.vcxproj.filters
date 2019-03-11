@@ -45,6 +45,9 @@
     <ClCompile Include="CSTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightingCasters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -98,6 +101,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\LightingMapsVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightingCastersFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightingCastersVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -146,6 +146,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="LightingCasters.cpp" />
     <ClCompile Include="LightingMaps.cpp" />
     <ClCompile Include="Materials.cpp" />
     <ClCompile Include="PhongLighting.cpp" />
@@ -163,6 +164,8 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <None Include="Shaders\BasicFragmentShader.frag" />
     <None Include="Shaders\BasicVertexShader.vert" />
     <None Include="Shaders\LightFragmentShader.frag" />
+    <None Include="Shaders\LightingCastersFragmentShader.frag" />
+    <None Include="Shaders\LightingCastersVertexShader.vert" />
     <None Include="Shaders\LightingMapsFragmentShader.frag" />
     <None Include="Shaders\LightingMapsVertexShader.vert" />
     <None Include="Shaders\LightVertexShader.vert" />

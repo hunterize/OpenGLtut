@@ -9,7 +9,9 @@ int main(int args, char** argv)
 
 	//Materials::GLSLMaterials();
 
-	LightingMaps::GLSLLightingMaps();
+	//LightingMaps::GLSLLightingMaps();
+
+	LightingCasters::GLSLLightingCasters();
 
 	return 1;
 }

@@ -21,6 +21,7 @@ public:
 	void SetSpeed(float speed) { m_fSpeed = speed; }
 	void SetSensitivity(float se) { m_fSensitivity = se; }
 	glm::vec3 GetPosition() const { return m_cPosition; } 
+	glm::vec3 GetFront() const { return m_cFront; }
 
 private:
 	void UpdateCameraVector();
