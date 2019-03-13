@@ -11,7 +11,9 @@ int main(int args, char** argv)
 
 	//LightingMaps::GLSLLightingMaps();
 
-	LightingCasters::GLSLLightingCasters();
+	//LightingCasters::GLSLLightingCasters();
+
+	MultipleLighting::GLSLMultipleLighting();
 
 	return 1;
 }

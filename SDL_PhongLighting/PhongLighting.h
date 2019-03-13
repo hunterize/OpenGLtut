@@ -33,3 +33,8 @@ namespace LightingCasters
 {
 	void GLSLLightingCasters();
 }
+
+namespace MultipleLighting
+{
+	void GLSLMultipleLighting();
+}

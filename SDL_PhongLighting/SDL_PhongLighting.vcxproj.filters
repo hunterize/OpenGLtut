@@ -48,6 +48,9 @@
     <ClCompile Include="LightingCasters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MultipleLighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -107,6 +110,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\LightingCastersVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightingMultipleFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightingMultipleVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

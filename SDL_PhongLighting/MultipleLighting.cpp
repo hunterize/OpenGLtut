@@ -2,7 +2,7 @@
 
 #include "PhongLighting.h"
 
-namespace LightingCasters
+namespace MultipleLighting
 {
 	void ProcessInput();
 
@@ -15,7 +15,7 @@ namespace LightingCasters
 
 	bool isFirstMove = true;
 
-	void GLSLLightingCasters()
+	void GLSLMultipleLighting()
 	{
 		//initial SDL
 		SDL_Window* window = nullptr;
@@ -36,7 +36,7 @@ namespace LightingCasters
 			glm::vec3(0.0f, 0.0f, 50.0f),
 			glm::vec3(0.0f, 0.0f, -1.0f));
 
-		window = SDL_CreateWindow("Phong Lighting Window - Lighting Casters", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("Phong Lighting Window - Multiple Lights", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
 
 		SDL_ShowCursor(0);
@@ -55,7 +55,7 @@ namespace LightingCasters
 		// these shaders are for lighting calculating in world space
 		//
 		//load vertex shader and fragment shader
-		cubeShader.AttachShader("Shaders/LightingCastersVertexShader.vert", "Shaders/LightingCastersFragmentShader.frag");
+		cubeShader.AttachShader("Shaders/LightingMultipleVertexShader.vert", "Shaders/LightingMultipleFragmentShader.frag");
 		lightShader.AttachShader("Shaders/LightVertexShader.vert", "Shaders/LightFragmentShader.frag");
 
 
@@ -136,8 +136,17 @@ namespace LightingCasters
 		};
 
 		//light position
-		glm::vec3 lightPos = glm::vec3(20.0, 0.0, 0.0);
+		glm::vec3 lightPos[] = {
+			glm::vec3(20.0f, 0.0f, 0.0f),
+			glm::vec3(18.0f, 18.0f, 18.0f),
+			glm::vec3(-18.0f, -18.0f, 18.0f)
+		};
 
+		glm::vec3 lightCol[] = {
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f)
+		};
 
 		//set vao for cube
 		glGenBuffers(1, &vbo);
@@ -215,10 +224,20 @@ namespace LightingCasters
 				//update camera
 				camera.Update(inputManager, timespan);
 
-				//update light position
+				//update point lights position
 				glm::mat4 lightRotation;
-				lightRotation = glm::rotate(lightRotation, timespan * 0.6f, glm::vec3(0.0f, 1.0f, 0.0f));
-				lightPos = glm::vec3(lightRotation * glm::vec4(lightPos, 1.0f));
+
+				//first point light
+				glm::mat4 rot1 = glm::rotate(lightRotation, timespan * 0.6f, glm::vec3(0.0f, 1.0f, 0.0f));
+				lightPos[0] = glm::vec3(rot1 * glm::vec4(lightPos[0], 1.0f));
+
+				//second point light
+				glm::mat4 rot2 = glm::rotate(lightRotation, timespan * 0.3f, glm::vec3(-1.0f, 0.0f, 1.0f));
+				lightPos[1] = glm::vec3(rot2 * glm::vec4(lightPos[1], 1.0f));
+
+				//third point light
+				glm::mat4 rot3 = glm::rotate(lightRotation, timespan * 0.8f, glm::vec3(1.0f, 0.0f, 1.0f));
+				lightPos[2] = glm::vec3(rot3 * glm::vec4(lightPos[2], 1.0f));
 
 				lag -= MS_PER_FRAME;
 			}
@@ -244,36 +263,82 @@ namespace LightingCasters
 
 			//eyePos is only for the lighting calculation in world space
 			glm::vec3 eyePos = camera.GetPosition();
-			cubeShader.SetUniformVec3("eysPos", eyePos);
+			cubeShader.SetUniformVec3("eyePos", eyePos);
 
 			//set light color
-			glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-			float lightAmbientStrength = 0.2f;
-			float lightDisffuseStrength = 0.75f;
-			float lightSpecularStrength = 1.0f;
-			glm::vec3 lightAmbient = lightAmbientStrength * lightColor;
-			glm::vec3 lightDiffuse = lightDisffuseStrength * lightColor;
-			glm::vec3 lightSpecular = lightSpecularStrength * lightColor;
+			glm::vec3 directLightColor(1.0f, 1.0f, 1.0f);
+			//glm::vec3 pointLightColor(1.0f, 1.0f, 1.0f);
+			glm::vec3 spotLightColor(0.1f, 0.1f, 0.1f);
 
-			//for attenuation point light
-			//cubeShader.SetUniformVec3("light.position", lightPos);
-			cubeShader.SetUniformVec3("light.position", camera.GetPosition());
-			cubeShader.SetUniformVec3("light.ambient", lightAmbient);
-			cubeShader.SetUniformVec3("light.diffuse", lightDiffuse);
-			cubeShader.SetUniformVec3("light.specular", lightSpecular);
+			float lightAmbientStrength = 0.1f;
+			float lightDiffuseStrength = 0.75f;
+			float lightSpecularStrength = 1.0f;
+
+			glm::vec3 dirLightAmbient = 0.1f * lightAmbientStrength * directLightColor;
+			glm::vec3 dirLightDiffuse = 0.2f * lightDiffuseStrength * directLightColor;
+			glm::vec3 dirLightSpecular = 0.2f * lightSpecularStrength * directLightColor;
+
+			glm::vec3 pointLightAmbient0 = lightAmbientStrength * lightCol[0];
+			glm::vec3 pointLighDiffuse0 = lightDiffuseStrength * lightCol[0];
+			glm::vec3 pointLightSpecular0 = lightSpecularStrength * lightCol[0];
+
+			glm::vec3 pointLightAmbient1 = lightAmbientStrength * lightCol[1];
+			glm::vec3 pointLighDiffuse1 = lightDiffuseStrength * lightCol[1];
+			glm::vec3 pointLightSpecular1 = lightSpecularStrength * lightCol[1];
+
+			glm::vec3 pointLightAmbient2 = lightAmbientStrength * lightCol[2];
+			glm::vec3 pointLighDiffuse2 = lightDiffuseStrength * lightCol[2];
+			glm::vec3 pointLightSpecular2 = lightSpecularStrength * lightCol[2];
+
+			glm::vec3 spotLightAmbient = lightAmbientStrength * spotLightColor;
+			glm::vec3 spotLighDiffuse = lightDiffuseStrength * spotLightColor;
+			glm::vec3 spotLightSpecular = lightSpecularStrength * spotLightColor;
+
+			//for point lights
+				//light 1
+			cubeShader.SetUniformVec3("pointLight[0].position", lightPos[0]);
+			cubeShader.SetUniformVec3("pointLight[0].ambient", pointLightAmbient0);
+			cubeShader.SetUniformVec3("pointLight[0].diffuse", pointLighDiffuse0);
+			cubeShader.SetUniformVec3("pointLight[0].specular", pointLightSpecular0);
+			cubeShader.SetUniformFloat("pointLight[0].constant", 1.0f);
+			cubeShader.SetUniformFloat("pointLight[0].linear", 0.022f);
+			cubeShader.SetUniformFloat("pointLight[0].quadratic", 0.0017f);
+				//light 2
+			cubeShader.SetUniformVec3("pointLight[1].position", lightPos[1]);
+			cubeShader.SetUniformVec3("pointLight[1].ambient", pointLightAmbient1);
+			cubeShader.SetUniformVec3("pointLight[1].diffuse", pointLighDiffuse1);
+			cubeShader.SetUniformVec3("pointLight[1].specular", pointLightSpecular1);
+			cubeShader.SetUniformFloat("pointLight[1].constant", 1.0f);
+			cubeShader.SetUniformFloat("pointLight[1].linear", 0.022f);
+			cubeShader.SetUniformFloat("pointLight[1].quadratic", 0.0017f);
+				//light 3
+			cubeShader.SetUniformVec3("pointLight[2].position", lightPos[2]);
+			cubeShader.SetUniformVec3("pointLight[2].ambient", pointLightAmbient2);
+			cubeShader.SetUniformVec3("pointLight[2].diffuse", pointLighDiffuse2);
+			cubeShader.SetUniformVec3("pointLight[2].specular", pointLightSpecular2);
+			cubeShader.SetUniformFloat("pointLight[2].constant", 1.0f);
+			cubeShader.SetUniformFloat("pointLight[2].linear", 0.022f);
+			cubeShader.SetUniformFloat("pointLight[2].quadratic", 0.0017f);
 
 			//for directional light
-			//cubeShader.SetUniformVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+			cubeShader.SetUniformVec3("dirLight.ambient", dirLightAmbient);
+			cubeShader.SetUniformVec3("dirLight.diffuse", dirLightDiffuse);
+			cubeShader.SetUniformVec3("dirLight.specular", dirLightSpecular);
+			cubeShader.SetUniformVec3("dirLight.direction", glm::vec3(0.0f, -1.0f, 0.0f));
+
 			
-			//for flash light
-			cubeShader.SetUniformVec3("light.direction", camera.GetFront());
-
-			cubeShader.SetUniformFloat("light.constant", 1.0f);
-			cubeShader.SetUniformFloat("light.linear", 0.022f);
-			cubeShader.SetUniformFloat("light.quadratic", 0.0017f);
-			cubeShader.SetUniformFloat("light.cutoff", glm::cos(glm::radians(12.5f)));
-			cubeShader.SetUniformFloat("light.outercutoff", glm::cos(glm::radians(17.5f)));
-
+			//for spot light
+			cubeShader.SetUniformVec3("spotLight.direction", camera.GetFront());
+			cubeShader.SetUniformVec3("spotLight.position", eyePos);
+			cubeShader.SetUniformVec3("spotLight.ambient", spotLightAmbient);
+			cubeShader.SetUniformVec3("spotLight.diffuse", spotLighDiffuse);
+			cubeShader.SetUniformVec3("spotLight.specular", spotLightSpecular);
+			cubeShader.SetUniformFloat("spotLight.constant", 1.0f);
+			cubeShader.SetUniformFloat("spotLight.linear", 0.022f);
+			cubeShader.SetUniformFloat("spotLight.quadratic", 0.0017f);
+			cubeShader.SetUniformFloat("spotLight.innercutoff", glm::cos(glm::radians(12.5f)));
+			cubeShader.SetUniformFloat("spotLight.outercutoff", glm::cos(glm::radians(17.5f)));
+			
 
 			//set object texture
 			cubeShader.SetUniformInt("material.diffuse", 1);
@@ -313,7 +378,7 @@ namespace LightingCasters
 			cubeShader.Unuse();
 			//end of rendering cubes
 
-			/*
+			
 			//render light
 			lightShader.Use();
 
@@ -321,18 +386,22 @@ namespace LightingCasters
 			lightShader.SetUniformMat4("projection", projection);
 			lightShader.SetUniformMat4("view", view);
 
-			glm::mat4 lightModel;
-			lightModel = glm::translate(lightModel, lightPos);
-			lightModel = glm::scale(lightModel, glm::vec3(2, 2, 2));
-			lightShader.SetUniformMat4("model", lightModel);
-			lightShader.SetUniformVec3("lightColor", lightColor);
+			for (int i = 0; i < sizeof(lightPos) / sizeof(glm::vec3); i++)
+			{
+				glm::mat4 lightModel;
+				lightModel = glm::translate(lightModel, lightPos[i]);
+				lightModel = glm::scale(lightModel, glm::vec3(2, 2, 2));
+				lightShader.SetUniformMat4("model", lightModel);
+				lightShader.SetUniformVec3("lightColor", lightCol[i]);
 
-			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+			}
+
 			glBindVertexArray(0);
 			lightShader.Unuse();
 
 			//end of rendering light
-			*/
+			
 
 			//float fps = timer.End();
 
