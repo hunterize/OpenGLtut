@@ -47,8 +47,8 @@ namespace DepthTesting
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		
 		glEnable(GL_DEPTH_TEST);
-		//glDepthFunc(GL_LESS);
-		glDepthFunc(GL_ALWAYS);
+		glDepthFunc(GL_LESS);
+		//glDepthFunc(GL_ALWAYS);
 
 
 		//load vertex shader and fragment shader
@@ -127,7 +127,7 @@ namespace DepthTesting
 		//object positions
 		glm::vec3 obj_pos = glm::vec3(0.0, 0.0, 0.0);
 		
-		glm::vec3 floor_pos = glm::vec3(0.0f, -5.0f, 0.0f);
+		glm::vec3 floor_pos = glm::vec3(0.0f, -5.1f, 0.0f);
 
 		//set vao for cube
 		glGenBuffers(1, &vbo);
@@ -222,7 +222,7 @@ namespace DepthTesting
 
 			//create projection matrix
 			glm::mat4 projection;
-			projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 1.0f, 1000.0f);
+			projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 1.0f, 100.0f);
 			cubeShader.SetUniformMat4("projection", projection);
 
 			//create view matrix
