@@ -147,6 +147,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="DepthTesting.cpp" />
+    <ClCompile Include="StencilTesting.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdvancedOpenGL.h" />
@@ -160,6 +161,9 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
   <ItemGroup>
     <None Include="Shaders\DepthTestingFragmentShader.frag" />
     <None Include="Shaders\DepthTestingVertexShader.vert" />
+    <None Include="Shaders\StencilTestingFragmentShader.frag" />
+    <None Include="Shaders\StencilTestingOutlineFragmentShader.frag" />
+    <None Include="Shaders\StencilTestingVertexShader.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="crate.png" />

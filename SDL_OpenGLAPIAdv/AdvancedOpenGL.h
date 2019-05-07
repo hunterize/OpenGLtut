@@ -21,3 +21,9 @@ namespace DepthTesting
 	void DepthTesting();
 }
 
+
+namespace StencilTesting
+{
+	void StencilTesting();
+}
+

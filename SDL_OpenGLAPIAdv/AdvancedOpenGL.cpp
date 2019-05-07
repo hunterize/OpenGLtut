@@ -3,7 +3,9 @@
 
 int main(int args, char** argv)
 {
-	DepthTesting::DepthTesting();
+	//DepthTesting::DepthTesting();
+	StencilTesting::StencilTesting();
+
 
 	return 1;
 }

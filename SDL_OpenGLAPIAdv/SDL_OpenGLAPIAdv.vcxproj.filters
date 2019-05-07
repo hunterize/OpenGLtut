@@ -39,6 +39,9 @@
     <ClCompile Include="DepthTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StencilTesting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -68,6 +71,15 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\DepthTestingVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\StencilTestingFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\StencilTestingVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\StencilTestingOutlineFragmentShader.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
