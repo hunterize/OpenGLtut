@@ -4,8 +4,9 @@
 int main(int args, char** argv)
 {
 	//DepthTesting::DepthTesting();
-	StencilTesting::StencilTesting();
+	//StencilTesting::StencilTesting();
 
+	StencilReflection::StencilReflection();
 
 	return 1;
 }

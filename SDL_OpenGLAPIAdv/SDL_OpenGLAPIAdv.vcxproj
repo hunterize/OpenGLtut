@@ -147,6 +147,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="DepthTesting.cpp" />
+    <ClCompile Include="StencilReflection.cpp" />
     <ClCompile Include="StencilTesting.cpp" />
   </ItemGroup>
   <ItemGroup>

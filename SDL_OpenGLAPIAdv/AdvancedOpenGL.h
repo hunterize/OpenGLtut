@@ -27,3 +27,8 @@ namespace StencilTesting
 	void StencilTesting();
 }
 
+namespace StencilReflection
+{
+	void StencilReflection();
+}
+
