@@ -141,6 +141,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdvancedOpenGL.cpp" />
+    <ClCompile Include="BlendFuncTesting.cpp" />
     <ClCompile Include="Blending.cpp" />
     <ClCompile Include="CCamera3D.cpp" />
     <ClCompile Include="CInputManager.cpp" />
@@ -174,6 +175,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <Image Include="grass.png" />
     <Image Include="marble.jpg" />
     <Image Include="metal.png" />
+    <Image Include="window.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

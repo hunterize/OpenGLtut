@@ -48,6 +48,9 @@
     <ClCompile Include="Blending.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BlendFuncTesting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -106,6 +109,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="grass.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="window.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -14,6 +14,8 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
+#include <map>
+
 
 
 namespace DepthTesting
@@ -35,5 +37,10 @@ namespace StencilReflection
 namespace Blending
 {
 	void Blending();
+}
+
+namespace BlendFunc
+{
+	void BlendFunc();
 }
 
