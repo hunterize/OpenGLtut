@@ -32,3 +32,8 @@ namespace StencilReflection
 	void StencilReflection();
 }
 
+namespace Blending
+{
+	void Blending();
+}
+

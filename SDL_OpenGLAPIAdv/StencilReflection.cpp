@@ -134,8 +134,8 @@ namespace StencilReflection
 
 		//object positions
 		glm::vec3 obj_pos[] = {
-			glm::vec3(0.0, 0.0, 0.0),
-			glm::vec3(15.0, 0.0, 15.0)
+			glm::vec3(0.0, 1.0, 0.0),
+			glm::vec3(15.0, 1.0, 15.0)
 		};
 
 		glm::vec3 floor_pos = glm::vec3(0.0f, -5.1f, 0.0f);
