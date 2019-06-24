@@ -125,9 +125,9 @@ namespace StencilReflection
 		GLfloat floorVertices[] = {
 			//position           //normal           //uv
 			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  //bottom left
-			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  //top left
+			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f,  //top left
 			0.5f, 0.0f, 0.5f,    0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  //bottom right
-			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  //top left
+			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f,  //top left
 			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
 			0.5f, 0.0f, 0.5f,    0.0f, 1.0f, 0.0f,  1.0f, 0.0f   //bottom right
 		};
@@ -294,6 +294,12 @@ namespace StencilReflection
 			//glStencilMask(0x00);
 			glDepthMask(GL_TRUE);
 
+			//enable blending
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+
+			
+
 			//get floor normal vector
 			glm::vec3 floorNormal = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -320,6 +326,8 @@ namespace StencilReflection
 			//end of rendering reflections
 
 			glDisable(GL_STENCIL_TEST);
+
+			glDisable(GL_BLEND);
 			//end of rendering floor and reflection
 			
 			cubeShader.Unuse();
