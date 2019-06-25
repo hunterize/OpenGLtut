@@ -7,8 +7,8 @@ int main(int args, char** argv)
 	//StencilTesting::StencilTesting();
 	//StencilReflection::StencilReflection();
 	//Blending::Blending();
-	BlendFunc::BlendFunc();
-
+	//BlendFunc::BlendFunc();
+	FaceCulling::FaceCulling();
 
 	return 1;
 }

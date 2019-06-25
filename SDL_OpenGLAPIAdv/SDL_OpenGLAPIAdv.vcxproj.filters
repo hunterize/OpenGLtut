@@ -51,6 +51,9 @@
     <ClCompile Include="BlendFuncTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FaceCulling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -95,6 +98,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\BlendingTestingVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FaceCullingFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FaceCullingVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

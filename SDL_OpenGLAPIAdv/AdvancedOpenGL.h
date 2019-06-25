@@ -44,3 +44,8 @@ namespace BlendFunc
 	void BlendFunc();
 }
 
+namespace FaceCulling
+{
+	void FaceCulling();
+}
+
