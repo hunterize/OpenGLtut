@@ -54,6 +54,9 @@
     <ClCompile Include="FaceCulling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferTesting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -104,6 +107,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\FaceCullingVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferScreenFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferScreenVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -150,6 +150,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="DepthTesting.cpp" />
     <ClCompile Include="FaceCulling.cpp" />
+    <ClCompile Include="FrameBufferTesting.cpp" />
     <ClCompile Include="StencilReflection.cpp" />
     <ClCompile Include="StencilTesting.cpp" />
   </ItemGroup>
@@ -169,6 +170,10 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <None Include="Shaders\DepthTestingVertexShader.vert" />
     <None Include="Shaders\FaceCullingFragmentShader.frag" />
     <None Include="Shaders\FaceCullingVertexShader.vert" />
+    <None Include="Shaders\FrameBufferFragmentShader.frag" />
+    <None Include="Shaders\FrameBufferScreenFragmentShader.frag" />
+    <None Include="Shaders\FrameBufferScreenVertexShader.vert" />
+    <None Include="Shaders\FrameBufferVertexShader.vert" />
     <None Include="Shaders\StencilTestingFragmentShader.frag" />
     <None Include="Shaders\StencilTestingOutlineFragmentShader.frag" />
     <None Include="Shaders\StencilTestingVertexShader.vert" />

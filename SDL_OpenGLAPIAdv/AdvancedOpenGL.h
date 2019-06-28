@@ -49,3 +49,8 @@ namespace FaceCulling
 	void FaceCulling();
 }
 
+namespace FrameBuffer
+{
+	void FrameBuffer();
+}
+

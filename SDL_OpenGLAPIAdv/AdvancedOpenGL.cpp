@@ -8,7 +8,9 @@ int main(int args, char** argv)
 	//StencilReflection::StencilReflection();
 	//Blending::Blending();
 	//BlendFunc::BlendFunc();
-	FaceCulling::FaceCulling();
+	//FaceCulling::FaceCulling();
+	FrameBuffer::FrameBuffer();
+
 
 	return 1;
 }
