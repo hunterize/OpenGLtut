@@ -6,8 +6,8 @@ namespace FrameBuffer
 	void ProcessInput();
 
 	bool isRunning = true;
-	int screenWidth = 800;
-	int screenHeight = 600;
+	int screenWidth = 1920;
+	int screenHeight = 1080;
 	float fov = 45.0f;
 
 	CInputManager inputManager;
@@ -38,6 +38,8 @@ namespace FrameBuffer
 		context = SDL_GL_CreateContext(window);
 
 		SDL_ShowCursor(0);
+
+		//glViewport(screenWidth / 2 - screenWidth / (1.2 * 2), screenHeight / 2 - screenHeight / (1.2 * 2), screenWidth / 1.2, screenHeight / 1.2);
 
 		GLenum error = glewInit();
 		if (error != GLEW_OK)
@@ -219,7 +221,6 @@ namespace FrameBuffer
 		//end of setting vertex for screen
 
 		///set frame buffers
-
 		//create frame buffer object
 		glGenFramebuffers(1, &screenFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
@@ -230,6 +231,8 @@ namespace FrameBuffer
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTextureBuffer, 0);
 
 		//create render buffer attachment for depth and stencil 
@@ -244,7 +247,6 @@ namespace FrameBuffer
 			std::cout << "Frame buffer is not complete!" << std::endl;
 			exit(0);
 		}
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		///end of setting frame buffers
 
@@ -302,6 +304,7 @@ namespace FrameBuffer
 			glm::mat4 view;
 			view = camera.GetCameraMatrix();
 
+			//cube and floor are using same shader
 			cubeShader.Use();
 			cubeShader.SetUniformMat4("projection", projection);
 			cubeShader.SetUniformMat4("view", view);
