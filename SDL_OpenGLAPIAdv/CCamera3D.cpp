@@ -34,6 +34,11 @@ glm::mat4 CCamera3D::GetCameraMatrix()
 	return glm::lookAt(m_cPosition, m_cPosition + m_cFront, m_cUp);
 }
 
+glm::mat4 CCamera3D::GetReverseCameraMatrix()
+{
+	return glm::lookAt(m_cPosition, m_cPosition - m_cFront, m_cUp);
+}
+
 void CCamera3D::Update(const CInputManager& input, float timeSpan)
 {
 	if (input.IsKeyDown(SDLK_w))

@@ -3,23 +3,23 @@
 in vec2 texCoord;
 out vec4 color;
 
-uniform sampler2D screenSample;
+uniform sampler2D mirrorSample;
 
 void normal()
 {
-	vec4 texColor = texture(screenSample, texCoord);
+	vec4 texColor = texture(mirrorSample, texCoord);
 	color = texColor;
 }
 
 void inverse()
 {
-	vec4 texColor = vec4(vec3(1.0 - texture(screenSample, texCoord)), 1.0);
+	vec4 texColor = vec4(vec3(1.0 - texture(mirrorSample, texCoord)), 1.0);
 	color = texColor;
 }
 
 void grayscale()
 {
-	vec4 texColor = texture(screenSample, texCoord);
+	vec4 texColor = texture(mirrorSample, texCoord);
 	//float av = (texColor.r + texColor.g + texColor.b) / 3.0;
 	float av = texColor.r * 0.2126 + texColor.g * 0.7152 + texColor.b * 0.0722;
 	color = vec4(av, av, av, 1.0);
@@ -27,7 +27,7 @@ void grayscale()
 
 //kernel effect
 
-const float offset = 1.0 / 600.0;
+const float offset = 1.0 / 300.0;
 
 vec2 offsets[9] = vec2[](
 	vec2(-offset, offset),
@@ -54,7 +54,7 @@ void sharpen()
 
 	for(int i=0; i<9; i++)
 	{
-		sampleTex[i] = vec3(texture(screenSample, texCoord.st + offsets[i]));
+		sampleTex[i] = vec3(texture(mirrorSample, texCoord.st + offsets[i]));
 	}
 
 	vec3 col = vec3(0.0);
@@ -80,7 +80,7 @@ void blur()
 
 	for(int i=0; i<9; i++)
 	{
-		sampleTex[i] = vec3(texture(screenSample, texCoord.st + offsets[i]));
+		sampleTex[i] = vec3(texture(mirrorSample, texCoord.st + offsets[i]));
 	}
 
 	vec3 col = vec3(0.0);
@@ -105,7 +105,7 @@ void edge()
 
 	for(int i=0; i<9; i++)
 	{
-		sampleTex[i] = vec3(texture(screenSample, texCoord.st + offsets[i]));
+		sampleTex[i] = vec3(texture(mirrorSample, texCoord.st + offsets[i]));
 	}
 
 	vec3 col = vec3(0.0);

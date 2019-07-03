@@ -15,6 +15,7 @@ public:
 	~CCamera3D();
 
 	glm::mat4 GetCameraMatrix();
+	glm::mat4 GetReverseCameraMatrix();
 
 	void Update(const CInputManager& input, float timeSpan);
 

@@ -55,3 +55,8 @@ namespace FrameBuffer
 }
 
 
+namespace FrameBufferMirror
+{
+	void FrameBufferMirror();
+}
+

@@ -57,6 +57,9 @@
     <ClCompile Include="FrameBufferTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBufferMirror.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -119,6 +122,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\FrameBufferScreenVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferMirrorFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FrameBufferMirrorVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

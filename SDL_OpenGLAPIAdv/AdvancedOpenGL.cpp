@@ -9,8 +9,8 @@ int main(int args, char** argv)
 	//Blending::Blending();
 	//BlendFunc::BlendFunc();
 	//FaceCulling::FaceCulling();
-	FrameBuffer::FrameBuffer();
-
+	//FrameBuffer::FrameBuffer();
+	FrameBufferMirror::FrameBufferMirror();
 
 	return 1;
 }
