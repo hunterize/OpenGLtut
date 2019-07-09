@@ -9,14 +9,31 @@ out vec4 color;
 uniform samplerCube sky;
 uniform vec3 cameraPos;
 
-void main()
+void reflection()
 {
 	vec3 lookat = normalize(position - cameraPos);
 	vec3 reflection = reflect(lookat, normalize(normal));
 
-	vec4 texColor = texture(sky, reflection);
+	vec4 texColor = texture(sky, reflection);	
+	color = vec4(texColor.rgb, 1.0);
+
+}
+
+void refraction()
+{
+	float ratio = 1.0/1.52;
+	vec3 lookat = normalize(position - cameraPos);
+	vec3 refract = refract(lookat, normalize(normal), ratio);
+
+	vec4 texColor = texture(sky, refract);
 	
 	color = vec4(texColor.rgb, 1.0);
 
+}
+
+void main()
+{
+	reflection();
+	//refraction();
 }
 
