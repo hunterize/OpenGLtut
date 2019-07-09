@@ -10,7 +10,9 @@ int main(int args, char** argv)
 	//BlendFunc::BlendFunc();
 	//FaceCulling::FaceCulling();
 	//FrameBuffer::FrameBuffer();
-	FrameBufferMirror::FrameBufferMirror();
+	//FrameBufferMirror::FrameBufferMirror();
+	
+	CubeMaps::CubeMaps();
 
 	return 1;
 }

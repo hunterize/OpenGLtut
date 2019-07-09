@@ -60,3 +60,8 @@ namespace FrameBufferMirror
 	void FrameBufferMirror();
 }
 
+namespace CubeMaps
+{
+	void CubeMaps();
+}
+

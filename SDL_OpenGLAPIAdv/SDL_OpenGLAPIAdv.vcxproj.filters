@@ -60,6 +60,9 @@
     <ClCompile Include="FrameBufferMirror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMaps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -130,6 +133,18 @@
     <None Include="Shaders\FrameBufferMirrorVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\CubeMapsObjectFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CubeMapsObjectVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CubeMapsSkyFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CubeMapsSkyVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="crate.png">
@@ -145,6 +160,24 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="window.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\back.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\bottom.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\front.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\left.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\right.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="skybox\top.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

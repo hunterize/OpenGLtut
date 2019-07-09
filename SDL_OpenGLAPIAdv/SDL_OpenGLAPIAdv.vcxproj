@@ -114,7 +114,8 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
-xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
+xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
+xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -148,6 +149,7 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="CTimer.cpp" />
+    <ClCompile Include="CubeMaps.cpp" />
     <ClCompile Include="DepthTesting.cpp" />
     <ClCompile Include="FaceCulling.cpp" />
     <ClCompile Include="FrameBufferMirror.cpp" />
@@ -167,6 +169,10 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
   <ItemGroup>
     <None Include="Shaders\BlendingTestingFragmentShader.frag" />
     <None Include="Shaders\BlendingTestingVertexShader.vert" />
+    <None Include="Shaders\CubeMapsObjectFragmentShader.frag" />
+    <None Include="Shaders\CubeMapsObjectVertexShader.vert" />
+    <None Include="Shaders\CubeMapsSkyFragmentShader.frag" />
+    <None Include="Shaders\CubeMapsSkyVertexShader.vert" />
     <None Include="Shaders\DepthTestingFragmentShader.frag" />
     <None Include="Shaders\DepthTestingVertexShader.vert" />
     <None Include="Shaders\FaceCullingFragmentShader.frag" />
@@ -186,6 +192,12 @@ xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
     <Image Include="grass.png" />
     <Image Include="marble.jpg" />
     <Image Include="metal.png" />
+    <Image Include="skybox\back.jpg" />
+    <Image Include="skybox\bottom.jpg" />
+    <Image Include="skybox\front.jpg" />
+    <Image Include="skybox\left.jpg" />
+    <Image Include="skybox\right.jpg" />
+    <Image Include="skybox\top.jpg" />
     <Image Include="window.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
