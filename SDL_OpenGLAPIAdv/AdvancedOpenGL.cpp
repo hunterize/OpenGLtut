@@ -12,7 +12,8 @@ int main(int args, char** argv)
 	//FrameBuffer::FrameBuffer();
 	//FrameBufferMirror::FrameBufferMirror();
 	
-	CubeMaps::CubeMaps();
+	//CubeMaps::CubeMaps();
+	CubeMapsReflection::CubeMapsReflection();
 
 	return 1;
 }

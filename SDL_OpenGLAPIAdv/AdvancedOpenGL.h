@@ -65,3 +65,8 @@ namespace CubeMaps
 	void CubeMaps();
 }
 
+namespace CubeMapsReflection
+{
+	void CubeMapsReflection();
+}
+

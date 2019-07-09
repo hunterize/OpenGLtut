@@ -96,7 +96,8 @@
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
-xcopy /y "$(ProjectDir)*.png" "$(Outdir)"</Command>
+xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
+xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -150,6 +151,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="CTimer.cpp" />
     <ClCompile Include="CubeMaps.cpp" />
+    <ClCompile Include="CubeMapsReflection.cpp" />
     <ClCompile Include="DepthTesting.cpp" />
     <ClCompile Include="FaceCulling.cpp" />
     <ClCompile Include="FrameBufferMirror.cpp" />
@@ -171,6 +173,8 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <None Include="Shaders\BlendingTestingVertexShader.vert" />
     <None Include="Shaders\CubeMapsObjectFragmentShader.frag" />
     <None Include="Shaders\CubeMapsObjectVertexShader.vert" />
+    <None Include="Shaders\CubeMapsReflectionFragmentShader.frag" />
+    <None Include="Shaders\CubeMapsReflectionVertexShader.vert" />
     <None Include="Shaders\CubeMapsSkyFragmentShader.frag" />
     <None Include="Shaders\CubeMapsSkyVertexShader.vert" />
     <None Include="Shaders\DepthTestingFragmentShader.frag" />

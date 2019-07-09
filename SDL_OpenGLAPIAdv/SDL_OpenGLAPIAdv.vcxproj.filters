@@ -63,6 +63,9 @@
     <ClCompile Include="CubeMaps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CubeMapsReflection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -143,6 +146,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\CubeMapsSkyVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CubeMapsReflectionFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CubeMapsReflectionVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
