@@ -6,7 +6,7 @@ in vec3 position;
 
 out vec4 color;
 
-uniform samplerCube sky;
+uniform samplerCube env;
 uniform vec3 cameraPos;
 
 void reflection()
@@ -14,7 +14,7 @@ void reflection()
 	vec3 lookat = normalize(position - cameraPos);
 	vec3 reflection = reflect(lookat, normalize(normal));
 
-	vec4 texColor = texture(sky, reflection);	
+	vec4 texColor = texture(env, reflection);	
 	color = vec4(texColor.rgb, 1.0);
 
 }
@@ -25,7 +25,7 @@ void refraction()
 	vec3 lookat = normalize(position - cameraPos);
 	vec3 refract = refract(lookat, normalize(normal), ratio);
 
-	vec4 texColor = texture(sky, refract);
+	vec4 texColor = texture(env, refract);
 	
 	color = vec4(texColor.rgb, 1.0);
 

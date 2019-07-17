@@ -55,16 +55,6 @@ namespace CubeMapsReflection
 		GLTexture floorTexture;
 		GLTexture skyTexture;
 
-		std::vector<std::string> faces = {
-			"skybox/right.jpg",
-			"skybox/left.jpg",
-			"skybox/top.jpg",
-			"skybox/bottom.jpg",
-			"skybox/back.jpg",
-			"skybox/front.jpg"
-		};
-		//skyTexture.ID = CSTexture::LoadCubeMaps(faces);
-
 		cubeTexture = CSTexture::LoadImage("crate.png");
 		floorTexture = CSTexture::LoadImage("metal.png");
 		skyTexture.ID = CSTexture::LoadCubeMaps("skybox/front.jpg",
@@ -79,9 +69,6 @@ namespace CubeMapsReflection
 		GLuint vbo = 0;
 		GLuint vao = 0;
 		GLuint ebo = 0;
-
-		GLuint floorVBO = 0;
-		GLuint floorVAO = 0;
 
 		GLuint skyVBO = 0;
 		GLuint skyVAO = 0;
@@ -129,16 +116,6 @@ namespace CubeMapsReflection
 			12, 13, 14, 14, 15, 12,
 			16, 17, 18, 18, 19, 16,
 			20, 21, 22, 22, 23, 20
-		};
-
-		GLfloat floorVertices[] = {
-			//position           //normal           //uv
-			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  //bottom left
-			0.5f, 0.0f, 0.5f,    0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  //bottom right
-			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
-			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
-			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,	0.0f, 1.0f,	//top left
-			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f  //bottom left
 		};
 
 		GLfloat skyVertices[] = {
@@ -200,8 +177,6 @@ namespace CubeMapsReflection
 		};
 
 
-		glm::vec3 floor_pos = glm::vec3(0.0f, -5.1f, 0.0f);
-
 		//set vao for cube
 		glGenBuffers(1, &vbo);
 		glGenBuffers(1, &ebo);
@@ -230,25 +205,6 @@ namespace CubeMapsReflection
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		//end of setting vertex for cube
-
-		//set vao for floor
-		glGenBuffers(1, &floorVBO);
-		glGenVertexArrays(1, &floorVAO);
-
-		glBindVertexArray(floorVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
-		//set atrributes in vertex shader
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		//end of setting vertex for floor
 
 		//set vao for sky box
 		glGenBuffers(1, &skyVBO);
@@ -316,23 +272,24 @@ namespace CubeMapsReflection
 
 			//draw sky box
 			glDisable(GL_DEPTH_TEST);
-
+			
 			skyShader.Use();
 			view = glm::mat4(glm::mat3(view));
 			skyShader.SetUniformMat4("view", view);
 			skyShader.SetUniformMat4("projection", projection);
-			skyShader.SetUniformInt("skybox", 0);
+			skyShader.SetUniformInt("skybox", 1);
 
 			glBindVertexArray(skyVAO);
-			glActiveTexture(GL_TEXTURE0);
+			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 
-			skyShader.Unuse();
-
+			skyShader.Unuse();			
 			//end of drawing sky box
+
 			glEnable(GL_DEPTH_TEST);
+			
 			///render cubes
 			//cube and floor are using same shader
 			cubeShader.Use();
@@ -342,8 +299,8 @@ namespace CubeMapsReflection
 
 			cubeShader.SetUniformVec3("cameraPos", camera.GetPosition());
 
-			//set object texture
-			cubeShader.SetUniformInt("sample", 1);
+			//set sky texture for cube object
+			cubeShader.SetUniformInt("env", 1);
 			glActiveTexture(GL_TEXTURE1);
 
 			//draw cubes
@@ -361,31 +318,16 @@ namespace CubeMapsReflection
 				model = glm::scale(model, glm::vec3(10, 10, 10));
 
 				cubeShader.SetUniformMat4("model", model);
-				cubeShader.SetUniformVec3("position", obj_pos[i]);
+				//cubeShader.SetUniformVec3("position", obj_pos[i]);
 
 				//draw the cube
-				glBindTexture(GL_TEXTURE_2D, cubeTexture.ID);
+				//glBindTexture(GL_TEXTURE_2D, cubeTexture.ID);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
 				glBindVertexArray(vao);
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 			}
 			///end of rendering cubes
-			/*
-			//draw floor
-			glDisable(GL_CULL_FACE);
-			glBindVertexArray(floorVAO);
-			glm::mat4 floorMode;
-			floorMode = glm::translate(floorMode, floor_pos);
-			floorMode = glm::scale(floorMode, glm::vec3(160, 160, 160));
-
-			cubeShader.SetUniformMat4("model", floorMode);
-			glBindTexture(GL_TEXTURE_2D, floorTexture.ID);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindVertexArray(0);
-			//end of drawing floor
-
-			*/
 
 			cubeShader.Unuse();
 			////end of rendering
