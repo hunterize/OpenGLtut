@@ -284,6 +284,7 @@ namespace CubeMapsReflection
 			glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 			skyShader.Unuse();			
 			//end of drawing sky box
@@ -291,23 +292,22 @@ namespace CubeMapsReflection
 			glEnable(GL_DEPTH_TEST);
 			
 			///render cubes
-			//cube and floor are using same shader
 			cubeShader.Use();
 			cubeShader.SetUniformMat4("projection", projection);
 			view = camera.GetCameraMatrix();
 			cubeShader.SetUniformMat4("view", view);
-
 			cubeShader.SetUniformVec3("cameraPos", camera.GetPosition());
-
-			//set sky texture for cube object
-			cubeShader.SetUniformInt("env", 1);
-			glActiveTexture(GL_TEXTURE1);
 
 			//draw cubes
 			//enable face culling before drawing cubes
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK); //by default
 			glFrontFace(GL_CCW); //by default
+
+			//set sky texture for cube object
+			cubeShader.SetUniformInt("env", 1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
 
 			for (int i = 0; i < sizeof(obj_pos) / sizeof(glm::vec3); i++)
 			{
@@ -318,15 +318,11 @@ namespace CubeMapsReflection
 				model = glm::scale(model, glm::vec3(10, 10, 10));
 
 				cubeShader.SetUniformMat4("model", model);
-				//cubeShader.SetUniformVec3("position", obj_pos[i]);
-
-				//draw the cube
-				//glBindTexture(GL_TEXTURE_2D, cubeTexture.ID);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
 				glBindVertexArray(vao);
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 			}
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			///end of rendering cubes
 
 			cubeShader.Unuse();
