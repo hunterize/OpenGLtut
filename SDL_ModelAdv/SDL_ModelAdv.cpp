@@ -44,7 +44,8 @@ void AdvancedModel()
 	soldierShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag");
 
 	//initialize soldier model
-	CModel soldierModel("GameResource/nanosuit/nanosuit.obj");
+	//CModel soldierModel("GameResource/nanosuit/nanosuit.obj");
+	CModel soldierModel("GameResource/nanosuit_reflection/nanosuit.obj");
 
 	//initialize textures
 	GLTexture skyTexture;
@@ -57,7 +58,7 @@ void AdvancedModel()
 		"GameResource/skybox/right.jpg");
 
 	//light position
-	glm::vec3 lightPos = glm::vec3(-100.0f, 100.0f, -100.0f);
+	glm::vec3 lightPos = glm::vec3(-100.0f, 100.0f, 100.0f);
 
 	//initialize camera
 	CCamera3D camera(screenWidth, screenHeight,
@@ -138,11 +139,8 @@ void AdvancedModel()
 
 	while (isRunning)
 	{
-		glClearColor(0.1, 0.1, 0.1, 1.0);
-		//glClearStencil(0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		//timer.Start();
 		Uint32 current = SDL_GetTicks();
 
 		Uint32 elapsed = current - previous;
@@ -190,13 +188,14 @@ void AdvancedModel()
 		view = glm::mat4(glm::mat3(view));
 		skyShader.SetUniformMat4("view", view);
 		skyShader.SetUniformMat4("projection", projection);
-		skyShader.SetUniformInt("skybox", 0);
+		skyShader.SetUniformInt("skybox", 9);
 
 		glBindVertexArray(skyVAO);
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE9);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 		skyShader.Unuse();
 
@@ -224,8 +223,13 @@ void AdvancedModel()
 		float shininess = 32.0;
 		soldierShader.SetUniformFloat("shininess", shininess);
 
+		soldierShader.SetUniformInt("env", 10);
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skyTexture.ID);
+
 		soldierModel.Render(soldierShader);
 
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		soldierShader.Unuse();
 
 		//end of rendering soldier

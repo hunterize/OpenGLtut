@@ -95,6 +95,7 @@ void CModel::ProcessMesh(aiMesh* pMesh, const aiScene* pScene)
 
 	//get materials
 	aiMaterial* material = pScene->mMaterials[pMesh->mMaterialIndex];
+	GetTextures(material, aiTextureType_AMBIENT, textures);
 	GetTextures(material, aiTextureType_DIFFUSE, textures);
 	GetTextures(material, aiTextureType_SPECULAR, textures);
 
@@ -132,6 +133,9 @@ void CModel::GetTextures(aiMaterial* pMaterial, aiTextureType type, std::vector<
 			texture.m_FileName = std::string(fileName.C_Str());
 			switch (type)
 			{
+			case aiTextureType_AMBIENT:
+				texture.m_Type = "texture_ambient";
+				break;
 			case aiTextureType_DIFFUSE:
 				texture.m_Type = "texture_diffuse";
 				break;
