@@ -74,6 +74,11 @@ void CShader::SetUniformMat4(const std::string& name, const glm::mat4& value) co
 	glUniformMatrix4fv(glGetUniformLocation(m_iProgramID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
 
+GLuint CShader::GetID()
+{
+	return m_iProgramID;
+}
+
 void CShader::Use()
 {
 	glUseProgram(m_iProgramID);

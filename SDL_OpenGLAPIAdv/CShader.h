@@ -42,6 +42,8 @@ public:
 	void SetUniformVec4(const std::string& name, const glm::vec4& value) const;
 	void SetUniformMat4(const std::string& name, const glm::mat4& value) const;
 
+	GLuint GetID();
+
 	void Use();
 	void Unuse();
 

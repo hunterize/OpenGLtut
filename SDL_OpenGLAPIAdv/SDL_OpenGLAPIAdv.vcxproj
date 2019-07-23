@@ -97,6 +97,7 @@
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
 xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
+xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"
 xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -116,6 +117,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
 xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
+xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"
 xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -142,6 +144,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AdvancedAPI.cpp" />
     <ClCompile Include="AdvancedOpenGL.cpp" />
     <ClCompile Include="BlendFuncTesting.cpp" />
     <ClCompile Include="Blending.cpp" />
@@ -169,6 +172,12 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\AdvAPIBlueFragmentShader.frag" />
+    <None Include="Shaders\AdvAPICrateVertexShader.vert" />
+    <None Include="Shaders\AdvAPIGreenFragmentShader.frag" />
+    <None Include="Shaders\AdvAPIObjectFragmentShader.frag" />
+    <None Include="Shaders\AdvAPIObjectVertexShader.vert" />
+    <None Include="Shaders\AdvAPIRedFragmentShader.frag" />
     <None Include="Shaders\BlendingTestingFragmentShader.frag" />
     <None Include="Shaders\BlendingTestingVertexShader.vert" />
     <None Include="Shaders\CubeMapsObjectFragmentShader.frag" />

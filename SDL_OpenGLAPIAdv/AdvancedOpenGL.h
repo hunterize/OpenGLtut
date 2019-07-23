@@ -13,6 +13,7 @@
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 
 #include <map>
 
@@ -68,5 +69,10 @@ namespace CubeMaps
 namespace CubeMapsReflection
 {
 	void CubeMapsReflection();
+}
+
+namespace AdvancedAPI
+{
+	void AdvancedAPI();
 }
 
