@@ -76,3 +76,7 @@ namespace AdvancedAPI
 	void AdvancedAPI();
 }
 
+namespace GeometryShader
+{
+	void GeometryShader();
+}

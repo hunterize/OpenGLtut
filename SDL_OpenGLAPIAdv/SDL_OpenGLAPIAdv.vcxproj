@@ -159,6 +159,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <ClCompile Include="FaceCulling.cpp" />
     <ClCompile Include="FrameBufferMirror.cpp" />
     <ClCompile Include="FrameBufferTesting.cpp" />
+    <ClCompile Include="GeometryShader.cpp" />
     <ClCompile Include="StencilReflection.cpp" />
     <ClCompile Include="StencilTesting.cpp" />
   </ItemGroup>
@@ -174,6 +175,9 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
   <ItemGroup>
     <None Include="Shaders\AdvAPIBlueFragmentShader.frag" />
     <None Include="Shaders\AdvAPICrateVertexShader.vert" />
+    <None Include="Shaders\AdvAPIGeometryFragmentShader.frag" />
+    <None Include="Shaders\AdvAPIGeometryShader.geom" />
+    <None Include="Shaders\AdvAPIGeometryVertexShader.vert" />
     <None Include="Shaders\AdvAPIGreenFragmentShader.frag" />
     <None Include="Shaders\AdvAPIObjectFragmentShader.frag" />
     <None Include="Shaders\AdvAPIObjectVertexShader.vert" />

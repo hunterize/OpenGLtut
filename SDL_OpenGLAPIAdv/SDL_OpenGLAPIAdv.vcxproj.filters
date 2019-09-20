@@ -69,6 +69,9 @@
     <ClCompile Include="AdvancedAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeometryShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -173,6 +176,15 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\AdvAPIRedFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AdvAPIGeometryFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AdvAPIGeometryShader.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AdvAPIGeometryVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

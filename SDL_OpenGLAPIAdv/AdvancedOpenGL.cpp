@@ -14,7 +14,8 @@ int main(int args, char** argv)
 	
 	//CubeMaps::CubeMaps();
 	//CubeMapsReflection::CubeMapsReflection();
-	AdvancedAPI::AdvancedAPI();
+	//AdvancedAPI::AdvancedAPI();
+	GeometryShader::GeometryShader();
 
 	return 1;
 }
