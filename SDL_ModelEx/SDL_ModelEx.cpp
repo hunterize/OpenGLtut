@@ -4,13 +4,14 @@
 void ProcessInput();
 
 bool isRunning = true;
-int screenWidth = 1920;
-int screenHeight = 1080;
+int screenWidth = 1600/*1920*/;
+int screenHeight = 900/*1080*/;
 float fov = 45.0f;
 
 CInputManager inputManager;
 
 bool isFirstMove = true;
+bool isDebug = false;
 
 void AdvancedModel()
 {
@@ -39,9 +40,11 @@ void AdvancedModel()
 	//initialize shader instance
 	CShader skyShader;
 	CShader soldierShader;
+	CShader furShader;
 	//load vertex shader and fragment shader
 	skyShader.AttachShader("Shaders/SkyVertexShader.vert", "Shaders/SkyFragmentShader.frag");
-	soldierShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag");
+	soldierShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag", "Shaders/ModelGeometryShader.geom");
+	furShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/FurFragmentShader.frag", "Shaders/FurGeometryShader.geom");
 
 	//initialize soldier model
 	//CModel soldierModel("GameResource/nanosuit/nanosuit.obj");
@@ -236,6 +239,8 @@ void AdvancedModel()
 			soldierShader.SetUniformInt("eff", 3);
 		if (inputManager.IskeyPressed(SDLK_4))
 			soldierShader.SetUniformInt("eff", 4);
+		if (inputManager.IskeyPressed(SDLK_0))
+			isDebug = !isDebug;
 
 		soldierShader.SetUniformInt("env", 10);
 		glActiveTexture(GL_TEXTURE10);
@@ -248,6 +253,17 @@ void AdvancedModel()
 
 		//end of rendering soldier
 
+		if(isDebug)
+		{
+			//render fur
+			furShader.Use();
+			furShader.SetUniformMat4("model", model);
+			furShader.SetUniformMat4("view", view);
+			furShader.SetUniformMat4("projection", projection);
+			soldierModel.Render(furShader);
+			furShader.Unuse();
+			//end of rendering fur
+		}
 		////end of rendering
 		
 

@@ -100,5 +100,17 @@
     <None Include="Shaders\SkyVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\ModelGeometryShader.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ModelFurShader.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FurFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\FurGeometryShader.geom">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
