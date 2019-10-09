@@ -24,6 +24,40 @@ CCamera3D::CCamera3D(
 	UpdateCameraVector();
 }
 
+CCamera3D::CCamera3D(
+	float screenWidth, float screenHeight,
+	bool isInit,
+	glm::vec3 position,
+	glm::vec3 front)
+{
+	m_cPosition = position;
+	m_cFront = front;
+	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_fSpeed = 8.0f;
+	m_fSensitivity = 2.0f;
+
+	m_cWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_fPitch = 0.0f;
+	m_fFov = 45.0f;
+	m_fScreenWidth = screenWidth;
+	m_fScreenHeight = screenHeight;
+	
+	if (isInit)
+	{
+		m_fYaw = -90.0f;
+		UpdateCameraVector();
+	}
+	else
+	{
+		m_cFront = glm::normalize(m_cFront);
+		float yaw = m_cFront.x == 0 ? 0.0f : glm::atan(m_cFront.z, m_cFront.x);
+		m_fYaw = (yaw + 3.14f) * 360.0f / (2 * 3.14f) - 180.0f;
+		float pitch = glm::atan(m_cFront.y, glm::sqrt(m_cFront.x * m_cFront.x + m_cFront.z * m_cFront.z));
+		m_fPitch = (pitch + 3.14f) * 360.0f / (2 * 3.14f) - 180.0f;
+		m_cRight = glm::normalize(glm::cross(m_cFront, m_cWorldUp));
+		m_cUp = glm::normalize(glm::cross(m_cRight, m_cFront));
+	}
+}
 
 CCamera3D::~CCamera3D()
 {
