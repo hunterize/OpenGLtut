@@ -72,6 +72,9 @@
     <ClCompile Include="GeometryShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Instancing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -185,6 +188,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\AdvAPIGeometryVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\InstancingFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\InstancingVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

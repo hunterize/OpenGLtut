@@ -17,6 +17,8 @@
 
 #include <map>
 
+#include <vector>
+
 
 
 namespace DepthTesting
@@ -79,4 +81,9 @@ namespace AdvancedAPI
 namespace GeometryShader
 {
 	void GeometryShader();
+}
+
+namespace Instancing
+{
+	void Instancing();
 }

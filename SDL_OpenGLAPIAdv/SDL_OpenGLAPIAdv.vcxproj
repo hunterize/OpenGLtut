@@ -160,6 +160,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <ClCompile Include="FrameBufferMirror.cpp" />
     <ClCompile Include="FrameBufferTesting.cpp" />
     <ClCompile Include="GeometryShader.cpp" />
+    <ClCompile Include="Instancing.cpp" />
     <ClCompile Include="StencilReflection.cpp" />
     <ClCompile Include="StencilTesting.cpp" />
   </ItemGroup>
@@ -200,6 +201,8 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <None Include="Shaders\FrameBufferScreenFragmentShader.frag" />
     <None Include="Shaders\FrameBufferScreenVertexShader.vert" />
     <None Include="Shaders\FrameBufferVertexShader.vert" />
+    <None Include="Shaders\InstancingFragmentShader.frag" />
+    <None Include="Shaders\InstancingVertexShader.vert" />
     <None Include="Shaders\StencilTestingFragmentShader.frag" />
     <None Include="Shaders\StencilTestingOutlineFragmentShader.frag" />
     <None Include="Shaders\StencilTestingVertexShader.vert" />
