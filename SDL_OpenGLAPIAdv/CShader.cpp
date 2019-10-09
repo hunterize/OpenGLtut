@@ -4,7 +4,6 @@
 
 CShader::CShader()
 {
-	m_iProgramID = glCreateProgram();
 }
 
 
@@ -14,6 +13,8 @@ CShader::~CShader()
 
 void CShader::AttachShader(const char* vertexShaderFilePath, const char* fragmentShaderFilePath, const char* geometryShaderFilePath)
 {
+	m_iProgramID = glCreateProgram();
+
 	//compile shader
 	if (vertexShaderFilePath != NULL)
 	{
