@@ -40,8 +40,8 @@ void AdvancedModel()
 	CShader skyShader;
 	CShader soldierShader;
 	//load vertex shader and fragment shader
-	skyShader.AttachShader("Shaders/SkyVertexShader.vert", "Shaders/SkyFragmentShader.frag");
-	soldierShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag");
+	skyShader.AttachShader("Shaders/SkyVertexShaderAdv.vert", "Shaders/SkyFragmentShaderAdv.frag");
+	soldierShader.AttachShader("Shaders/ModelVertexShaderAdv.vert", "Shaders/ModelFragmentShaderAdv.frag");
 
 	//initialize soldier model
 	//CModel soldierModel("GameResource/nanosuit/nanosuit.obj");

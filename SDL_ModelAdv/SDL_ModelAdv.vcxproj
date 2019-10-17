@@ -192,10 +192,10 @@ xcopy /y /e /i "$(ProjectDir)GameResource" "$(Outdir)GameResource"</Command>
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\ModelFragmentShader.frag" />
-    <None Include="Shaders\ModelVertexShader.vert" />
-    <None Include="Shaders\SkyFragmentShader.frag" />
-    <None Include="Shaders\SkyVertexShader.vert" />
+    <None Include="Shaders\ModelFragmentShaderAdv.frag" />
+    <None Include="Shaders\ModelVertexShaderAdv.vert" />
+    <None Include="Shaders\SkyFragmentShaderAdv.frag" />
+    <None Include="Shaders\SkyVertexShaderAdv.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -82,16 +82,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\SkyFragmentShader.frag">
+    <None Include="Shaders\SkyVertexShaderAdv.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\SkyVertexShader.vert">
+    <None Include="Shaders\SkyFragmentShaderAdv.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\ModelFragmentShader.frag">
+    <None Include="Shaders\ModelVertexShaderAdv.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\ModelVertexShader.vert">
+    <None Include="Shaders\ModelFragmentShaderAdv.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

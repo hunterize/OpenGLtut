@@ -82,34 +82,34 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\LightFragmentShader.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\LightVertexShader.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\ModelFragmentShader.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\ModelVertexShader.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\SkyFragmentShader.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\SkyVertexShader.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\ModelGeometryShader.geom">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\ModelFurShader.geom">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\FurFragmentShader.frag">
+    <None Include="Shaders\FurFragmentShaderEx.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\FurGeometryShader.geom">
+    <None Include="Shaders\FurGeometryShaderEx.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightFragmentShaderEx.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightVertexShaderEx.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ModelFragmentShaderEx.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ModelGeometryShaderEx.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ModelVertexShaderEx.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\SkyFragmentShaderEx.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\SkyVertexShaderEx.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
