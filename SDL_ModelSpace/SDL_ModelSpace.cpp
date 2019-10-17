@@ -76,20 +76,31 @@ void AdvancedModel()
 	{
 		 mat4 projection;    0
 		 mat4 view;          64
-		 vec4 lightPos;      128
-		 vec4 lightColor;    144
-		 vec4 eyePos;        160
-		 float shininess;    176
 	}
+
+	layout (std140) uniform uboLight
+	{
+		vec4 lightPos;       0
+		vec4 lightColor;     16
+		vec4 eyePos;         32
+		float shininess;     48
+	}
+
 	*/
 	GLuint ubo = 0;
 	glGenBuffers(1, &ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 	//glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
-	glBufferData(GL_UNIFORM_BUFFER, 192, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 128, NULL, GL_DYNAMIC_DRAW);
 	
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	//end of setting ubo
+
+	GLuint uboLight = 0;
+	glGenBuffers(1, &uboLight);
+	glBindBuffer(GL_UNIFORM_BUFFER, uboLight);
+	glBufferData(GL_UNIFORM_BUFFER, 64, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	//bind matrices uniform block to location index 0, lights uniform block to location index 1
 	GLuint planetMatrixIndex = glGetUniformBlockIndex(planetShader.GetID(), "plaMatrices");
@@ -108,7 +119,7 @@ void AdvancedModel()
 	glUniformBlockBinding(asteroidShader.GetID(), asteroidLightIndex, 1);
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, 128);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 1, ubo, 128, 64);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 1, uboLight, 0, 64);
 
 	//create projection matrix
 	glm::mat4 projection;
@@ -116,7 +127,13 @@ void AdvancedModel()
 	//link projection matrix to ubo
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, glm::value_ptr(projection));
-	//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, uboLight);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16, glm::value_ptr(lightPos));
+	glBufferSubData(GL_UNIFORM_BUFFER, 16, 16, glm::value_ptr(lightColor));
+	glBufferSubData(GL_UNIFORM_BUFFER, 48, 16, &shininess);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	//initial time tick
 	Uint32 previous = SDL_GetTicks();
@@ -154,12 +171,11 @@ void AdvancedModel()
 		glm::vec4 eyePos = glm::vec4(camera.GetPosition(), 1.0);
 		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 		glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, glm::value_ptr(view));
-		glBufferSubData(GL_UNIFORM_BUFFER, 128, 16, glm::value_ptr(lightPos));
-		glBufferSubData(GL_UNIFORM_BUFFER, 144, 16, glm::value_ptr(lightColor));
-		glBufferSubData(GL_UNIFORM_BUFFER, 160, 16, glm::value_ptr(eyePos));
-		glBufferSubData(GL_UNIFORM_BUFFER, 176, 16, &shininess);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+		glBindBuffer(GL_UNIFORM_BUFFER, uboLight);
+		glBufferSubData(GL_UNIFORM_BUFFER, 32, 16, glm::value_ptr(eyePos));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		////render
 		glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //set background color
@@ -205,11 +221,6 @@ void AdvancedModel()
 
 		SDL_GL_SwapWindow(window);
 
-
-		//if (elapsed < 16)
-		//{
-		//	SDL_Delay(16 - elapsed);
-		//}
 	} // end of main loop
 
 	SDL_GL_DeleteContext(context);
