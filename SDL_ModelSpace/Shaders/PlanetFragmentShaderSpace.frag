@@ -33,9 +33,9 @@ void planet()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
 	vec3 specular = spec * vec3(texture(texture_specular1, texCoord));
 
-	vec3 ambient = 0.8f * vec3(texture(texture_diffuse1, texCoord));
+	vec3 ambient = 0.4f * vec3(texture(texture_diffuse1, texCoord));
 
-	vec3 effect = vec3(lightColor) * (ambient + diffuse + specular);
+	vec3 effect = ambient + diffuse + specular;
 
 	color = vec4(effect, 1.0);
 }
@@ -50,16 +50,11 @@ void planetenv()
 	vec3 viewDir = normalize(vec3(eyePos) - fragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-	vec3 specular = spec * vec3(texture(texture_specular1, texCoord));
+	vec3 specular = spec * vec3(lightColor) * vec3(texture(texture_specular1, texCoord));
 
-	vec3 ambient = 0.6f * vec3(texture(texture_ambient1, texCoord));
+	vec3 ambient = 0.1f * vec3(lightColor) * vec3(texture(texture_ambient1, texCoord));
 
-	vec3 lookat = normalize(fragPos - vec3(eyePos));
-	vec3 reflection = reflect(lookat, normalize(normal));
-	//vec3 mapping = texture(env, reflection).rgb;
-	vec3 mapping = vec3(0.1, 0.1, 0.1);
-
-	vec3 effect = vec3(lightColor) * (mapping * ambient + diffuse + specular);
+	vec3 effect = ambient + diffuse + specular;
 
 	color = vec4(effect, 1.0);
 }

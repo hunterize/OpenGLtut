@@ -106,6 +106,7 @@ xcopy /y /e /i "$(ProjectDir)GameResource" "$(Outdir)GameResource"</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependency\lib\SDL\sdl2.dll" "$(OutDir)"
@@ -166,6 +167,8 @@ xcopy /y /e /i "$(ProjectDir)GameResource" "$(Outdir)GameResource"</Command>
   <ItemGroup>
     <None Include="Shaders\AsteroidFragmentShaderSpace.frag" />
     <None Include="Shaders\AsteroidVertexShaderSpace.vert" />
+    <None Include="Shaders\ObjectFragmentShaderSpace.frag" />
+    <None Include="Shaders\ObjectVertexShaderSpace.vert" />
     <None Include="Shaders\PlanetFragmentShaderSpace.frag" />
     <None Include="Shaders\PlanetVertexShaderSpace.vert" />
   </ItemGroup>

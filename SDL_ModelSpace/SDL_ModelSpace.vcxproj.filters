@@ -88,5 +88,11 @@
     <None Include="Shaders\PlanetVertexShaderSpace.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\ObjectFragmentShaderSpace.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ObjectVertexShaderSpace.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
