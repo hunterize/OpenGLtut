@@ -15,6 +15,8 @@ public:
 	~CMesh();
 
 	void Render(const CShader& shader);
+	void RenderInstance(const CShader& shader);
+	void SetInstanceNumber(unsigned int num);
 
 	std::vector<CVertex> m_Vertices;
 	std::vector<unsigned int> m_Indices;
@@ -25,6 +27,7 @@ private:
 
 	unsigned int m_VBO;
 	unsigned int m_EBO;
+	unsigned int m_instanceNum;
 
 	void Init();
 

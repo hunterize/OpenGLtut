@@ -94,5 +94,11 @@
     <None Include="Shaders\ObjectVertexShaderSpace.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\AsteroidFragmentShaderSpaceInstancing.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AsteroidVertexShaderSpaceInstancing.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -19,6 +19,8 @@ public:
 	~CModel();
 
 	void Render(const CShader& shader);
+	void RenderInstance(const CShader& shader, unsigned int num);
+	std::vector<CMesh> GetMeshes();
 
 private:
 	std::vector<CTexture> m_LoadedTextures;

@@ -166,7 +166,9 @@ xcopy /y /e /i "$(ProjectDir)GameResource" "$(Outdir)GameResource"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\AsteroidFragmentShaderSpace.frag" />
+    <None Include="Shaders\AsteroidFragmentShaderSpaceInstancing.frag" />
     <None Include="Shaders\AsteroidVertexShaderSpace.vert" />
+    <None Include="Shaders\AsteroidVertexShaderSpaceInstancing.vert" />
     <None Include="Shaders\ObjectFragmentShaderSpace.frag" />
     <None Include="Shaders\ObjectVertexShaderSpace.vert" />
     <None Include="Shaders\PlanetFragmentShaderSpace.frag" />

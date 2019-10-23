@@ -12,11 +12,25 @@ CModel::~CModel()
 {
 }
 
+std::vector<CMesh> CModel::GetMeshes()
+{
+	return m_Meshes;
+}
+
 void CModel::Render(const CShader& shader)
 {
 	for (auto& mesh : m_Meshes)
 	{
 		mesh.Render(shader);
+	}
+}
+
+void CModel::RenderInstance(const CShader& shader, unsigned int num)
+{
+	for (auto& mesh : m_Meshes)
+	{
+		mesh.SetInstanceNumber(num);
+		mesh.RenderInstance(shader);
 	}
 }
 

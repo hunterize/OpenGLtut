@@ -20,6 +20,10 @@ CMesh::~CMesh()
 {
 }
 
+void CMesh::SetInstanceNumber(unsigned int num)
+{
+	m_instanceNum = num;
+}
 
 void CMesh::Render(const CShader& shader)
 {
@@ -48,6 +52,38 @@ void CMesh::Render(const CShader& shader)
 	//draw
 	glBindVertexArray(m_VAO);
 	glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+
+	//glActiveTexture(GL_TEXTURE0);
+}
+
+void CMesh::RenderInstance(const CShader& shader)
+{
+	int diffuseNum = 1;
+	int specularNum = 1;
+
+	//bind texture to shader
+	for (int i = 0; i < m_Textures.size(); i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		std::string name = m_Textures[i].m_Type;
+		std::string number;
+		if (name == "texture_diffuse")
+		{
+			number = std::to_string(diffuseNum++);
+		}
+		else if (name == "texture_specular")
+		{
+			number = std::to_string(specularNum++);
+		}
+
+		shader.SetUniformInt(name + number, i);
+		glBindTexture(GL_TEXTURE_2D, m_Textures[i].m_ID);
+	}
+
+	//draw
+	glBindVertexArray(m_VAO);
+	glDrawElementsInstanced(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT,0, m_instanceNum);
 	glBindVertexArray(0);
 
 	//glActiveTexture(GL_TEXTURE0);

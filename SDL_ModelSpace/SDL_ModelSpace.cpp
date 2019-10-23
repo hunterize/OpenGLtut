@@ -120,7 +120,6 @@ void AdvancedModel()
 		vec4 eyePos;         288
 		float shininess;     304
 	}
-
 	*/
 
 	int sizef;
@@ -153,7 +152,7 @@ void AdvancedModel()
 	glUniformBlockBinding(asteroidShader.GetID(), asteroidLightIndex, lightBindingPoint);
 
 	glBindBufferRange(GL_UNIFORM_BUFFER, matrixBindingPoint, ubo, 0, 128);
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightBindingPoint, ubo, 256, 62);
+	glBindBufferRange(GL_UNIFORM_BUFFER, lightBindingPoint, ubo, 256, 52);
 
 	//create projection matrix
 	glm::mat4 projection;
@@ -549,6 +548,251 @@ void AdvancedModelEx()
 	SDL_GL_DeleteContext(context);
 
 }
+
+void AdvancedModelInstancing()
+{
+	//initial SDL
+	SDL_Window* window = nullptr;
+	SDL_GLContext context = nullptr;
+
+	SDL_Init(SDL_INIT_EVERYTHING);
+
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	window = SDL_CreateWindow("Space", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	context = SDL_GL_CreateContext(window);
+
+	SDL_ShowCursor(0);
+
+	//initialize glew
+	GLenum error = glewInit();
+	if (error != GLEW_OK)
+	{
+		std::cout << "Glew init error" << std::endl;
+		exit(0);
+	}
+
+	//enable opengl debug message
+#ifdef DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
+#endif // DEBUG
+
+	//initialize shader instance
+	CShader planetShader;
+	CShader asteroidShader;
+
+	//load vertex shader and fragment shader
+	planetShader.AttachShader("Shaders/PlanetVertexShaderSpace.vert", "Shaders/PlanetFragmentShaderSpace.frag");
+	asteroidShader.AttachShader("Shaders/AsteroidVertexShaderSpaceInstancing.vert", "Shaders/AsteroidFragmentShaderSpaceInstancing.frag");
+
+
+	//initialize soldier model
+	//CModel soldierModel("GameResource/nanosuit/nanosuit.obj");
+	CModel planetModel("GameResource/planet/planet.obj");
+	glm::vec3 planetPos = glm::vec3(0.0f, -10.0f, 0.0f);
+
+	CModel asteroidModel("GameResource/rock/rock.obj");
+
+	//set random model matrice for asteroid
+	int asteroidCount = 100000;
+	float radius = 150.0f;
+	std::vector<glm::mat4> asteroidModels;
+	asteroidModels.reserve(asteroidCount);
+
+	std::mt19937 randomEngine;
+	randomEngine.seed(time(nullptr));
+	std::uniform_real_distribution<float> offset(0.0f, 20.0f);
+	std::uniform_real_distribution<float> scale(0.06f, 0.1f);
+	std::uniform_real_distribution<float> rotate(0.0f, 1.0f);
+	
+	for (int i = 0; i < asteroidCount; i++)
+	{
+		glm::mat4 model = glm::mat4(1.0);
+		float angle = (float(i) / asteroidCount) * 360.0f;
+		float x = sin(angle) * radius + offset(randomEngine);
+		float y = offset(randomEngine) * 0.4;
+		float z = cos(angle) * radius + offset(randomEngine);
+
+		model = glm::translate(model, glm::vec3(x, y, z));
+		model = glm::scale(model, glm::vec3(scale(randomEngine)));
+		model = glm::rotate(model, rotate(randomEngine), glm::vec3(0.4f, 0.6f, 0.8f));
+
+		asteroidModels.push_back(model);
+	}
+
+	//light position
+	glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
+	glm::vec3 lightColor = glm::vec3(0.5f, 0.5f, 0.5f);
+	float shininess = 32.0f;
+
+	//initialize camera
+	CCamera3D camera(screenWidth, screenHeight,
+		glm::vec3(0.0f, 20.0f, 200.0f),
+		glm::vec3(0.0f, -0.2f, -1.0f));
+	camera.SetSpeed(10.5f);
+	camera.SetSensitivity(2.0f);
+
+	//setup uniform buffer object
+
+	GLuint ubo = 0;
+	glGenBuffers(1, &ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+	glBufferData(GL_UNIFORM_BUFFER, 512, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	//end of setting ubo
+
+	GLuint matrixBindingPoint = 10;
+	GLuint lightBindingPoint = 11;
+
+	//bind matrices uniform block to location index 10, lights uniform block to location index 11
+	GLuint planetMatrixIndex = glGetUniformBlockIndex(planetShader.GetID(), "plaMatrices");
+	glUniformBlockBinding(planetShader.GetID(), planetMatrixIndex, matrixBindingPoint);
+	GLuint planetLightIndex = glGetUniformBlockIndex(planetShader.GetID(), "plaLights");
+	glUniformBlockBinding(planetShader.GetID(), planetLightIndex, lightBindingPoint);
+
+	//bind matrices uniform block to location index 10, lights uniform block to location index 11
+	GLuint asteroidUBOIndex = glGetUniformBlockIndex(asteroidShader.GetID(), "astMatrices");
+	glUniformBlockBinding(asteroidShader.GetID(), asteroidUBOIndex, matrixBindingPoint);
+	GLuint asteroidLightIndex = glGetUniformBlockIndex(asteroidShader.GetID(), "astLights");
+	glUniformBlockBinding(asteroidShader.GetID(), asteroidLightIndex, lightBindingPoint);
+
+	glBindBufferRange(GL_UNIFORM_BUFFER, matrixBindingPoint, ubo, 0, 128);
+	glBindBufferRange(GL_UNIFORM_BUFFER, lightBindingPoint, ubo, 256, 52);
+
+	//create projection matrix
+	glm::mat4 projection;
+	projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
+	//link projection matrix to ubo
+	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 64, glm::value_ptr(projection));
+	glBufferSubData(GL_UNIFORM_BUFFER, 256, 16, glm::value_ptr(lightPos));
+	glBufferSubData(GL_UNIFORM_BUFFER, 272, 16, glm::value_ptr(lightColor));
+	glBufferSubData(GL_UNIFORM_BUFFER, 304, 4, &shininess);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	//end of setting ubo
+
+	//config instance object array buffer
+	GLuint instanceVBO = 0;
+	glGenBuffers(1, &instanceVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferData(GL_ARRAY_BUFFER, asteroidCount * sizeof(glm::mat4), asteroidModels.data(), GL_STATIC_DRAW);
+	
+	std::vector<CMesh> meshes = asteroidModel.GetMeshes();
+
+	//add attribute pointer for each vertex array object in mesh object
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		GLuint vao = meshes[i].m_VAO;
+		
+		glBindVertexArray(vao);
+		GLuint size = sizeof(glm::vec4);
+		
+		glEnableVertexAttribArray(6);
+		glEnableVertexAttribArray(7);
+		glEnableVertexAttribArray(8);
+		glEnableVertexAttribArray(9);
+		//pointer for each vector, one matrix contains four vectors
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * size, (void*)0);
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * size, (void*)(size));
+		glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, 4 * size, (void*)(size * 2));
+		glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 4 * size, (void*)(size * 3));
+
+		glVertexAttribDivisor(6, 1);
+		glVertexAttribDivisor(7, 1);
+		glVertexAttribDivisor(8, 1);
+		glVertexAttribDivisor(9, 1);
+
+		glBindVertexArray(0);
+	}
+	//end of configuration of instance buffer
+
+	//initial time tick
+	Uint32 previous = SDL_GetTicks();
+	Uint32 lag = 0;
+	Uint32 MS_PER_FRAME = 8;
+
+	while (isRunning)
+	{
+		Uint32 current = SDL_GetTicks();
+
+		Uint32 elapsed = current - previous;
+		previous = current;
+		lag += elapsed;
+
+		float timespan = (float)MS_PER_FRAME / 1000;
+
+		//update input
+		ProcessInput();
+
+		while (lag >= MS_PER_FRAME)
+		{
+			//update game
+			//update camera
+			camera.Update(inputManager, timespan);
+
+			lag -= MS_PER_FRAME;
+		}
+
+		//synchronize the update and render
+		Uint32 step = lag % MS_PER_FRAME;
+		camera.Update(inputManager, (float)step / 1000);
+
+		//create view matrix
+		glm::mat4 view = camera.GetCameraMatrix();
+		glm::vec3 eyePos = camera.GetPosition();
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferSubData(GL_UNIFORM_BUFFER, 64, 64, glm::value_ptr(view));
+		glBufferSubData(GL_UNIFORM_BUFFER, 288, 16, glm::value_ptr(eyePos));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		////render
+		glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //set background color
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear color buffer
+
+
+		//render planet
+		planetShader.Use();
+
+		glm::mat4 model = glm::mat4(1.0);
+		model = glm::translate(model, planetPos);
+		model = glm::scale(model, glm::vec3(6.0, 6.0, 6.0));
+		planetShader.SetUniformMat4("model", model);
+
+		if (inputManager.IskeyPressed(SDLK_1))
+			planetShader.SetUniformInt("eff", 1);
+		if (inputManager.IskeyPressed(SDLK_2))
+			planetShader.SetUniformInt("eff", 2);
+
+		planetModel.Render(planetShader);
+
+		planetShader.Unuse();
+		//end of rendering planet
+
+		//render asteroid
+		asteroidShader.Use();
+
+		if (inputManager.IskeyPressed(SDLK_1))
+			asteroidShader.SetUniformInt("eff", 1);
+		if (inputManager.IskeyPressed(SDLK_2))
+			asteroidShader.SetUniformInt("eff", 2);
+
+		asteroidModel.RenderInstance(asteroidShader, asteroidCount);
+
+		asteroidShader.Unuse();
+		//end of rendering asteroid
+
+		SDL_GL_SwapWindow(window);
+
+	} // end of main loop
+
+	SDL_GL_DeleteContext(context);
+
+}
+
 void ProcessInput()
 {
 
@@ -614,6 +858,6 @@ void GetDebugInfo(GLuint pID)
 
 int main(int args, char** argv)
 {
-	AdvancedModel();
+	AdvancedModelInstancing();
 	return 1;
 }
