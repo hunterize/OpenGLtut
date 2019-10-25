@@ -87,3 +87,8 @@ namespace Instancing
 {
 	void Instancing();
 }
+
+namespace AntiAliasing
+{
+	void AntiAliasing();
+}

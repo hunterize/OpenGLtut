@@ -23,7 +23,7 @@ public:
 
 	void Update(const CInputManager& input, float timeSpan);
 
-	void SetSpeed(float speed) { m_fSpeed = speed; }
+	void SetSpeed(float speed);
 	void SetSensitivity(float se) { m_fSensitivity = se; }
 	glm::vec3 GetPosition() const { return m_cPosition; } 
 	glm::vec3 GetFront() const { return m_cFront; }
@@ -38,6 +38,8 @@ private:
 	glm::vec3 m_cWorldUp;
 
 	float m_fSpeed;
+	float m_fInitSpeed;
+	float m_fTackleSpeed;
 	float m_fSensitivity;
 	float m_fFov;
 	float m_fYaw;

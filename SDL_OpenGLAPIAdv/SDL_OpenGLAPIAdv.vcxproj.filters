@@ -75,6 +75,9 @@
     <ClCompile Include="Instancing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AntiAliasing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h">
@@ -194,6 +197,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\InstancingVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AntiAliasingFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AntiAliasingVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AAScreenFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AAScreenVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

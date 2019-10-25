@@ -10,6 +10,8 @@ CCamera3D::CCamera3D(
 	m_cPosition = position;
 	m_cFront = front;
 	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_fInitSpeed = 8.0f;
+	m_fTackleSpeed = 1.0f;
 	m_fSpeed = 8.0f;
 	m_fSensitivity = 2.0f;
 
@@ -33,6 +35,8 @@ CCamera3D::CCamera3D(
 	m_cPosition = position;
 	m_cFront = front;
 	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_fInitSpeed = 8.0f;
+	m_fTackleSpeed = 1.0f;
 	m_fSpeed = 8.0f;
 	m_fSensitivity = 2.0f;
 
@@ -63,6 +67,13 @@ CCamera3D::~CCamera3D()
 {
 }
 
+void CCamera3D::SetSpeed(float speed)
+{
+	m_fInitSpeed = speed;
+	m_fTackleSpeed = speed / 10.0f;
+	m_fSpeed = m_fInitSpeed;
+}
+
 glm::mat4 CCamera3D::GetCameraMatrix()
 {
 	return glm::lookAt(m_cPosition, m_cPosition + m_cFront, m_cUp);
@@ -90,6 +101,14 @@ void CCamera3D::Update(const CInputManager& input, float timeSpan)
 	if (input.IsKeyDown(SDLK_d))
 	{
 		m_cPosition += m_cRight * m_fSpeed * timeSpan;
+	}
+	if (input.IsKeyDown(SDLK_LCTRL))
+	{
+		m_fSpeed = m_fTackleSpeed;
+	}
+	else
+	{
+		m_fSpeed = m_fInitSpeed;
 	}
 
 	if(input.GetMouseCoord() != glm::vec2(-1.0f))

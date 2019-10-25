@@ -107,6 +107,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sdl2.lib;sdl2main.lib;sdl2test.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -146,6 +147,7 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
   <ItemGroup>
     <ClCompile Include="AdvancedAPI.cpp" />
     <ClCompile Include="AdvancedOpenGL.cpp" />
+    <ClCompile Include="AntiAliasing.cpp" />
     <ClCompile Include="BlendFuncTesting.cpp" />
     <ClCompile Include="Blending.cpp" />
     <ClCompile Include="CCamera3D.cpp" />
@@ -174,6 +176,8 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\AAScreenFragmentShader.frag" />
+    <None Include="Shaders\AAScreenVertexShader.vert" />
     <None Include="Shaders\AdvAPIBlueFragmentShader.frag" />
     <None Include="Shaders\AdvAPICrateVertexShader.vert" />
     <None Include="Shaders\AdvAPIGeometryFragmentShader.frag" />
@@ -183,6 +187,8 @@ xcopy /y "$(ProjectDir)skybox\*.*" "$(Outdir)skybox\"</Command>
     <None Include="Shaders\AdvAPIObjectFragmentShader.frag" />
     <None Include="Shaders\AdvAPIObjectVertexShader.vert" />
     <None Include="Shaders\AdvAPIRedFragmentShader.frag" />
+    <None Include="Shaders\AntiAliasingFragmentShader.frag" />
+    <None Include="Shaders\AntiAliasingVertexShader.vert" />
     <None Include="Shaders\BlendingTestingFragmentShader.frag" />
     <None Include="Shaders\BlendingTestingVertexShader.vert" />
     <None Include="Shaders\CubeMapsObjectFragmentShader.frag" />
