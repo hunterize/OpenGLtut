@@ -12,14 +12,20 @@ public:
 	CCamera3D(float screenWidth, float screenHeight,
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), 
 		glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f));
+	CCamera3D(float screenWidth, float screenHeight,
+		bool isInit,
+		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f));;
 	~CCamera3D();
 
 	glm::mat4 GetCameraMatrix();
+	glm::mat4 GetReverseCameraMatrix();
 
 	void Update(const CInputManager& input, float timeSpan);
-
-	void SetSpeed(float speed) { m_fSpeed = speed; }
+	void SetSpeed(float speed);
 	void SetSensitivity(float se) { m_fSensitivity = se; }
+	glm::vec3 GetPosition() const { return m_cPosition; } 
+	glm::vec3 GetFront() const { return m_cFront; }
 
 private:
 	void UpdateCameraVector();
@@ -31,6 +37,7 @@ private:
 	glm::vec3 m_cWorldUp;
 
 	float m_fSpeed;
+	float m_fInitSpeed;
 	float m_fSensitivity;
 	float m_fFov;
 	float m_fYaw;

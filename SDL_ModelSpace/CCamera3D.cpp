@@ -11,6 +11,7 @@ CCamera3D::CCamera3D(
 	m_cFront = front;
 	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	m_fSpeed = 8.0f;
+	m_fInitSpeed = m_fSpeed;
 	m_fSensitivity = 2.0f;
 
 	m_cWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -34,6 +35,7 @@ CCamera3D::CCamera3D(
 	m_cFront = front;
 	m_cUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	m_fSpeed = 8.0f;
+	m_fInitSpeed = m_fSpeed;
 	m_fSensitivity = 2.0f;
 
 	m_cWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -63,6 +65,12 @@ CCamera3D::~CCamera3D()
 {
 }
 
+void CCamera3D::SetSpeed(float speed)
+{ 
+	m_fInitSpeed = speed;
+	m_fSpeed = speed;
+}
+
 glm::mat4 CCamera3D::GetCameraMatrix()
 {
 	return glm::lookAt(m_cPosition, m_cPosition + m_cFront, m_cUp);
@@ -75,6 +83,25 @@ glm::mat4 CCamera3D::GetReverseCameraMatrix()
 
 void CCamera3D::Update(const CInputManager& input, float timeSpan)
 {
+
+	if (input.IsKeyDown(SDLK_LCTRL))
+	{
+		m_fSpeed = m_fInitSpeed / 10.0f;
+	}
+	if(input.IsKeyUp(SDLK_LCTRL))
+	{
+		m_fSpeed = m_fInitSpeed;
+	}
+
+	if (input.IsKeyDown(SDLK_LSHIFT))
+	{
+		m_fSpeed = m_fInitSpeed * 2.0f;
+	}
+	if(input.IsKeyUp(SDLK_LSHIFT))
+	{
+		m_fSpeed = m_fInitSpeed;
+	}
+
 	if (input.IsKeyDown(SDLK_w))
 	{
 		m_cPosition += m_cFront * m_fSpeed * timeSpan;
@@ -104,7 +131,6 @@ void CCamera3D::Update(const CInputManager& input, float timeSpan)
 		m_fPitch = m_fPitch < -89.0f ? -89.0f : m_fPitch;
 		UpdateCameraVector();		
 	}
-
 }
 
 void CCamera3D::UpdateCameraVector()

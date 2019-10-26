@@ -15,6 +15,7 @@ public:
 	void Releasekey(unsigned int key);
 
 	bool IsKeyDown(unsigned int key) const;
+	bool IsKeyUp(unsigned int key) const;
 	bool IskeyPressed(unsigned int key) const;
 
 	glm::vec2 GetMouseCoord() const;

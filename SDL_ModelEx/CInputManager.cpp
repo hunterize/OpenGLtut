@@ -45,6 +45,11 @@ bool CInputManager::IsKeyDown(unsigned int key) const
 	return CheckKeyState(key, m_cKeyMap);
 }
 
+bool CInputManager::IsKeyUp(unsigned int key) const
+{
+	return !CheckKeyState(key, m_cKeyMap) && CheckKeyState(key, m_cPreviousKeyMap);
+}
+
 //key is pressed for the first time
 bool CInputManager::IskeyPressed(unsigned int key) const 
 {
