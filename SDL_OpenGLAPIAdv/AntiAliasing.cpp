@@ -256,21 +256,16 @@ namespace AntiAliasing
 		glGenTextures(1, &screenTextureBuffer);
 		glBindTexture(GL_TEXTURE_2D, screenTextureBuffer);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, screenTextureBuffer);
-		//glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, screenWidth, screenHeight, GL_TRUE);
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTextureBuffer, 0);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, screenTextureBuffer, 0);
 
 		//create render buffer attachment for depth and stencil
 		glGenRenderbuffers(1, &screenRBO);
 		glBindRenderbuffer(GL_RENDERBUFFER, screenRBO);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
-		//glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO);
 
 		//check if the frame buffer with attachment is complete
@@ -419,6 +414,7 @@ namespace AntiAliasing
 			glBindVertexArray(0);
 
 			crateShader.Unuse();
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			//end of rendering objects
 
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, screenFBOMSAA);
@@ -426,7 +422,6 @@ namespace AntiAliasing
 			glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 			//bind default frame buffer
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 			glDisable(GL_DEPTH_TEST);
