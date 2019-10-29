@@ -27,6 +27,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_ModelEx", "SDL_ModelEx\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_ModelSpace", "SDL_ModelSpace\SDL_ModelSpace.vcxproj", "{3279B507-2CE7-4396-AAFD-023536C97DDD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLLightingAdv", "SDL_OpenGLLightingAdv\SDL_OpenGLLightingAdv.vcxproj", "{C12A501B-2956-4F1B-AD25-59CA7F08514F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLProject", "SDL_InitProject\SDL_OpenGLProject.vcxproj", "{0688B059-4787-43D3-98CE-D55F894298A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -131,6 +135,22 @@ Global
 		{3279B507-2CE7-4396-AAFD-023536C97DDD}.Release|x64.Build.0 = Release|x64
 		{3279B507-2CE7-4396-AAFD-023536C97DDD}.Release|x86.ActiveCfg = Release|Win32
 		{3279B507-2CE7-4396-AAFD-023536C97DDD}.Release|x86.Build.0 = Release|Win32
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Debug|x64.ActiveCfg = Debug|x64
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Debug|x64.Build.0 = Debug|x64
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Debug|x86.ActiveCfg = Debug|Win32
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Debug|x86.Build.0 = Debug|Win32
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Release|x64.ActiveCfg = Release|x64
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Release|x64.Build.0 = Release|x64
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Release|x86.ActiveCfg = Release|Win32
+		{C12A501B-2956-4F1B-AD25-59CA7F08514F}.Release|x86.Build.0 = Release|Win32
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Debug|x64.ActiveCfg = Debug|x64
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Debug|x64.Build.0 = Debug|x64
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Debug|x86.ActiveCfg = Debug|Win32
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Debug|x86.Build.0 = Debug|Win32
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Release|x64.ActiveCfg = Release|x64
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Release|x64.Build.0 = Release|x64
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Release|x86.ActiveCfg = Release|Win32
+		{0688B059-4787-43D3-98CE-D55F894298A8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
