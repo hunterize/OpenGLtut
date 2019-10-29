@@ -36,11 +36,12 @@ namespace BlinnPhongLighting
 		SDL_Init(SDL_INIT_EVERYTHING);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 4);
 
 		//initialize camera
 		CCamera3D camera(screenWidth, screenHeight, false,
-			glm::vec3(20.0f, 0.0f, 20.0f),
-			glm::vec3(-1.0f, 0.0f, -1.0f));
+			glm::vec3(20.0f, 10.0f, 20.0f),
+			glm::vec3(-1.0f, -1.0f, -1.0f));
 
 		//create projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
@@ -100,6 +101,7 @@ namespace BlinnPhongLighting
 		//end of setting floor vao and vbo
 
 		glm::vec3 floorPos = glm::vec3(0.0f, -10.0f, 0.0f);
+		bool isBlinn = true;
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -122,6 +124,9 @@ namespace BlinnPhongLighting
 			//update input
 			ProcessInput();
 
+			if (inputManager.IskeyPressed(SDLK_0))
+				isBlinn = !isBlinn;
+
 			while (lag >= MS_PER_FRAME)
 			{
 				//update game
@@ -138,6 +143,10 @@ namespace BlinnPhongLighting
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
+			glm::vec3 lightPos = glm::vec3(0.0f, 5.0f, 0.0f);
+			glm::vec3 eyePos = camera.GetPosition();
+			float shininess = 32.0f;
+
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //set background color
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear color buffer
@@ -145,10 +154,17 @@ namespace BlinnPhongLighting
 			woodShader.Use();
 			glm::mat4 floorModel;
 			floorModel = glm::translate(floorModel, floorPos);
-			floorModel = glm::scale(floorModel, glm::vec3(10.0f, 10.0f, 10.0f));
+			floorModel = glm::scale(floorModel, glm::vec3(100.0f, 100.0f, 100.0f));
 			woodShader.SetUniformMat4("model", floorModel);
 			woodShader.SetUniformMat4("view", view);
 			woodShader.SetUniformMat4("projection", projection);
+
+			woodShader.SetUniformVec3("lightPos", lightPos);
+			woodShader.SetUniformVec3("eyePos", eyePos);
+			woodShader.SetUniformFloat("shininess", shininess);
+
+			woodShader.SetUniformInt("isBlinn", isBlinn);
+
 			glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
 
 			glBindVertexArray(floorVAO);
