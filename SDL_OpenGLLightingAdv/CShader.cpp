@@ -79,6 +79,23 @@ void CShader::SetUniformMat4(const std::string& name, const glm::mat4& value) co
 	glUniformMatrix4fv(glGetUniformLocation(m_iProgramID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
 
+void CShader::SetUniformVec2Array(const std::string& name, const glm::vec2 value[], int size) const
+{
+	glUniform2fv(glGetUniformLocation(m_iProgramID, name.c_str()), size, &value[0][0]);
+}
+void CShader::SetUniformVec3Array(const std::string& name, const glm::vec3 value[], int size) const
+{
+	glUniform3fv(glGetUniformLocation(m_iProgramID, name.c_str()), size, &value[0][0]);
+}
+void CShader::SetUniformVec4Array(const std::string& name, const glm::vec4 value[], int size) const
+{
+	glUniform4fv(glGetUniformLocation(m_iProgramID, name.c_str()), size, &value[0][0]);
+}
+void CShader::SetUniformMat4Array(const std::string& name, const glm::mat4 value[], int size) const
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_iProgramID, name.c_str()), size, GL_FALSE, &value[0][0][0]);
+}
+
 GLuint CShader::GetID()
 {
 	return m_iProgramID;

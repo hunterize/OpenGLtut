@@ -3,6 +3,7 @@
 
 int main(int args, char** argv)
 {
-	BlinnPhongLighting::BlinnPhongLighting();
+	//BlinnPhongLighting::BlinnPhongLighting();
+	GammaCorrection::GammaCorrection();
 	return 1;
 }

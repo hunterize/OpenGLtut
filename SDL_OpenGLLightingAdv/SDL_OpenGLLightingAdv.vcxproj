@@ -148,6 +148,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
+    <ClCompile Include="GammaCorrection.cpp" />
     <ClCompile Include="SDL_OpenGLLightingAdv.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +165,8 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
   <ItemGroup>
     <None Include="Shaders\BlinnPhongFragmentShader.frag" />
     <None Include="Shaders\BlinnPhongVertexShader.vert" />
+    <None Include="Shaders\GammaCorrectionFragmentShader.frag" />
+    <None Include="Shaders\GammaCorrectionVertexShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

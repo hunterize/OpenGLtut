@@ -2,7 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION 
 #include "CSTexture.h"
 
-GLTexture CSTexture::LoadImage(const std::string& fileName)
+GLTexture CSTexture::LoadImage(const std::string& fileName, bool isGammaCorrection)
 {
 	GLTexture texture = {};
 	texture.ID = -1;
@@ -19,21 +19,25 @@ GLTexture CSTexture::LoadImage(const std::string& fileName)
 	if(imageData)
 	{
 		GLenum format;
+		GLenum internalFormat;
 		if (channel == 1)
 		{
 			format = GL_RED;
+			internalFormat = GL_RED;
 		}
 		else if (channel == 3)
 		{
 			format = GL_RGB;
+			internalFormat = isGammaCorrection? GL_SRGB : GL_RGB;
 		}
 		else if (channel == 4)
 		{
 			format = GL_RGBA;
+			internalFormat = isGammaCorrection? GL_SRGB_ALPHA : GL_RGBA;
 		}
 
 		glBindTexture(GL_TEXTURE_2D, texture.ID);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, texture.width, texture.height, 0, format, GL_UNSIGNED_BYTE, imageData);
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, texture.width, texture.height, 0, format, GL_UNSIGNED_BYTE, imageData);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA? GL_CLAMP_TO_EDGE : GL_REPEAT);

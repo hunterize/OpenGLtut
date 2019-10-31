@@ -16,7 +16,7 @@ struct GLTexture
 class CSTexture
 {
 public:
-	GLTexture static LoadImage(const std::string& fileName);
+	GLTexture static LoadImage(const std::string& fileName, bool isGammaCorrection = false);
 
 	//folder contains files for cube maps, names should be 
 	//"back", "front", "top", "bottom", "left", "right"

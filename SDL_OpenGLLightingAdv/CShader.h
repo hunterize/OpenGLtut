@@ -42,6 +42,11 @@ public:
 	void SetUniformVec4(const std::string& name, const glm::vec4& value) const;
 	void SetUniformMat4(const std::string& name, const glm::mat4& value) const;
 
+	void SetUniformVec2Array(const std::string& name, const glm::vec2 value[], int size) const;
+	void SetUniformVec3Array(const std::string& name, const glm::vec3 value[], int size) const;
+	void SetUniformVec4Array(const std::string& name, const glm::vec4 value[], int size) const;
+	void SetUniformMat4Array(const std::string& name, const glm::mat4 value[], int size) const;
+
 	GLuint GetID();
 
 	void Use();

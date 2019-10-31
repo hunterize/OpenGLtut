@@ -36,6 +36,9 @@
     <ClCompile Include="BlinnPhongLighting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GammaCorrection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -67,6 +70,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\BlinnPhongVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\GammaCorrectionFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\GammaCorrectionVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

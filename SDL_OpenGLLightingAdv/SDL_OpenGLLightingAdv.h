@@ -17,3 +17,8 @@ namespace BlinnPhongLighting
 {
 	void BlinnPhongLighting();
 }
+
+namespace GammaCorrection
+{
+	void GammaCorrection();
+}
