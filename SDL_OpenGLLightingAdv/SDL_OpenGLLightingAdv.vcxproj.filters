@@ -39,6 +39,9 @@
     <ClCompile Include="GammaCorrection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -64,6 +67,9 @@
     <Image Include="wood.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="crate.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BlinnPhongFragmentShader.frag">
@@ -76,6 +82,24 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\GammaCorrectionVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMappingCrateFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMappingCrateVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMappingDepthFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMappingDepthVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMappingDebugFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ShadowMappingDebugVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

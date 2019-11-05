@@ -14,7 +14,7 @@ uniform bool isGamma;
 
 void BlinnPhongWithGammaCorrection()
 {
-	vec3 lightPos = vec3(0.0, 5.0, 0.0);
+	vec3 lightPos = vec3(-10.0, 5.0, 0.0);
 
 	float distance = length(lightPos - fragPos);
 	float attenuation = 1.0f / (distance);
@@ -53,7 +53,7 @@ void NoTexture()
 
 void MultipleLighting()
 {
-	float ambi = 0.01f;
+	float ambi = 0.06f;
 	vec3 textureColor = vec3(texture(sample, texCoord));
 	vec3 ambient = ambi * textureColor;
 	vec3 diffuse = vec3(0.0);

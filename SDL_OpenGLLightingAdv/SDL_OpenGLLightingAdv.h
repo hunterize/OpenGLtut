@@ -22,3 +22,8 @@ namespace GammaCorrection
 {
 	void GammaCorrection();
 }
+
+namespace ShadowMapping
+{
+	void ShadowMapping();
+}

@@ -4,6 +4,7 @@
 int main(int args, char** argv)
 {
 	//BlinnPhongLighting::BlinnPhongLighting();
-	GammaCorrection::GammaCorrection();
+	//GammaCorrection::GammaCorrection();
+	ShadowMapping::ShadowMapping();
 	return 1;
 }
