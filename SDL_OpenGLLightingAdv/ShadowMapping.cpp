@@ -14,6 +14,7 @@ namespace ShadowMapping
 	CInputManager inputManager;
 
 	bool isFirstMove = true;
+	bool isDebug = false;
 
 	void GLAPIENTRY MessageCallback(GLenum source,
 		GLenum type,
@@ -213,7 +214,7 @@ namespace ShadowMapping
 		GLuint depthMapTexture;
 		glGenTextures(1, &depthMapTexture);
 		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -234,8 +235,8 @@ namespace ShadowMapping
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 
-		CShader woodShader;
-		woodShader.AttachShader("Shaders/ShadowMappingCrateVertexShader.vert", "Shaders/ShadowMappingCrateFragmentShader.frag");
+		CShader objShader;
+		objShader.AttachShader("Shaders/ShadowMappingCrateVertexShader.vert", "Shaders/ShadowMappingCrateFragmentShader.frag");
 
 		CShader shadowShader;
 		shadowShader.AttachShader("Shaders/ShadowMappingDepthVertexShader.vert", "Shaders/ShadowMappingDepthFragmentShader.frag");
@@ -282,10 +283,18 @@ namespace ShadowMapping
 			Uint32 step = lag % MS_PER_FRAME;
 			camera.Update(inputManager, (float)step / 1000);
 
+			if (inputManager.IskeyPressed(SDLK_0))
+			{
+				isDebug = !isDebug;
+			}
+
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
 			glm::vec3 floorPos = glm::vec3(0.0f, -5.0f, 0.0f);
+			glm::mat4 floorModel;
+			floorModel = glm::translate(floorModel, floorPos);
+			floorModel = glm::scale(floorModel, glm::vec3(50.0f, 50.0f, 50.0f));
 
 			glm::vec3 cratePos[] = {
 				glm::vec3(0.0f, 5.0f, 0.0f),
@@ -293,25 +302,20 @@ namespace ShadowMapping
 				glm::vec3(-5.0f, 0.0f, 0.0f) };
 
 			lightPos = glm::vec3(-10.0f, 20.0f, -10.0f);
-
-			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -10.0f, 40.0f);
-			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 40.0f);
+			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 			//render light view to depth texture
 			shadowShader.Use();
 			shadowShader.SetUniformMat4("projection", lightProjection);
 			shadowShader.SetUniformMat4("view", lightView);
-			glViewport(0, 0, 1024, 1024);
+			glViewport(0, 0, screenWidth, screenHeight);
 			
 			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			//draw floor 
-			glm::mat4 floorModel;
-			floorModel = glm::translate(floorModel, floorPos);
-			floorModel = glm::scale(floorModel, glm::vec3(20.0f, 20.0f, 20.0f));
-
 			shadowShader.SetUniformMat4("model", floorModel);
 			glBindVertexArray(floorVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -323,7 +327,7 @@ namespace ShadowMapping
 			{
 				glm::mat4 crateModel;
 				crateModel = glm::translate(crateModel, cratePos[i]);
-				crateModel = glm::scale(crateModel, glm::vec3(4.0f, 4.0f, 4.0f));
+				crateModel = glm::scale(crateModel, glm::vec3(3.0f, 3.0f, 3.0f));
 				shadowShader.SetUniformMat4("model", crateModel);
 
 				glBindVertexArray(crateVAO);
@@ -332,23 +336,77 @@ namespace ShadowMapping
 			}
 			
 			shadowShader.Unuse();
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-			glClear(GL_COLOR_BUFFER_BIT);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);;
 
 			glViewport(0, 0, screenWidth, screenHeight);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glClearColor(0.1, 0.1, 0.1, 1.0);
 
-			debugShader.Use();
-			debugShader.SetUniformInt("depthMap", 11);
-			glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-			glActiveTexture(GL_TEXTURE11);
-			glBindVertexArray(debugVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindVertexArray(0);
-			debugShader.Unuse();
-			
+			if (isDebug)
+			{
+				debugShader.Use();
+				debugShader.SetUniformInt("depthMap", 11);
+				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+				glActiveTexture(GL_TEXTURE11);
+
+				glBindVertexArray(debugVAO);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+				glBindVertexArray(0);
+				debugShader.Unuse();
+				//
+			}
+			else
+			{
+				//render normal scene
+				//initialize shaders
+				objShader.Use();
+				objShader.SetUniformMat4("projection", projection);
+				objShader.SetUniformMat4("view", view);
+				objShader.SetUniformMat4("lightPV", lightProjection * lightView);
+				glm::vec3 eyePos = camera.GetPosition();
+				objShader.SetUniformVec3("eyePos", eyePos);
+				objShader.SetUniformVec3("lightPos", lightPos);
+				objShader.SetUniformFloat("shininess", 32.0f);
+
+				//render floor
+				objShader.SetUniformInt("sample", 20);
+				glActiveTexture(GL_TEXTURE20);
+				glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
+
+				objShader.SetUniformInt("shadowMap", 21);
+				glActiveTexture(GL_TEXTURE21);
+				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+
+
+				objShader.SetUniformMat4("model", floorModel);
+				glBindVertexArray(floorVAO);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+				glBindVertexArray(0);
+
+				//render crates
+				objShader.SetUniformInt("sample", 20);
+				glActiveTexture(GL_TEXTURE20);
+				glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
+
+				objShader.SetUniformInt("shadowMap", 21);
+				glActiveTexture(GL_TEXTURE21);
+				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+
+				for (int i = 0; i < 3; i++)
+				{
+					glm::mat4 crateModel;
+					crateModel = glm::translate(crateModel, cratePos[i]);
+					crateModel = glm::scale(crateModel, glm::vec3(3.0f, 3.0f, 3.0f));
+					objShader.SetUniformMat4("model", crateModel);
+
+					glBindVertexArray(crateVAO);
+					glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+					glBindVertexArray(0);
+				}
+
+				objShader.Unuse();
+				//end of rendering normal scene
+			}
 
 			SDL_GL_SwapWindow(window);
 
