@@ -215,10 +215,10 @@ namespace ShadowMapping
 		glGenTextures(1, &depthMapTexture);
 		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
@@ -247,7 +247,7 @@ namespace ShadowMapping
 		GLTexture woodTexture = CSTexture::LoadImage("wood.png");
 		GLTexture crateTexture = CSTexture::LoadImage("crate.png");
 
-		glm::vec3 lightPos = glm::vec3(-5.0f, 5.0f, -2.0f);
+		glm::vec3 lightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -299,11 +299,11 @@ namespace ShadowMapping
 			glm::vec3 cratePos[] = {
 				glm::vec3(0.0f, 5.0f, 0.0f),
 				glm::vec3(5.0f, 0.0f, 10.0f),
-				glm::vec3(-5.0f, 0.0f, 0.0f) };
+				glm::vec3(-5.0f, -3.49f, 0.0f) };
 
 			lightPos = glm::vec3(-10.0f, 20.0f, -10.0f);
-			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 40.0f);
-			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, 1.0f, 60.0f);
+			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 2.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 			//render light view to depth texture
 			shadowShader.Use();
