@@ -14,7 +14,6 @@ namespace ShadowMapping
 	CInputManager inputManager;
 
 	bool isFirstMove = true;
-	bool isDebug = false;
 
 	void GLAPIENTRY MessageCallback(GLenum source,
 		GLenum type,
@@ -61,6 +60,9 @@ namespace ShadowMapping
 			std::cout << "Glew init error" << std::endl;
 			exit(0);
 		}
+
+		bool isDebug = false;
+		bool isOrtho = true;
 
 		//enable opengl debug message
 #ifdef DEBUG
@@ -287,6 +289,10 @@ namespace ShadowMapping
 			{
 				isDebug = !isDebug;
 			}
+			if (inputManager.IskeyPressed(SDLK_1))
+			{
+				isOrtho = !isOrtho;
+			}
 
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
@@ -298,11 +304,16 @@ namespace ShadowMapping
 
 			glm::vec3 cratePos[] = {
 				glm::vec3(0.0f, 5.0f, 0.0f),
-				glm::vec3(5.0f, 0.0f, 10.0f),
+				glm::vec3(4.0f, -2.0f, 10.0f),
 				glm::vec3(-5.0f, -3.49f, 0.0f) };
 
 			lightPos = glm::vec3(-10.0f, 20.0f, -10.0f);
-			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, 1.0f, 60.0f);
+			glm::mat4 lightProjection = glm::mat4(1.0f);
+			if(isOrtho)
+				lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, 1.0f, 60.0f);
+			else
+				lightProjection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 5.0f, 60.0f);
+
 			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 2.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 			//render light view to depth texture
@@ -321,7 +332,8 @@ namespace ShadowMapping
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glBindVertexArray(0);
 			
-
+			//glEnable(GL_CULL_FACE);
+			//glCullFace(GL_FRONT);
 			//draw crate			
 			for (int i = 0; i < 3; i++)
 			{
@@ -334,6 +346,8 @@ namespace ShadowMapping
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 			}
+			//glCullFace(GL_BACK);
+			//glDisable(GL_CULL_FACE);
 			
 			shadowShader.Unuse();
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);;

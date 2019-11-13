@@ -18,12 +18,27 @@ float GetShadow(vec4 frag)
 {
 	vec3 fragCoords = frag.xyz / frag.w;
 	fragCoords = fragCoords * 0.5f + 0.5f;
-	float depthPoint = texture(shadowMap, fragCoords.xy).r;
-	float shadowPoint = fragCoords.z;
+	float shadowMapDepth = texture(shadowMap, fragCoords.xy).r;
+	float fragDepth = fragCoords.z;
 	vec3 norm = normalize(normal);
 	vec3 lightDir = normalize(lightPos - fragPos);
-	float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
-	return (shadowPoint - bias) > depthPoint ? 1.0f : 0.0f;
+	float bias = max(0.05f * (1.0 - dot(norm, lightDir)), 0.005f);
+
+	float shadow = 0.0f;
+	//PCF
+	vec2 texelSize = 1.0f / textureSize(shadowMap, 0);
+	for(int x = -1; x <= 1; x++)
+	{
+		for(int y = -1; y <= 1; y++)
+		{
+			float pcfDepth = texture(shadowMap, fragCoords.xy + vec2(x, y) * texelSize).r;
+			shadow += (fragDepth - bias) > pcfDepth ? 1.0f : 0.0f;
+		}
+	}
+
+	shadow /= 9.0f;
+	//shadow = (fragDepth - bias) > shadowMapDepth ? 1.0f : 0.0f;
+	return shadow;
 }
 
 //Blinn-Phong lighting
@@ -45,7 +60,6 @@ void BlinnPhongLighting()
 	vec3 ambient = ambi * vec3(texture(sample, texCoord));
 
 	float shadow = GetShadow(fragPosLightSpace);
-	//float shadow = 0.0f;
 	vec3 effect = ambient + (1.0 - shadow) * (diffuse + specular);
 	
 	finalColor = vec4(effect, 1.0);
