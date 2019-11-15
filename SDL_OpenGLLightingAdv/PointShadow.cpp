@@ -1,6 +1,6 @@
 #include "SDL_OpenGLLightingAdv.h"
 
-namespace ShadowMapping
+namespace PointShadow
 {
 	void ProcessInput();
 
@@ -26,7 +26,7 @@ namespace ShadowMapping
 			source, type, id, severity, message);
 	}
 
-	void ShadowMapping()
+	void PointShadow()
 	{
 		//initial SDL
 		SDL_Window* window = nullptr;
@@ -47,7 +47,7 @@ namespace ShadowMapping
 
 		camera.SetSpeed(6.0f);
 
-		window = SDL_CreateWindow("ShadowMapping", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("PointShadow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
 
 		SDL_ShowCursor(0);
@@ -153,30 +153,79 @@ namespace ShadowMapping
 		//set floor vao and vbo
 		GLuint floorVBO = 0;
 		GLuint floorVAO = 0;
+		GLuint floorEBO = 0;
+
+		//a cube for floors the normals are toward to inner side
 		GLfloat floorVertices[] = {
-			//position           //normal           //uv
-			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  //bottom left
-			0.5f, 0.0f, 0.5f,    0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  //bottom right
-			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
-			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
-			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,	0.0f, 1.0f,	//top left
-			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f  //bottom left
+			//Pos                 //normal              //texture coordinates
+			//front side
+			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, -1.0f,	0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f,  0.5f,   0.0f, 0.0f, -1.0f,	1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  0.5f,   0.0f, 0.0f, -1.0f,	1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, -1.0f,	0.0f, 1.0f,	//top left			
+			//back side
+			0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 1.0,		0.0f, 0.0f,	//bottom left
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0,	    1.0f, 0.0f,	//bottom right
+			-0.5f, 0.5f,  -0.5f,  0.0f, 0.0f, 1.0,		1.0f, 1.0f,	//top right
+			0.5f, 0.5f,  -0.5f,   0.0f, 0.0f, 1.0,		0.0f, 1.0f,	//top left			
+			//left side
+			-0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,	    0.0f, 0.0f,	//bottom left
+			-0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,	    1.0f, 0.0f,	//bottom right
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,	    1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,	    0.0f, 1.0f,	//top left			
+			//right side
+			0.5f, -0.5f,  0.5f,   -1.0f, 0.0f, 0.0f,	0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 1.0f,	//top right
+			0.5f, 0.5f,   0.5f,   -1.0f, 0.0f, 0.0f,	0.0f, 1.0f,	//top left			
+			//top side
+			-0.5f, 0.5f,  0.5f,   0.0f, -1.0f, 0.0f,	0.0f, 0.0f,	//bottom left
+			0.5f,  0.5f,  0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  -0.5f,  0.0f, -1.0f, 0.0f,	1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  -0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 1.0f,	//top left			
+			//bottom side
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,	    0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,	    1.0f, 0.0f,	//bottom right
+			0.5f,  -0.5f, 0.5f,   0.0f, 1.0f, 0.0f,	    1.0f, 1.0f,	//top right
+			-0.5f,  -0.5f, 0.5f,  0.0f, 1.0f, 0.0f,	    0.0f, 1.0f	//top left			
+		};
+
+		//verex indices
+		GLuint floorIndices[] = {
+			0, 1, 2, 2, 3, 0,
+			4, 5, 6, 6, 7, 4,
+			8, 9, 10, 10, 11, 8,
+			12, 13, 14, 14, 15, 12,
+			16, 17, 18, 18, 19, 16,
+			20, 21, 22, 22, 23, 20
 		};
 
 		glGenBuffers(1, &floorVBO);
-		glGenVertexArrays(1, &floorVAO);
+		glGenBuffers(1, &floorEBO);
 
-		glBindVertexArray(floorVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, floorEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crateIndices), crateIndices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glGenVertexArrays(1, &floorVAO);
+		
+		glBindVertexArray(floorVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, floorEBO);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//end of setting floor vao and vbo
 
 
@@ -207,7 +256,7 @@ namespace ShadowMapping
 		glBindVertexArray(0);
 		//end of setting debug vao and vbo
 
-		
+
 		GLuint depthMapFBO = 0;
 		glGenFramebuffers(1, &depthMapFBO);
 
@@ -224,7 +273,7 @@ namespace ShadowMapping
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
-		
+
 		//check if the frame buffer with attachment is complete
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{
@@ -233,16 +282,19 @@ namespace ShadowMapping
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
+
 
 		CShader objShader;
-		objShader.AttachShader("Shaders/ShadowMappingCrateVertexShader.vert", "Shaders/ShadowMappingCrateFragmentShader.frag");
+		objShader.AttachShader("Shaders/PointShadowCrateVertexShader.vert", "Shaders/PointShadowCrateFragmentShader.frag");
 
 		CShader shadowShader;
-		shadowShader.AttachShader("Shaders/ShadowMappingDepthVertexShader.vert", "Shaders/ShadowMappingDepthFragmentShader.frag");
+		shadowShader.AttachShader("Shaders/PointShadowDepthVertexShader.vert", "Shaders/PointShadowDepthFragmentShader.frag");
 
 		CShader debugShader;
-		debugShader.AttachShader("Shaders/ShadowMappingDebugVertexShader.vert", "Shaders/ShadowMappingDebugFragmentShader.frag");
+		debugShader.AttachShader("Shaders/PointShadowDebugVertexShader.vert", "Shaders/PointShadowDebugFragmentShader.frag");
+
+		CShader lightShader;
+		lightShader.AttachShader("Shaders/PointShadowLightVertexShader.vert", "Shaders/PointShadowLightFragmentShader.frag");
 
 		GLTexture woodTexture = CSTexture::LoadImage("wood.png");
 		GLTexture crateTexture = CSTexture::LoadImage("crate.png");
@@ -257,7 +309,7 @@ namespace ShadowMapping
 		while (isRunning)
 		{
 			glClearColor(0.1, 0.1, 0.1, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			Uint32 current = SDL_GetTicks();
 
@@ -287,17 +339,15 @@ namespace ShadowMapping
 			{
 				isDebug = !isDebug;
 			}
-			if (inputManager.IskeyPressed(SDLK_1))
-			{
-				isOrtho = !isOrtho;
-			}
 
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
-			glm::vec3 floorPos = glm::vec3(0.0f, -5.0f, 0.0f);
+			//glm::vec3 floorPos = glm::vec3(0.0f, -5.0f, 0.0f);
+			glm::vec3 floorPos = glm::vec3(0.0f, 20.0f, 0.0f);
 			glm::mat4 floorModel;
 			floorModel = glm::translate(floorModel, floorPos);
+
 			floorModel = glm::scale(floorModel, glm::vec3(50.0f, 50.0f, 50.0f));
 
 			glm::vec3 cratePos[] = {
@@ -307,11 +357,7 @@ namespace ShadowMapping
 
 			lightPos = glm::vec3(-10.0f, 20.0f, -10.0f);
 			glm::mat4 lightProjection = glm::mat4(1.0f);
-			if(isOrtho)
-				lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, 1.0f, 60.0f);
-			else
-				lightProjection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 5.0f, 60.0f);
-
+			lightProjection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 5.0f, 60.0f);
 			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 2.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 			//render light view to depth texture
@@ -319,19 +365,17 @@ namespace ShadowMapping
 			shadowShader.SetUniformMat4("projection", lightProjection);
 			shadowShader.SetUniformMat4("view", lightView);
 			glViewport(0, 0, screenWidth, screenHeight);
-			
+
 			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			//draw floor 
 			shadowShader.SetUniformMat4("model", floorModel);
-			glBindVertexArray(floorVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(crateVAO);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
-			
-			//glEnable(GL_CULL_FACE);
-			//glCullFace(GL_FRONT);
+
 			//draw crate			
 			for (int i = 0; i < 3; i++)
 			{
@@ -344,9 +388,7 @@ namespace ShadowMapping
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 			}
-			//glCullFace(GL_BACK);
-			//glDisable(GL_CULL_FACE);
-			
+
 			shadowShader.Unuse();
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);;
 
@@ -371,6 +413,19 @@ namespace ShadowMapping
 			{
 				//render normal scene
 				//initialize shaders
+
+				lightShader.Use();
+				glm::mat4 lightModel;
+				lightModel = glm::translate(lightModel, lightPos);
+				lightModel = glm::scale(lightModel, glm::vec3(1.0f));
+				lightShader.SetUniformMat4("projection", projection);
+				lightShader.SetUniformMat4("view", view);
+				lightShader.SetUniformMat4("model", lightModel);
+				glBindVertexArray(crateVAO);
+				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+				lightShader.Unuse();
+				
 				objShader.Use();
 				objShader.SetUniformMat4("projection", projection);
 				objShader.SetUniformMat4("view", view);
@@ -389,10 +444,9 @@ namespace ShadowMapping
 				glActiveTexture(GL_TEXTURE21);
 				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
 
-
 				objShader.SetUniformMat4("model", floorModel);
 				glBindVertexArray(floorVAO);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
+				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 
 				//render crates

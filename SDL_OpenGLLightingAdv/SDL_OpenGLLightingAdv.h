@@ -27,3 +27,8 @@ namespace ShadowMapping
 {
 	void ShadowMapping();
 }
+
+namespace PointShadow
+{
+	void PointShadow();
+}

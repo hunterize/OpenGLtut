@@ -5,6 +5,7 @@ int main(int args, char** argv)
 {
 	//BlinnPhongLighting::BlinnPhongLighting();
 	//GammaCorrection::GammaCorrection();
-	ShadowMapping::ShadowMapping();
+	//ShadowMapping::ShadowMapping();
+	PointShadow::PointShadow();
 	return 1;
 }

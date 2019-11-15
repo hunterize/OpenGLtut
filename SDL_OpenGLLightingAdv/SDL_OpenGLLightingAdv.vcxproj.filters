@@ -42,6 +42,9 @@
     <ClCompile Include="ShadowMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PointShadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -100,6 +103,30 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\ShadowMappingDebugVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowCrateFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowCrateVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowDebugFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowDebugVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowDepthVertexShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowDepthVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowLightFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowLightVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
