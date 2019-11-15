@@ -117,9 +117,6 @@
     <None Include="Shaders\PointShadowDebugVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\PointShadowDepthVertexShader.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\PointShadowDepthVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
@@ -127,6 +124,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\PointShadowLightVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PointShadowDepthFragmentShader.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

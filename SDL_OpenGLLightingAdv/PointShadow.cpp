@@ -42,9 +42,6 @@ namespace PointShadow
 			glm::vec3(30.0f, 20.0f, 30.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f));
 
-		//create projection matrix
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
-
 		camera.SetSpeed(6.0f);
 
 		window = SDL_CreateWindow("PointShadow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
@@ -256,7 +253,7 @@ namespace PointShadow
 		glBindVertexArray(0);
 		//end of setting debug vao and vbo
 
-
+		//depth map for single light view
 		GLuint depthMapFBO = 0;
 		glGenFramebuffers(1, &depthMapFBO);
 
@@ -273,16 +270,46 @@ namespace PointShadow
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
-
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
 		//check if the frame buffer with attachment is complete
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{
 			std::cout << "Frame buffer is not complete!" << std::endl;
 			exit(0);
 		}
+		//end of depth map for single light view
 
+		//frame buffer object for point shadow
+		GLuint depthCubeMapFBO = 0;
+		glGenFramebuffers(1, &depthCubeMapFBO);
+
+		GLuint depthCubeMapTexture;
+		glGenTextures(1, &depthCubeMapTexture);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
+		for (int i = 0; i < 6; i++)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, depthCubeMapFBO);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMapTexture, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+		
+		//check if the frame buffer with attachment is complete
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "Frame buffer is not complete!" << std::endl;
+			exit(0);
+		}
+		//end of frame buffer object for point shadow
 
 		CShader objShader;
 		objShader.AttachShader("Shaders/PointShadowCrateVertexShader.vert", "Shaders/PointShadowCrateFragmentShader.frag");
@@ -298,8 +325,14 @@ namespace PointShadow
 
 		GLTexture woodTexture = CSTexture::LoadImage("wood.png");
 		GLTexture crateTexture = CSTexture::LoadImage("crate.png");
+		//create projection matrix
+		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
 		glm::vec3 lightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
+
+		glm::vec3 pointLightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
+		glm::mat4 pointLightProjection = glm::perspective(glm::radians(90.0f), (float)screenWidth / screenHeight, 1.0f, 60.0f);
+		std::vector<glm::mat4> plViews;
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -359,6 +392,21 @@ namespace PointShadow
 			glm::mat4 lightProjection = glm::mat4(1.0f);
 			lightProjection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 5.0f, 60.0f);
 			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 2.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+			//for point light views
+			plViews.push_back(
+				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			plViews.push_back(
+				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			plViews.push_back(
+				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+			plViews.push_back(
+				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+			plViews.push_back(
+				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			plViews.push_back(
+				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+			//end for point light views
 
 			//render light view to depth texture
 			shadowShader.Use();

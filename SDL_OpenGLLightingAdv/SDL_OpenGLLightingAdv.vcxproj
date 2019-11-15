@@ -174,7 +174,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <None Include="Shaders\PointShadowCrateVertexShader.vert" />
     <None Include="Shaders\PointShadowDebugFragmentShader.frag" />
     <None Include="Shaders\PointShadowDebugVertexShader.vert" />
-    <None Include="Shaders\PointShadowDepthVertexShader.frag" />
+    <None Include="Shaders\PointShadowDepthFragmentShader.frag" />
     <None Include="Shaders\PointShadowDepthVertexShader.vert" />
     <None Include="Shaders\PointShadowLightFragmentShader.frag" />
     <None Include="Shaders\PointShadowLightVertexShader.vert" />
