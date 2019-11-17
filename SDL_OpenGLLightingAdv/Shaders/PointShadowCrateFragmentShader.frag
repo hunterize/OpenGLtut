@@ -26,7 +26,7 @@ float GetShadow(vec3 fragPos)
 	
 	float fragDepth = length(lightLookat);
 
-	float bias = 0.001f;
+	float bias = 0.05f;
 	float shadow = fragDepth - bias > storedDepth ? 1.0f : 0.0f;
 
 	return shadow;

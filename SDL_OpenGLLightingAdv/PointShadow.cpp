@@ -307,7 +307,7 @@ namespace PointShadow
 
 		glm::vec3 pointLightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
 		float plNearPlane = 1.0f;
-		float plFarPlane = 60.0f;
+		float plFarPlane = 100.0f;
 		glm::mat4 pointLightProjection = glm::perspective(glm::radians(90.0f), (float)depthWidth / depthHeight, plNearPlane, plFarPlane);
 		std::vector<glm::mat4> plViews;
 
@@ -358,12 +358,19 @@ namespace PointShadow
 			glm::mat4 floorModel;
 			floorModel = glm::translate(floorModel, floorPos);
 
-			floorModel = glm::scale(floorModel, glm::vec3(50.0f, 50.0f, 50.0f));
+			floorModel = glm::scale(floorModel, glm::vec3(80.0f, 50.0f, 80.0f));
 
 			glm::vec3 cratePos[] = {
 				glm::vec3(0.0f, 5.0f, 0.0f),
 				glm::vec3(4.0f, -2.0f, 10.0f),
-				glm::vec3(-5.0f, -3.499f, 0.0f) };
+				glm::vec3(-5.0f, -3.499f, 0.0f),
+				glm::vec3(-16.0f, 5.0f, -16.0f),
+				glm::vec3(-25.0f, 20.0f, -10.0f),
+				glm::vec3(-20.0f, 25.0f, -25.0f),
+				glm::vec3(-4.0f, 15.0f, -4.0f)
+			};
+
+			int crateNum = sizeof(cratePos) / sizeof(glm::vec3);
 
 			pointLightPos = glm::vec3(-10.0f, 10.0f, -10.0f);
 
@@ -405,7 +412,7 @@ namespace PointShadow
 			glBindVertexArray(0);
 
 			//draw crate			
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < crateNum; i++)
 			{
 				glm::mat4 crateModel;
 				crateModel = glm::translate(crateModel, cratePos[i]);
@@ -480,7 +487,7 @@ namespace PointShadow
 				glActiveTexture(GL_TEXTURE21);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
 
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < crateNum; i++)
 				{
 					glm::mat4 crateModel;
 					crateModel = glm::translate(crateModel, cratePos[i]);
