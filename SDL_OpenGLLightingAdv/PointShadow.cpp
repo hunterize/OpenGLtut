@@ -253,34 +253,9 @@ namespace PointShadow
 		glBindVertexArray(0);
 		//end of setting debug vao and vbo
 
-		//depth map for single light view
-		GLuint depthMapFBO = 0;
-		glGenFramebuffers(1, &depthMapFBO);
-
-		GLuint depthMapTexture;
-		glGenTextures(1, &depthMapTexture);
-		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
-		//check if the frame buffer with attachment is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			std::cout << "Frame buffer is not complete!" << std::endl;
-			exit(0);
-		}
-		//end of depth map for single light view
-
 		//frame buffer object for point shadow
+		int depthWidth = 1024;
+		int depthHeight = 1024;
 		GLuint depthCubeMapFBO = 0;
 		glGenFramebuffers(1, &depthCubeMapFBO);
 
@@ -289,7 +264,7 @@ namespace PointShadow
 		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
 		for (int i = 0; i < 6; i++)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, screenWidth, screenHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, depthWidth, depthHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -315,7 +290,7 @@ namespace PointShadow
 		objShader.AttachShader("Shaders/PointShadowCrateVertexShader.vert", "Shaders/PointShadowCrateFragmentShader.frag");
 
 		CShader shadowShader;
-		shadowShader.AttachShader("Shaders/PointShadowDepthVertexShader.vert", "Shaders/PointShadowDepthFragmentShader.frag");
+		shadowShader.AttachShader("Shaders/PointShadowDepthVertexShader.vert", "Shaders/PointShadowDepthFragmentShader.frag", "Shaders/PointShadowDepthGeometryShader.geo");
 
 		CShader debugShader;
 		debugShader.AttachShader("Shaders/PointShadowDebugVertexShader.vert", "Shaders/PointShadowDebugFragmentShader.frag");
@@ -331,7 +306,9 @@ namespace PointShadow
 		glm::vec3 lightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
 
 		glm::vec3 pointLightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
-		glm::mat4 pointLightProjection = glm::perspective(glm::radians(90.0f), (float)screenWidth / screenHeight, 1.0f, 60.0f);
+		float plNearPlane = 1.0f;
+		float plFarPlane = 60.0f;
+		glm::mat4 pointLightProjection = glm::perspective(glm::radians(90.0f), (float)depthWidth / depthHeight, plNearPlane, plFarPlane);
 		std::vector<glm::mat4> plViews;
 
 		//initial time tick
@@ -388,10 +365,7 @@ namespace PointShadow
 				glm::vec3(4.0f, -2.0f, 10.0f),
 				glm::vec3(-5.0f, -3.499f, 0.0f) };
 
-			lightPos = glm::vec3(-10.0f, 20.0f, -10.0f);
-			glm::mat4 lightProjection = glm::mat4(1.0f);
-			lightProjection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 5.0f, 60.0f);
-			glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 2.0, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			pointLightPos = glm::vec3(-10.0f, 10.0f, -10.0f);
 
 			//for point light views
 			plViews.push_back(
@@ -410,15 +384,21 @@ namespace PointShadow
 
 			//render light view to depth texture
 			shadowShader.Use();
-			shadowShader.SetUniformMat4("projection", lightProjection);
-			shadowShader.SetUniformMat4("view", lightView);
-			glViewport(0, 0, screenWidth, screenHeight);
+			glViewport(0, 0, depthWidth, depthHeight);
 
-			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+			glBindFramebuffer(GL_FRAMEBUFFER, depthCubeMapFBO);
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			//draw floor 
+			shadowShader.SetUniformFloat("far_plane", plFarPlane);
+			shadowShader.SetUniformVec3("lightPos", pointLightPos);
+
+			for (int i = 0; i < plViews.size(); i++)
+			{
+				shadowShader.SetUniformMat4("cubeMatrices[" + std::to_string(i) + "]", plViews[i]);
+			}
+
 			shadowShader.SetUniformMat4("model", floorModel);
 			glBindVertexArray(crateVAO);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -446,15 +426,6 @@ namespace PointShadow
 
 			if (isDebug)
 			{
-				debugShader.Use();
-				debugShader.SetUniformInt("depthMap", 11);
-				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-				glActiveTexture(GL_TEXTURE11);
-
-				glBindVertexArray(debugVAO);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-				glBindVertexArray(0);
-				debugShader.Unuse();
 				//
 			}
 			else
@@ -462,9 +433,10 @@ namespace PointShadow
 				//render normal scene
 				//initialize shaders
 
+				//render light object
 				lightShader.Use();
 				glm::mat4 lightModel;
-				lightModel = glm::translate(lightModel, lightPos);
+				lightModel = glm::translate(lightModel, pointLightPos);
 				lightModel = glm::scale(lightModel, glm::vec3(1.0f));
 				lightShader.SetUniformMat4("projection", projection);
 				lightShader.SetUniformMat4("view", view);
@@ -473,15 +445,17 @@ namespace PointShadow
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
 				lightShader.Unuse();
+				//end of rendering light object
 				
 				objShader.Use();
 				objShader.SetUniformMat4("projection", projection);
 				objShader.SetUniformMat4("view", view);
-				objShader.SetUniformMat4("lightPV", lightProjection * lightView);
+
 				glm::vec3 eyePos = camera.GetPosition();
 				objShader.SetUniformVec3("eyePos", eyePos);
-				objShader.SetUniformVec3("lightPos", lightPos);
+				objShader.SetUniformVec3("lightPos", pointLightPos);
 				objShader.SetUniformFloat("shininess", 32.0f);
+				objShader.SetUniformFloat("far_plane", plFarPlane);
 
 				//render floor
 				objShader.SetUniformInt("sample", 20);
@@ -490,7 +464,7 @@ namespace PointShadow
 
 				objShader.SetUniformInt("shadowMap", 21);
 				glActiveTexture(GL_TEXTURE21);
-				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
 
 				objShader.SetUniformMat4("model", floorModel);
 				glBindVertexArray(floorVAO);
@@ -504,7 +478,7 @@ namespace PointShadow
 
 				objShader.SetUniformInt("shadowMap", 21);
 				glActiveTexture(GL_TEXTURE21);
-				glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
 
 				for (int i = 0; i < 3; i++)
 				{

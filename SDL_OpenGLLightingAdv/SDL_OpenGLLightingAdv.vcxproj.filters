@@ -129,5 +129,8 @@
     <None Include="Shaders\PointShadowDepthFragmentShader.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\PointShadowDepthGeometryShader.geo">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
