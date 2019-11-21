@@ -427,81 +427,74 @@ namespace PointShadow
 			shadowShader.Unuse();
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);;
 
+			//game scene rendering
 			glViewport(0, 0, screenWidth, screenHeight);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glClearColor(0.1, 0.1, 0.1, 1.0);
 
-			if (isDebug)
-			{
-				//
-			}
-			else
-			{
-				//render normal scene
-				//initialize shaders
+			//render light object
+			lightShader.Use();
+			glm::mat4 lightModel;
+			lightModel = glm::translate(lightModel, pointLightPos);
+			lightModel = glm::scale(lightModel, glm::vec3(1.0f));
+			lightShader.SetUniformMat4("projection", projection);
+			lightShader.SetUniformMat4("view", view);
+			lightShader.SetUniformMat4("model", lightModel);
+			glBindVertexArray(crateVAO);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+			lightShader.Unuse();
+			//end of rendering light object
+				
+			objShader.Use();
+			objShader.SetUniformMat4("projection", projection);
+			objShader.SetUniformMat4("view", view);
 
-				//render light object
-				lightShader.Use();
-				glm::mat4 lightModel;
-				lightModel = glm::translate(lightModel, pointLightPos);
-				lightModel = glm::scale(lightModel, glm::vec3(1.0f));
-				lightShader.SetUniformMat4("projection", projection);
-				lightShader.SetUniformMat4("view", view);
-				lightShader.SetUniformMat4("model", lightModel);
+			glm::vec3 eyePos = camera.GetPosition();
+			objShader.SetUniformVec3("eyePos", eyePos);
+			objShader.SetUniformVec3("lightPos", pointLightPos);
+			objShader.SetUniformFloat("shininess", 64.0f);
+			objShader.SetUniformFloat("far_plane", plFarPlane);
+			objShader.SetUniformInt("isDebug", isDebug);
+
+			//render floor
+			objShader.SetUniformInt("sample", 20);
+			glActiveTexture(GL_TEXTURE20);
+			glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
+
+			objShader.SetUniformInt("shadowMap", 21);
+			glActiveTexture(GL_TEXTURE21);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
+
+			objShader.SetUniformMat4("model", floorModel);
+			glBindVertexArray(floorVAO);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			//render crates
+			objShader.SetUniformInt("sample", 20);
+			glActiveTexture(GL_TEXTURE20);
+			glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
+
+			objShader.SetUniformInt("shadowMap", 21);
+			glActiveTexture(GL_TEXTURE21);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
+
+			for (int i = 0; i < crateNum; i++)
+			{
+				glm::mat4 crateModel;
+				crateModel = glm::translate(crateModel, cratePos[i]);
+				crateModel = glm::scale(crateModel, glm::vec3(3.0f, 3.0f, 3.0f));
+				objShader.SetUniformMat4("model", crateModel);
+
 				glBindVertexArray(crateVAO);
 				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
-				lightShader.Unuse();
-				//end of rendering light object
-				
-				objShader.Use();
-				objShader.SetUniformMat4("projection", projection);
-				objShader.SetUniformMat4("view", view);
-
-				glm::vec3 eyePos = camera.GetPosition();
-				objShader.SetUniformVec3("eyePos", eyePos);
-				objShader.SetUniformVec3("lightPos", pointLightPos);
-				objShader.SetUniformFloat("shininess", 32.0f);
-				objShader.SetUniformFloat("far_plane", plFarPlane);
-
-				//render floor
-				objShader.SetUniformInt("sample", 20);
-				glActiveTexture(GL_TEXTURE20);
-				glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-
-				objShader.SetUniformInt("shadowMap", 21);
-				glActiveTexture(GL_TEXTURE21);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
-
-				objShader.SetUniformMat4("model", floorModel);
-				glBindVertexArray(floorVAO);
-				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-				glBindVertexArray(0);
-
-				//render crates
-				objShader.SetUniformInt("sample", 20);
-				glActiveTexture(GL_TEXTURE20);
-				glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
-
-				objShader.SetUniformInt("shadowMap", 21);
-				glActiveTexture(GL_TEXTURE21);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
-
-				for (int i = 0; i < crateNum; i++)
-				{
-					glm::mat4 crateModel;
-					crateModel = glm::translate(crateModel, cratePos[i]);
-					crateModel = glm::scale(crateModel, glm::vec3(3.0f, 3.0f, 3.0f));
-					objShader.SetUniformMat4("model", crateModel);
-
-					glBindVertexArray(crateVAO);
-					glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-					glBindVertexArray(0);
-				}
-
-				objShader.Unuse();
-				//end of rendering normal scene
 			}
+
+			objShader.Unuse();
+			//end of rendering normal scene
+			
 
 			SDL_GL_SwapWindow(window);
 

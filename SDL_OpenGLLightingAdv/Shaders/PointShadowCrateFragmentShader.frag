@@ -14,6 +14,7 @@ uniform vec3 lightPos;
 uniform float shininess;
 
 uniform float far_plane;
+uniform bool isDebug;
 
 //calculate shadow
 float GetShadow(vec3 fragPos)
@@ -57,8 +58,26 @@ void BlinnPhongLighting()
 	finalColor = vec4(effect, 1.0);
 }
 
+void DebugShadow()
+{
+	//get depth value from cube map
+	vec3 lightLookat = fragPos - lightPos;
+	
+	float storedDepth = texture(shadowMap, lightLookat).r;
+
+	finalColor = vec4(vec3(storedDepth), 1.0);
+}
+
 void main()
 {
-	BlinnPhongLighting();
+	if(isDebug)
+	{
+		DebugShadow();
+	}
+	else
+	{
+		BlinnPhongLighting();
+	}
+
 }
 
