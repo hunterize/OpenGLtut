@@ -17,22 +17,42 @@ uniform float far_plane;
 uniform bool isDebug;
 uniform bool isNormalReverse;
 
+vec3 shadowOffset[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
+
+
 //calculate shadow
 float GetShadow(vec3 fragPos)
 {
 	//get depth value from cube map
+	float bias = 0.5f;
+	float shadow = 0.0f;
+	int samples = 20;
+	float fragDist = length(eyePos - fragPos);
+	float radius = (1.0 + (fragDist / far_plane)) / 25.0f;
+
 	vec3 lightLookat = fragPos - lightPos;
-	
-	float storedDepth = texture(shadowMap, lightLookat).r;
-	storedDepth *= far_plane;
-	
 	float fragDepth = length(lightLookat);
 
-	float bias = 0.05f;
-	float shadow = fragDepth - bias > storedDepth ? 1.0f : 0.0f;
+	for(int i = 0; i < samples; i++)
+	{
+		float storedDepth = texture(shadowMap, lightLookat + shadowOffset[i] * radius).r;
+		storedDepth *= far_plane;
+		if(fragDepth - bias > storedDepth)
+		{
+			shadow += 1.0;
+		}
+	}
+
+	shadow /= float(samples);
 
 	return shadow;
-
 }
 
 //Blinn-Phong lighting
