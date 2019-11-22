@@ -15,6 +15,7 @@ uniform float shininess;
 
 uniform float far_plane;
 uniform bool isDebug;
+uniform bool isNormalReverse;
 
 //calculate shadow
 float GetShadow(vec3 fragPos)
@@ -36,10 +37,14 @@ float GetShadow(vec3 fragPos)
 
 //Blinn-Phong lighting
 void BlinnPhongLighting()
-{
+{	
 	float distance = length(lightPos - fragPos);
 
 	vec3 norm = normalize(normal);
+	if(isNormalReverse)
+	{
+		norm = vec3(-1.0) * norm;
+	}
 	vec3 lightDir = normalize(lightPos - fragPos);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = diff * vec3(texture(sample, texCoord));

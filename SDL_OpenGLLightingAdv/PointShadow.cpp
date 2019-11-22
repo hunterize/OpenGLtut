@@ -147,85 +147,6 @@ namespace PointShadow
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		//set floor vao and vbo
-		GLuint floorVBO = 0;
-		GLuint floorVAO = 0;
-		GLuint floorEBO = 0;
-
-		//a cube for floors the normals are toward to inner side
-		GLfloat floorVertices[] = {
-			//Pos                 //normal              //texture coordinates
-			//front side
-			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, -1.0f,	0.0f, 0.0f,	//bottom left
-			0.5f, -0.5f,  0.5f,   0.0f, 0.0f, -1.0f,	1.0f, 0.0f,	//bottom right
-			0.5f,  0.5f,  0.5f,   0.0f, 0.0f, -1.0f,	1.0f, 1.0f,	//top right
-			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, -1.0f,	0.0f, 1.0f,	//top left			
-			//back side
-			0.5f, -0.5f, -0.5f,   0.0f, 0.0f, 1.0,		0.0f, 0.0f,	//bottom left
-			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0,	    1.0f, 0.0f,	//bottom right
-			-0.5f, 0.5f,  -0.5f,  0.0f, 0.0f, 1.0,		1.0f, 1.0f,	//top right
-			0.5f, 0.5f,  -0.5f,   0.0f, 0.0f, 1.0,		0.0f, 1.0f,	//top left			
-			//left side
-			-0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,	    0.0f, 0.0f,	//bottom left
-			-0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,	    1.0f, 0.0f,	//bottom right
-			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,	    1.0f, 1.0f,	//top right
-			-0.5f, 0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,	    0.0f, 1.0f,	//top left			
-			//right side
-			0.5f, -0.5f,  0.5f,   -1.0f, 0.0f, 0.0f,	0.0f, 0.0f,	//bottom left
-			0.5f, -0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 0.0f,	//bottom right
-			0.5f,  0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 1.0f,	//top right
-			0.5f, 0.5f,   0.5f,   -1.0f, 0.0f, 0.0f,	0.0f, 1.0f,	//top left			
-			//top side
-			-0.5f, 0.5f,  0.5f,   0.0f, -1.0f, 0.0f,	0.0f, 0.0f,	//bottom left
-			0.5f,  0.5f,  0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 0.0f,	//bottom right
-			0.5f,  0.5f,  -0.5f,  0.0f, -1.0f, 0.0f,	1.0f, 1.0f,	//top right
-			-0.5f, 0.5f,  -0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 1.0f,	//top left			
-			//bottom side
-			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,	    0.0f, 0.0f,	//bottom left
-			0.5f, -0.5f, -0.5f,   0.0f, 1.0f, 0.0f,	    1.0f, 0.0f,	//bottom right
-			0.5f,  -0.5f, 0.5f,   0.0f, 1.0f, 0.0f,	    1.0f, 1.0f,	//top right
-			-0.5f,  -0.5f, 0.5f,  0.0f, 1.0f, 0.0f,	    0.0f, 1.0f	//top left			
-		};
-
-		//verex indices
-		GLuint floorIndices[] = {
-			0, 1, 2, 2, 3, 0,
-			4, 5, 6, 6, 7, 4,
-			8, 9, 10, 10, 11, 8,
-			12, 13, 14, 14, 15, 12,
-			16, 17, 18, 18, 19, 16,
-			20, 21, 22, 22, 23, 20
-		};
-
-		glGenBuffers(1, &floorVBO);
-		glGenBuffers(1, &floorEBO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, floorEBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crateIndices), crateIndices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glGenVertexArrays(1, &floorVAO);
-		
-		glBindVertexArray(floorVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, floorEBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//end of setting floor vao and vbo
-
-
 		//set debug vao and vbo
 		GLuint debugVAO;
 		GLuint debugVBO;
@@ -291,9 +212,6 @@ namespace PointShadow
 
 		CShader shadowShader;
 		shadowShader.AttachShader("Shaders/PointShadowDepthVertexShader.vert", "Shaders/PointShadowDepthFragmentShader.frag", "Shaders/PointShadowDepthGeometryShader.geo");
-
-		CShader debugShader;
-		debugShader.AttachShader("Shaders/PointShadowDebugVertexShader.vert", "Shaders/PointShadowDebugFragmentShader.frag");
 
 		CShader lightShader;
 		lightShader.AttachShader("Shaders/PointShadowLightVertexShader.vert", "Shaders/PointShadowLightFragmentShader.frag");
@@ -456,6 +374,7 @@ namespace PointShadow
 			objShader.SetUniformFloat("shininess", 64.0f);
 			objShader.SetUniformFloat("far_plane", plFarPlane);
 			objShader.SetUniformInt("isDebug", isDebug);
+			objShader.SetUniformInt("isNormalReverse", true);
 
 			//render floor
 			objShader.SetUniformInt("sample", 20);
@@ -467,11 +386,12 @@ namespace PointShadow
 			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
 
 			objShader.SetUniformMat4("model", floorModel);
-			glBindVertexArray(floorVAO);
+			glBindVertexArray(crateVAO);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
 			//render crates
+			objShader.SetUniformInt("isNormalReverse", false);
 			objShader.SetUniformInt("sample", 20);
 			glActiveTexture(GL_TEXTURE20);
 			glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
