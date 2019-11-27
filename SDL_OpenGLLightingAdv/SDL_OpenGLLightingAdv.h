@@ -32,3 +32,8 @@ namespace PointShadow
 {
 	void PointShadow();
 }
+
+namespace NormalMapping
+{
+	void NormalMapping();
+}

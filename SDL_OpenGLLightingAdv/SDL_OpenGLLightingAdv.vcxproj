@@ -149,6 +149,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="GammaCorrection.cpp" />
+    <ClCompile Include="NormalMapping.cpp" />
     <ClCompile Include="PointShadow.cpp" />
     <ClCompile Include="SDL_OpenGLLightingAdv.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
@@ -170,6 +171,10 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <None Include="Shaders\BlinnPhongVertexShader.vert" />
     <None Include="Shaders\GammaCorrectionFragmentShader.frag" />
     <None Include="Shaders\GammaCorrectionVertexShader.vert" />
+    <None Include="Shaders\NormalMappingLightFragmentShader.frag" />
+    <None Include="Shaders\NormalMappingLightVertexShader.vert" />
+    <None Include="Shaders\NormalMappingObjectFragmentShader.frag" />
+    <None Include="Shaders\NormalMappingObjectVertexShader.vert" />
     <None Include="Shaders\PointShadowCrateFragmentShader.frag" />
     <None Include="Shaders\PointShadowCrateVertexShader.vert" />
     <None Include="Shaders\PointShadowDebugFragmentShader.frag" />

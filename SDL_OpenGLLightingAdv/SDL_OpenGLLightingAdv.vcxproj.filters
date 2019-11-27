@@ -45,6 +45,9 @@
     <ClCompile Include="PointShadow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="NormalMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -130,6 +133,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\PointShadowDepthGeometryShader.geo">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\NormalMappingLightFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\NormalMappingLightVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\NormalMappingObjectVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\NormalMappingObjectFragmentShader.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

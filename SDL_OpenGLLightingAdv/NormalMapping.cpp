@@ -1,6 +1,6 @@
 #include "SDL_OpenGLLightingAdv.h"
 
-namespace PointShadow
+namespace NormalMapping
 {
 	void ProcessInput();
 
@@ -26,7 +26,7 @@ namespace PointShadow
 			source, type, id, severity, message);
 	}
 
-	void PointShadow()
+	void NormalMapping()
 	{
 		//initial SDL
 		SDL_Window* window = nullptr;
@@ -44,7 +44,7 @@ namespace PointShadow
 
 		camera.SetSpeed(6.0f);
 
-		window = SDL_CreateWindow("PointShadow", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow("NormalMapping", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
 
 		SDL_ShowCursor(0);
@@ -147,87 +147,17 @@ namespace PointShadow
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		//set debug vao and vbo
-		GLuint debugVAO;
-		GLuint debugVBO;
-		GLfloat debugVertices[] = {
-			//position       //uv
-			-1.0f, 1.0f,     0.0f, 1.0f,    //top left
-			-1.0f, -1.0f,    0.0f, 0.0f,    //bottom left
-			1.0f,  -1.0f,    1.0f, 0.0f,    //bottom right
-			1.0f,  -1.0f,    1.0f, 0.0f,    //bottom right
-			1.0f,  1.0f,     1.0f, 1.0f,    //top right
-			-1.0f, 1.0f,     0.0f, 1.0f    //top left
-		};
-
-		glGenBuffers(1, &debugVBO);
-		glGenVertexArrays(1, &debugVAO);
-
-		glBindVertexArray(debugVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, debugVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(debugVertices), debugVertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void *)0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void *)(sizeof(GLfloat) * 2));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		//end of setting debug vao and vbo
-
-		//frame buffer object for point shadow
-		int depthWidth = 1024;
-		int depthHeight = 1024;
-		GLuint depthCubeMapFBO = 0;
-		glGenFramebuffers(1, &depthCubeMapFBO);
-
-		GLuint depthCubeMapTexture;
-		glGenTextures(1, &depthCubeMapTexture);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
-		for (int i = 0; i < 6; i++)
-		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, depthWidth, depthHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		}
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, depthCubeMapFBO);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMapTexture, 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
-		//check if the frame buffer with attachment is complete
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			std::cout << "Frame buffer is not complete!" << std::endl;
-			exit(0);
-		}
-		//end of frame buffer object for point shadow
-
 		CShader objShader;
-		objShader.AttachShader("Shaders/PointShadowCrateVertexShader.vert", "Shaders/PointShadowCrateFragmentShader.frag");
-
-		CShader shadowShader;
-		shadowShader.AttachShader("Shaders/PointShadowDepthVertexShader.vert", "Shaders/PointShadowDepthFragmentShader.frag", "Shaders/PointShadowDepthGeometryShader.geo");
+		objShader.AttachShader("Shaders/NormalMappingObjectVertexShader.vert", "Shaders/NormalMappingObjectFragmentShader.frag");
 
 		CShader lightShader;
-		lightShader.AttachShader("Shaders/PointShadowLightVertexShader.vert", "Shaders/PointShadowLightFragmentShader.frag");
+		lightShader.AttachShader("Shaders/NormalMappingLightVertexShader.vert", "Shaders/NormalMappingLightFragmentShader.frag");
 
-		GLTexture woodTexture = CSTexture::LoadImage("wood.png");
-		GLTexture crateTexture = CSTexture::LoadImage("crate.png");
+		GLTexture wallTexture = CSTexture::LoadImage("brickwall.jpg");
+		GLTexture normalTexture = CSTexture::LoadImage("brickwall_normal.jpg");
+
 		//create projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
-
-		glm::vec3 lightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
-
-		glm::vec3 pointLightPos = glm::vec3(-10.0f, 8.0f, -10.0f);
-		float plNearPlane = 1.0f;
-		float plFarPlane = 100.0f;
-		glm::mat4 pointLightProjection = glm::perspective(glm::radians(90.0f), (float)depthWidth / depthHeight, plNearPlane, plFarPlane);
-		std::vector<glm::mat4> plViews;
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -238,6 +168,8 @@ namespace PointShadow
 		{
 			glClearColor(0.1, 0.1, 0.1, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);  //enable depth testing
+
 
 			Uint32 current = SDL_GetTicks();
 
@@ -271,87 +203,9 @@ namespace PointShadow
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
-			//glm::vec3 floorPos = glm::vec3(0.0f, -5.0f, 0.0f);
-			glm::vec3 floorPos = glm::vec3(0.0f, 20.0f, 0.0f);
-			glm::mat4 floorModel;
-			floorModel = glm::translate(floorModel, floorPos);
-
-			floorModel = glm::scale(floorModel, glm::vec3(80.0f, 50.0f, 80.0f));
-
-			glm::vec3 cratePos[] = {
-				glm::vec3(0.0f, 5.0f, 0.0f),
-				glm::vec3(4.0f, -2.0f, 10.0f),
-				glm::vec3(-5.0f, -3.499f, 0.0f),
-				glm::vec3(-16.0f, 5.0f, -16.0f),
-				glm::vec3(-25.0f, 20.0f, -10.0f),
-				glm::vec3(-20.0f, 25.0f, -25.0f),
-				glm::vec3(-4.0f, 15.0f, -4.0f)
-			};
-
-			int crateNum = sizeof(cratePos) / sizeof(glm::vec3);
-
-			pointLightPos = glm::vec3(-10.0f, 10.0f, -10.0f);
-
-			//for point light views
-			plViews.push_back(
-				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-			plViews.push_back(
-				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-			plViews.push_back(
-				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-			plViews.push_back(
-				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-			plViews.push_back(
-				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-			plViews.push_back(
-				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-			//end for point light views
-
-			//render light view to depth texture
-			shadowShader.Use();
-			glViewport(0, 0, depthWidth, depthHeight);
-
-			glBindFramebuffer(GL_FRAMEBUFFER, depthCubeMapFBO);
-			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
-			glClear(GL_DEPTH_BUFFER_BIT);
-
-			//draw floor 
-			shadowShader.SetUniformFloat("far_plane", plFarPlane);
-			shadowShader.SetUniformVec3("lightPos", pointLightPos);
-
-			for (int i = 0; i < plViews.size(); i++)
-			{
-				shadowShader.SetUniformMat4("cubeMatrices[" + std::to_string(i) + "]", plViews[i]);
-			}
-
-			shadowShader.SetUniformMat4("model", floorModel);
-			glBindVertexArray(crateVAO);
-			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-
-			//draw crate			
-			for (int i = 0; i < crateNum; i++)
-			{
-				glm::mat4 crateModel;
-				crateModel = glm::translate(crateModel, cratePos[i]);
-				crateModel = glm::scale(crateModel, glm::vec3(3.0f, 3.0f, 3.0f));
-				shadowShader.SetUniformMat4("model", crateModel);
-
-				glBindVertexArray(crateVAO);
-				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-				glBindVertexArray(0);
-			}
-
-			shadowShader.Unuse();
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);;
-
-			//game scene rendering
-			glViewport(0, 0, screenWidth, screenHeight);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glClearColor(0.1, 0.1, 0.1, 1.0);
-
 			//render light object
 			lightShader.Use();
+			glm::vec3 pointLightPos = glm::vec3(-10.0f, 10.0f, -10.0f);
 			glm::mat4 lightModel;
 			lightModel = glm::translate(lightModel, pointLightPos);
 			lightModel = glm::scale(lightModel, glm::vec3(1.0f));
@@ -363,7 +217,8 @@ namespace PointShadow
 			glBindVertexArray(0);
 			lightShader.Unuse();
 			//end of rendering light object
-				
+
+			//render floor
 			objShader.Use();
 			objShader.SetUniformMat4("projection", projection);
 			objShader.SetUniformMat4("view", view);
@@ -372,49 +227,27 @@ namespace PointShadow
 			objShader.SetUniformVec3("eyePos", eyePos);
 			objShader.SetUniformVec3("lightPos", pointLightPos);
 			objShader.SetUniformFloat("shininess", 64.0f);
-			objShader.SetUniformFloat("far_plane", plFarPlane);
 			objShader.SetUniformInt("isDebug", isDebug);
 			objShader.SetUniformInt("isNormalReverse", true);
-
-			//render floor
+			glm::vec3 wallPos = glm::vec3(0.0f, 20.0f, 0.0f);
+			glm::mat4 wallModel;
+			wallModel = glm::translate(wallModel, wallPos);
+			wallModel = glm::scale(wallModel, glm::vec3(80.0f, 50.0f, 80.0f));
 			objShader.SetUniformInt("sample", 20);
 			glActiveTexture(GL_TEXTURE20);
-			glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-
-			objShader.SetUniformInt("shadowMap", 21);
+			glBindTexture(GL_TEXTURE_2D, wallTexture.ID);
+			objShader.SetUniformInt("nmap", 21);
 			glActiveTexture(GL_TEXTURE21);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
+			glBindTexture(GL_TEXTURE_2D, normalTexture.ID);
 
-			objShader.SetUniformMat4("model", floorModel);
+			objShader.SetUniformMat4("model", wallModel);
 			glBindVertexArray(crateVAO);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
-			//render crates
-			objShader.SetUniformInt("isNormalReverse", false);
-			objShader.SetUniformInt("sample", 20);
-			glActiveTexture(GL_TEXTURE20);
-			glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
-
-			objShader.SetUniformInt("shadowMap", 21);
-			glActiveTexture(GL_TEXTURE21);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMapTexture);
-
-			for (int i = 0; i < crateNum; i++)
-			{
-				glm::mat4 crateModel;
-				crateModel = glm::translate(crateModel, cratePos[i]);
-				crateModel = glm::scale(crateModel, glm::vec3(3.0f, 3.0f, 3.0f));
-				objShader.SetUniformMat4("model", crateModel);
-
-				glBindVertexArray(crateVAO);
-				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-				glBindVertexArray(0);
-			}
-
 			objShader.Unuse();
 			//end of rendering normal scene
-			
+
 
 			SDL_GL_SwapWindow(window);
 
@@ -425,7 +258,6 @@ namespace PointShadow
 		}
 
 		SDL_GL_DeleteContext(context);
-		plViews.clear();
 	}
 
 	void ProcessInput()
