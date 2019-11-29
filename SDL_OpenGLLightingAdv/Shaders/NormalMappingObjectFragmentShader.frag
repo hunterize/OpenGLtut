@@ -4,6 +4,8 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
 
+in mat3 TBN;
+
 out vec4 finalColor;
 
 uniform sampler2D sample;
@@ -25,6 +27,8 @@ void BlinnPhongLighting()
 	//vec3 norm = normalize(normal);
 	vec3 norm = texture(nmap, texCoord).rgb;
 	norm = normalize(norm * 2.0 - 1.0);
+
+	norm = normalize(TBN * norm);
 
 	if(isNormalReverse)
 	{

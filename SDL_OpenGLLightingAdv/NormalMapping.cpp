@@ -26,6 +26,61 @@ namespace NormalMapping
 			source, type, id, severity, message);
 	}
 
+	GLfloat* GetTangentVertices(GLfloat* vArray, int size)
+	{
+		if (size != 192)
+			return NULL;
+		GLfloat* vertexArray = new GLfloat[336];
+
+		int n = 0;
+		for (int i = 0; i < size; i += 32 )
+		{
+			glm::vec3 p1 = glm::vec3(vArray[i], vArray[i + 1], vArray[i + 2]);
+			glm::vec3 p2 = glm::vec3(vArray[i + 8], vArray[i + 9], vArray[i + 10]);
+			glm::vec3 p3 = glm::vec3(vArray[i + 16], vArray[i + 17], vArray[i + 18]);
+
+			glm::vec2 uv1 = glm::vec2(vArray[i + 6], vArray[i + 7]);
+			glm::vec2 uv2 = glm::vec2(vArray[i + 14], vArray[i + 15]);
+			glm::vec2 uv3 = glm::vec2(vArray[i + 22], vArray[i + 23]);
+
+			GLfloat deltaU1 = uv1.x - uv2.x;
+			GLfloat deltaU2 = uv3.x - uv2.x;
+			GLfloat deltaV1 = uv1.y - uv2.y;
+			GLfloat deltaV2 = uv3.y - uv2.y;
+
+			glm::vec3 E1 = p1 - p2;
+			glm::vec3 E2 = p3 - p2;
+
+			GLfloat f = 1.0f / (deltaU1*deltaV2 - deltaV1 * deltaU2);
+
+			glm::vec3 Tangent = f * (deltaV2 * E1 - deltaV1 * E2);
+			glm::vec3 Bitangent = f * (deltaU1 * E2 - deltaU2 * E1);
+
+			vertexArray[n + 8] = vertexArray[n + 8 + 14] = vertexArray[n + 8 + 28] = vertexArray[n + 8 + 42] = Tangent.x;
+			vertexArray[n + 9] = vertexArray[n + 9 + 14] = vertexArray[n + 9 + 28] = vertexArray[n + 9 + 42] = Tangent.y;
+			vertexArray[n + 10] = vertexArray[n + 10 + 14] = vertexArray[n + 10 + 28] = vertexArray[n + 10 + 42] = Tangent.z;
+
+			vertexArray[n + 11] = vertexArray[n + 11 + 14] = vertexArray[n + 11 + 28] = vertexArray[n + 11 + 42] = Bitangent.x;
+			vertexArray[n + 12] = vertexArray[n + 12 + 14] = vertexArray[n + 12 + 28] = vertexArray[n + 12 + 42] = Bitangent.y;
+			vertexArray[n + 13] = vertexArray[n + 13 + 14] = vertexArray[n + 13 + 28] = vertexArray[n + 13 + 42] = Bitangent.z;
+
+			for (int j = 0; j < 32; j++)
+			{
+				vertexArray[n] = vArray[i + j];
+				if ((j + 1) % 8 == 0)
+				{
+					n += 7;
+				}
+				else
+				{
+					n++;
+				}
+			}
+		}
+
+		return vertexArray;
+	}
+
 	void NormalMapping()
 	{
 		//initial SDL
@@ -105,6 +160,8 @@ namespace NormalMapping
 			-0.5f,  -0.5f, 0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 1.0f	//top left			
 		};
 
+		GLfloat* tangentVer = GetTangentVertices(crateVertices, sizeof(crateVertices)/sizeof(GLfloat));
+
 		//verex indices
 		GLuint crateIndices[] = {
 			0, 1, 2, 2, 3, 0,
@@ -115,6 +172,47 @@ namespace NormalMapping
 			20, 21, 22, 22, 23, 20
 		};
 
+		//set vao for cube
+		glGenBuffers(1, &crateVBO);
+		glGenBuffers(1, &crateEBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+		glBufferData(GL_ARRAY_BUFFER, 336 * sizeof(GLfloat), tangentVer, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crateIndices), crateIndices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//set attribute location for vertex arrays
+		glGenVertexArrays(1, &crateVAO);
+		glBindVertexArray(crateVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
+
+		//Attribute location = 0 in vertex shader
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 14, (void*)0);
+		glEnableVertexAttribArray(0);
+		//Attribute location = 1 in vertex shader
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 14, (void*)(sizeof(GLfloat) * 3));
+		glEnableVertexAttribArray(1);
+		//Attribute location = 2 in vertex shader
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 14, (void*)(sizeof(GLfloat) * 6));
+		glEnableVertexAttribArray(2);
+		//Attribute location = 3 in vertex shader
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 14, (void*)(sizeof(GLfloat) * 8));
+		glEnableVertexAttribArray(3);
+		//Attribute location = 4 in vertex shader
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 14, (void*)(sizeof(GLfloat) * 11));
+		glEnableVertexAttribArray(4);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		delete tangentVer;
+
+		/*
 		//set vao for cube
 		glGenBuffers(1, &crateVBO);
 		glGenBuffers(1, &crateEBO);
@@ -146,7 +244,8 @@ namespace NormalMapping
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+		*/
+		
 		CShader objShader;
 		objShader.AttachShader("Shaders/NormalMappingObjectVertexShader.vert", "Shaders/NormalMappingObjectFragmentShader.frag");
 
@@ -226,7 +325,7 @@ namespace NormalMapping
 			glm::vec3 eyePos = camera.GetPosition();
 			objShader.SetUniformVec3("eyePos", eyePos);
 			objShader.SetUniformVec3("lightPos", pointLightPos);
-			objShader.SetUniformFloat("shininess", 64.0f);
+			objShader.SetUniformFloat("shininess", 256.0f);
 			objShader.SetUniformInt("isDebug", isDebug);
 			objShader.SetUniformInt("isNormalReverse", true);
 			glm::vec3 wallPos = glm::vec3(0.0f, 20.0f, 0.0f);
