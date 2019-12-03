@@ -22,8 +22,6 @@ uniform bool isNormalReverse;
 //Blinn-Phong lighting
 void BlinnPhongLighting()
 {	
-	float distance = length(lightPos - fragPos);
-
 	//vec3 norm = normalize(normal);
 	vec3 norm = texture(nmap, texCoord).rgb;
 	norm = normalize(norm * 2.0 - 1.0);
@@ -41,7 +39,7 @@ void BlinnPhongLighting()
 	vec3 viewDir = normalize(eyePos - fragPos);
 	vec3 halfVector = normalize(lightDir + viewDir);
 	float spec = pow(max(dot(norm, halfVector), 0.0), shininess);
-	vec3 specular = spec * vec3(0.4);
+	vec3 specular = spec * vec3(0.3);
 
 	float ambi = 0.1f;
 	vec3 ambient = ambi * vec3(texture(sample, texCoord));
@@ -54,8 +52,6 @@ void BlinnPhongLighting()
 
 void main()
 {
-
 	BlinnPhongLighting();
-
 }
 
