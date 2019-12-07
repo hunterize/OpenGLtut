@@ -82,9 +82,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\ModelFurShader.geom">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\FurFragmentShaderEx.frag">
       <Filter>Shaders</Filter>
     </None>

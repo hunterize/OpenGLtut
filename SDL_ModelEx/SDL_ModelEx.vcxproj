@@ -171,7 +171,6 @@ xcopy /y /e /i "$(ProjectDir)GameResource" "$(Outdir)GameResource"</Command>
     <None Include="Shaders\LightFragmentShaderEx.frag" />
     <None Include="Shaders\LightVertexShaderEx.vert" />
     <None Include="Shaders\ModelFragmentShaderEx.frag" />
-    <None Include="Shaders\ModelFurShader.geom" />
     <None Include="Shaders\ModelGeometryShaderEx.geom" />
     <None Include="Shaders\ModelVertexShaderEx.vert" />
     <None Include="Shaders\SkyFragmentShaderEx.frag" />
