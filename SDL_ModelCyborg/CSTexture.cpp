@@ -11,7 +11,7 @@ GLTexture CSTexture::LoadImage(const std::string& fileName)
 	glGenTextures(1, &texture.ID);
 
 	//flip the texture
-	//stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(true);
 
 	unsigned char *imageData = NULL;
 	imageData = stbi_load(fileName.c_str(), &texture.width, &texture.height, &channel, 0);

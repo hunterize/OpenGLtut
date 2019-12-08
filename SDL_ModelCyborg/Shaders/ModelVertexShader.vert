@@ -31,7 +31,7 @@ void main()
 
 	vec3 nor = normalize(cross(T, B));
 
-	if(dot(nor, normalize(vec3(model * vec4(vertexNor, 0.0)))) < 0.0)
+	if(dot(nor, normal) < 0.0)
 	{
 		T = (-1.0) * T;
 	}

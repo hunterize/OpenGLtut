@@ -118,6 +118,7 @@ namespace Cyborg
 		Uint32 MS_PER_FRAME = 8;
 
 		int eff = 1;
+		int hasNM = 0;
 
 		while (isRunning)
 		{
@@ -225,6 +226,7 @@ namespace Cyborg
 
 			modelShader.SetUniformFloat("shininess", shininess);
 			modelShader.SetUniformInt("effect", eff);
+			modelShader.SetUniformInt("isNM", 0);
 
 			soldierModel.Render(modelShader);
 
@@ -232,6 +234,7 @@ namespace Cyborg
 			cybModel = glm::translate(cybModel, glm::vec3(-15.0f, 0.0, 0.0));
 			cybModel = glm::scale(cybModel, glm::vec3(4.0f));
 			modelShader.SetUniformMat4("model", cybModel);
+			modelShader.SetUniformInt("isNM", 1);
 
 			cyborgModel.Render(modelShader);
 
