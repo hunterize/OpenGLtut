@@ -23,7 +23,7 @@ void CModel::Render(const CShader& shader)
 void CModel::LoadModel(const std::string& path)
 {
 	Assimp::Importer importer;
-	const aiScene* pScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	const aiScene* pScene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 	
 	if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
 	{
