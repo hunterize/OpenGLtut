@@ -7,6 +7,7 @@ int main(int args, char** argv)
 	//GammaCorrection::GammaCorrection();
 	//ShadowMapping::ShadowMapping();
 	//PointShadow::PointShadow();
-	NormalMapping::NormalMapping();
+	//NormalMapping::NormalMapping();
+	ParallaxMapping::ParallaxMapping();
 	return 1;
 }

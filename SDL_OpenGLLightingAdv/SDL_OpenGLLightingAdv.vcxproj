@@ -150,6 +150,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="GammaCorrection.cpp" />
     <ClCompile Include="NormalMapping.cpp" />
+    <ClCompile Include="ParallaxMapping.cpp" />
     <ClCompile Include="PointShadow.cpp" />
     <ClCompile Include="SDL_OpenGLLightingAdv.cpp" />
     <ClCompile Include="ShadowMapping.cpp" />
@@ -163,6 +164,11 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bricks2.jpg" />
+    <Image Include="bricks2_disp.jpg" />
+    <Image Include="bricks2_normal.jpg" />
+    <Image Include="brickwall.jpg" />
+    <Image Include="brickwall_normal.jpg" />
     <Image Include="crate.png" />
     <Image Include="wood.png" />
   </ItemGroup>
@@ -175,6 +181,8 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <None Include="Shaders\NormalMappingLightVertexShader.vert" />
     <None Include="Shaders\NormalMappingObjectFragmentShader.frag" />
     <None Include="Shaders\NormalMappingObjectVertexShader.vert" />
+    <None Include="Shaders\ParallaxMappingObjectFragmentShader.frag" />
+    <None Include="Shaders\ParallaxMappingObjectVertexShader.vert" />
     <None Include="Shaders\PointShadowCrateFragmentShader.frag" />
     <None Include="Shaders\PointShadowCrateVertexShader.vert" />
     <None Include="Shaders\PointShadowDebugFragmentShader.frag" />

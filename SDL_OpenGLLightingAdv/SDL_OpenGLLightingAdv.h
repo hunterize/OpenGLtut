@@ -37,3 +37,8 @@ namespace NormalMapping
 {
 	void NormalMapping();
 }
+
+namespace ParallaxMapping
+{
+	void ParallaxMapping();
+}

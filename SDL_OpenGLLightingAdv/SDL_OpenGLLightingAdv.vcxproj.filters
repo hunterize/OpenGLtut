@@ -48,6 +48,9 @@
     <ClCompile Include="NormalMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParallaxMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -74,6 +77,21 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="crate.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bricks2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bricks2_disp.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bricks2_normal.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="brickwall.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="brickwall_normal.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -145,6 +163,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\NormalMappingObjectFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ParallaxMappingObjectFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ParallaxMappingObjectVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
