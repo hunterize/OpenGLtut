@@ -52,7 +52,19 @@ CCamera3D::CCamera3D(
 	else
 	{
 		m_cFront = glm::normalize(m_cFront);
-		float yaw = m_cFront.x == 0 ? 0.0f : glm::atan(m_cFront.z, m_cFront.x);
+		float yaw;
+		if (m_cFront.x > -0.0001 && m_cFront.x < 0.0001)
+		{
+			if (m_cFront.z > 0.0f)
+				yaw = 3.14 / 2.0f;
+			else
+				yaw = -3.14 / 2.0f;
+		}
+		else
+		{
+			yaw = glm::atan(m_cFront.z, m_cFront.x);
+		}
+			
 		m_fYaw = (yaw + 3.14f) * 360.0f / (2 * 3.14f) - 180.0f;
 		float pitch = glm::atan(m_cFront.y, glm::sqrt(m_cFront.x * m_cFront.x + m_cFront.z * m_cFront.z));
 		m_fPitch = (pitch + 3.14f) * 360.0f / (2 * 3.14f) - 180.0f;
