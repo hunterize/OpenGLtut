@@ -57,6 +57,69 @@ vec2 ParallaxMappingTexture(vec2 textureCoord, vec3 viewDir)
 	return textureCoord - viewDir.xy * h * heightScale;
 }
 
+vec2 ParallaxMappingTextureEx(vec2 textureCoord, vec3 viewDir)
+{
+	int num = 10;
+	float layerDepth = 1.0 / num;
+	float currentLayerDepth = 0.0;
+
+	vec2 Vxy = viewDir.xy * heightScale;
+	vec2 deltaV = Vxy / num;
+
+	vec2 currentTexCoord = textureCoord;
+	float currentDepthValue = texture(depthmap, currentTexCoord).r;
+
+	while(currentLayerDepth < currentDepthValue)
+	{
+		currentTexCoord -= deltaV;
+		currentDepthValue = texture(depthmap, currentTexCoord).r;
+		currentLayerDepth += layerDepth;
+	}
+
+	return currentTexCoord;
+
+}
+
+vec2 ParallaxOcclusionMappingTexture(vec2 textureCoord, vec3 viewDir)
+{
+	//int num = 10;
+
+	float minLayer = 8;
+	float maxLayer = 32;
+	float num = mix(maxLayer, minLayer, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
+	float layerDepth = 1.0 / num;
+	float currentLayerDepth = 0.0;
+
+	vec2 Vxy = viewDir.xy * heightScale;
+	vec2 deltaV = Vxy / num;
+
+	vec2 currentTexCoord = textureCoord;
+	float currentDepthValue = texture(depthmap, currentTexCoord).r;
+
+	while(currentLayerDepth < currentDepthValue)
+	{
+		currentTexCoord -= deltaV;
+		currentDepthValue = texture(depthmap, currentTexCoord).r;
+		currentLayerDepth += layerDepth;
+	}
+
+	vec2 preTexCoord = currentTexCoord + deltaV;
+	float preLayerDepth = currentLayerDepth - layerDepth;
+
+	//float afterDepth = currentDepthValue - currentLayerDepth;
+	//float beforeDepth = texture(depthmap, preTexCoord).r - preLayerDepth;
+	//float weight = afterDepth / (afterDepth - beforeDepth);
+
+	float currentOffset = currentLayerDepth - currentDepthValue;
+	float previousOffset = texture(depthmap, preTexCoord).r - preLayerDepth;
+	float weight = currentOffset / (currentOffset + previousOffset);
+
+	vec2 finalTexCoord = preTexCoord * weight + currentTexCoord * (1 - weight);
+
+	return finalTexCoord;
+
+}
+
 //calculate lighting in tangent space
 void ParallaxMapping()
 {	
@@ -65,7 +128,7 @@ void ParallaxMapping()
 	vec3 tangentLightPos = TBN * lightPos;
 
 	vec3 viewDir = normalize(tangentViewPos - tangentFragPos);
-	vec2 mappedTexCoord = ParallaxMappingTexture(texCoord, viewDir);
+	vec2 mappedTexCoord = ParallaxOcclusionMappingTexture(texCoord, viewDir);
 
 	if(mappedTexCoord.x > 1.0 || mappedTexCoord.y > 1.0
 	|| mappedTexCoord.x < 0.0 || mappedTexCoord.y < 0.0)

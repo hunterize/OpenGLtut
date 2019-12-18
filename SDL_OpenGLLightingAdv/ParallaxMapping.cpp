@@ -118,7 +118,6 @@ namespace ParallaxMapping
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);  //enable depth testing
 
-
 			Uint32 current = SDL_GetTicks();
 
 			Uint32 elapsed = current - previous;
@@ -164,7 +163,6 @@ namespace ParallaxMapping
 			glm::mat4 wallModel;
 			wallModel = glm::translate(wallModel, wallPos);
 			wallModel = glm::scale(wallModel, glm::vec3(80.0f, 80.0f, 80.0f));
-			//wallModel = glm::rotate(wallModel, 3.14f / 2.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 			
 			objShader.SetUniformInt("sample", 20);
 			glActiveTexture(GL_TEXTURE20);
@@ -185,7 +183,6 @@ namespace ParallaxMapping
 
 			objShader.Unuse();
 			//end of rendering normal scene
-
 
 			SDL_GL_SwapWindow(window);
 
