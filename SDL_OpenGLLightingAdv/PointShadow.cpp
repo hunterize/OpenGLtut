@@ -292,6 +292,8 @@ namespace PointShadow
 
 			pointLightPos = glm::vec3(-10.0f, 10.0f, -10.0f);
 
+			plViews.clear();
+
 			//for point light views
 			plViews.push_back(
 				pointLightProjection * glm::lookAt(pointLightPos, pointLightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -425,7 +427,6 @@ namespace PointShadow
 		}
 
 		SDL_GL_DeleteContext(context);
-		plViews.clear();
 	}
 
 	void ProcessInput()
