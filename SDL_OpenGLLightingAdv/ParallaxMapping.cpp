@@ -12,6 +12,7 @@ namespace ParallaxMapping
 	CInputManager inputManager;
 
 	bool isFirstMove = true;
+	bool isPOM = false;
 
 	void GLAPIENTRY MessageCallback(GLenum source,
 		GLenum type,
@@ -129,6 +130,9 @@ namespace ParallaxMapping
 			//update input
 			ProcessInput();
 
+			if (inputManager.IskeyPressed(SDLK_0))
+				isPOM = !isPOM;
+
 			while (lag >= MS_PER_FRAME)
 			{
 				//update game
@@ -158,6 +162,7 @@ namespace ParallaxMapping
 			objShader.SetUniformFloat("shininess", 256.0f);
 			objShader.SetUniformInt("isNormalReverse", false);
 			objShader.SetUniformFloat("heightScale", 0.1);
+			objShader.SetUniformInt("isPOM", isPOM);
 
 			glm::vec3 wallPos = glm::vec3(0.0f, 0.0f, -20.0f);
 			glm::mat4 wallModel;

@@ -19,6 +19,7 @@ uniform float shininess;
 uniform bool isNormalReverse;
 uniform float heightScale;
 
+uniform bool isPOM;
 
 //Blinn-Phong lighting with normal mapping in world space
 void NormalMapping()
@@ -163,7 +164,13 @@ void ParallaxMapping()
 
 void main()
 {
-	//NormalMapping();
-	ParallaxMapping();
+	if(isPOM)
+	{
+		ParallaxMapping();
+	}
+	else
+	{
+		NormalMapping();
+	}
 }
 
