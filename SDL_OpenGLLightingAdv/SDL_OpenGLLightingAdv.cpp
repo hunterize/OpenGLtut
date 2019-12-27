@@ -8,6 +8,7 @@ int main(int args, char** argv)
 	//ShadowMapping::ShadowMapping();
 	//PointShadow::PointShadow();
 	//NormalMapping::NormalMapping();
-	ParallaxMapping::ParallaxMapping();
+	//ParallaxMapping::ParallaxMapping();
+	HDR::HDR();
 	return 1;
 }

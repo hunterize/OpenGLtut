@@ -42,3 +42,8 @@ namespace ParallaxMapping
 {
 	void ParallaxMapping();
 }
+
+namespace HDR
+{
+	void HDR();
+}
