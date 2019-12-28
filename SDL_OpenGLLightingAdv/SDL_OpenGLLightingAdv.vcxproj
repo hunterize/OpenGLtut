@@ -144,6 +144,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BlinnPhongLighting.cpp" />
+    <ClCompile Include="Bloom.cpp" />
     <ClCompile Include="CCamera3D.cpp" />
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
@@ -176,6 +177,12 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
   <ItemGroup>
     <None Include="Shaders\BlinnPhongFragmentShader.frag" />
     <None Include="Shaders\BlinnPhongVertexShader.vert" />
+    <None Include="Shaders\BloomLightFragmentShader.frag" />
+    <None Include="Shaders\BloomLightVertexShader.vert" />
+    <None Include="Shaders\BloomObjectFragmentShader.frag" />
+    <None Include="Shaders\BloomObjectVertexShader.vert" />
+    <None Include="Shaders\BloomScreenFragmentShader.frag" />
+    <None Include="Shaders\BloomScreenVertexShader.vert" />
     <None Include="Shaders\GammaCorrectionFragmentShader.frag" />
     <None Include="Shaders\GammaCorrectionVertexShader.vert" />
     <None Include="Shaders\HDRScreenFragmentShader.frag" />

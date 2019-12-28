@@ -47,3 +47,8 @@ namespace HDR
 {
 	void HDR();
 }
+
+namespace Bloom
+{
+	void Bloom();
+}

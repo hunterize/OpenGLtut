@@ -54,6 +54,9 @@
     <ClCompile Include="HDR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Bloom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -184,6 +187,24 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\HDRScreenVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomLightFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomLightVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomObjectFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomObjectVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomScreenFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomScreenVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
