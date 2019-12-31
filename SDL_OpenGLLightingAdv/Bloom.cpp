@@ -187,15 +187,26 @@ namespace Bloom
 		glGenFramebuffers(1, &screenFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
 
-		//create color texture attachment
-		glGenTextures(1, &screenTextureBuffer);
-		glBindTexture(GL_TEXTURE_2D, screenTextureBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTextureBuffer, 0);
+		//create multiple color texture attachments
+		unsigned int screenTextureBuffers[2] = { 0 };
+		glGenTextures(2, screenTextureBuffers);
+		
+		//generate two texture images and bind them to the frame buffer
+		//as GL_COLOR_ATTACHMENT0 and GL_COLOR_ATTACHMENT1
+		for (int i = 0; i < 2; i++)
+		{
+			glBindTexture(GL_TEXTURE_2D, screenTextureBuffers[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, screenTextureBuffers[i], 0);
+		}
+		
+		//render to multiple color buffers
+		unsigned int colorAttachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+		glDrawBuffers(2, colorAttachments);
 
 		//create render buffer attachment for depth and stencil 
 		glGenRenderbuffers(1, &screenRBO);
@@ -227,14 +238,14 @@ namespace Bloom
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
 		CLight lights[4];
-		lights[0].m_Position = glm::vec3(0.0f, 0.0f, -75.0f);
-		lights[0].m_color = glm::vec3(1.0f, 1.0f, 1.0f);
+		lights[0].m_Position = glm::vec3(0.0f, 40.0f, -75.0f);
+		lights[0].m_color = glm::vec3(15.0f, 15.0f, 15.0f);
 		lights[1].m_Position = glm::vec3(24.0f, 24.0f, -35.0f);
-		lights[1].m_color = glm::vec3(20.1, 0.0, 0.0);
+		lights[1].m_color = glm::vec3(5.1, 0.0, 0.0);
 		lights[2].m_Position = glm::vec3(-40.0f, -10.0f, -55.0f);
 		lights[2].m_color = glm::vec3(0.0, 10.6, 0.0);
 		lights[3].m_Position = glm::vec3(-15.0f, 0.0f, 25.0f);
-		lights[3].m_color = glm::vec3(0.0, 0.0, 3.8);
+		lights[3].m_color = glm::vec3(0.0, 0.0, 10.8);
 
 		glm::vec3 obj[] = {
 			glm::vec3(20.0f, 20.0f, 20.f),
@@ -381,7 +392,7 @@ namespace Bloom
 			glActiveTexture(GL_TEXTURE1);
 
 			glBindVertexArray(screenVAO);
-			glBindTexture(GL_TEXTURE_2D, screenTextureBuffer);
+			glBindTexture(GL_TEXTURE_2D, screenTextureBuffers[1]);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 			screenShader.Unuse();

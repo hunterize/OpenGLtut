@@ -4,7 +4,8 @@ in vec2 texCoord;
 in vec3 normal;
 in vec3 fragPos;
 
-out vec4 finalColor;
+layout (location = 0) out vec4 finalColor;
+layout (location = 1) out vec4 brightColor;
 
 uniform sampler2D sample;
 
@@ -40,7 +41,7 @@ void BlinnPhongLighting()
 		vec3 viewDir = normalize(eyePos - fragPos);
 		vec3 halfVector = normalize(lightDir + viewDir);
 		float spec = pow(max(dot(norm, halfVector), 0.0), shininess);
-		vec3 specular = spec * vec3(1.0);
+		vec3 specular = spec * vec3(0.5);
 
 		float ambi = 0.1f;
 		vec3 ambient = ambi * vec3(texture(sample, texCoord));
@@ -79,5 +80,15 @@ void main()
 {
 	BlinnPhongLighting();
 	//HDRLighting();
+
+	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+	if(brightness > 1.0)
+	{
+		brightColor = vec4(finalColor.rgb, 1.0);
+	}
+	else
+	{
+		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
 }
 
