@@ -207,5 +207,11 @@
     <None Include="Shaders\BloomScreenVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\BloomBlurFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BloomBlurVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

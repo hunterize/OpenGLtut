@@ -180,7 +180,6 @@ namespace Bloom
 		glBindVertexArray(0);
 
 		GLuint screenFBO = 0;
-		GLuint screenTextureBuffer = 0;
 		GLuint screenRBO = 0;
 		//set frame buffers
 		//create frame buffer object
@@ -223,6 +222,34 @@ namespace Bloom
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//end of setting frame buffers
 
+		//config effect frame buffers - pingpong buffers
+		//only color buffer attachment for special effect
+		GLuint effectFBO[2] = { 0 };
+		GLuint effectTextureBuffers[2] = { 0 };
+
+		glGenFramebuffers(2, effectFBO);
+		glGenTextures(2, effectTextureBuffers);
+
+		for (int i = 0; i < 2; i++)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, effectFBO[i]);
+			glBindTexture(GL_TEXTURE_2D, effectTextureBuffers[i]);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, effectTextureBuffers[i], 0);
+			//check if the frame buffer with attachment is complete
+			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			{
+				std::cout << "Frame buffer is not complete!" << std::endl;
+				exit(0);
+			}
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+		//end of configuration of effect frame buffers
+
 		CShader objShader;
 		objShader.AttachShader("Shaders/BloomObjectVertexShader.vert", "Shaders/BloomObjectFragmentShader.frag");
 		GLTexture crateTexture = CSTexture::LoadImage("crate.png");
@@ -234,6 +261,9 @@ namespace Bloom
 		CShader screenShader;
 		screenShader.AttachShader("Shaders/BloomScreenVertexShader.vert", "Shaders/BloomScreenFragmentShader.frag");
 
+		CShader blurShader;
+		blurShader.AttachShader("Shaders/BloomBlurVertexShader.vert", "Shaders/BloomBlurFragmentShader.frag");
+
 		//create projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
@@ -244,7 +274,7 @@ namespace Bloom
 		lights[1].m_color = glm::vec3(5.1, 0.0, 0.0);
 		lights[2].m_Position = glm::vec3(-40.0f, -10.0f, -55.0f);
 		lights[2].m_color = glm::vec3(0.0, 10.6, 0.0);
-		lights[3].m_Position = glm::vec3(-15.0f, 0.0f, 25.0f);
+		lights[3].m_Position = glm::vec3(-15.0f, 3.0f, 25.0f);
 		lights[3].m_color = glm::vec3(0.0, 0.0, 10.8);
 
 		glm::vec3 obj[] = {
@@ -256,7 +286,8 @@ namespace Bloom
 		};
 
 		GLfloat exposure = 1.0f;
-		bool isHDR = false;
+		bool isDebug = false;
+		bool isBlur = false;
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -295,7 +326,11 @@ namespace Bloom
 
 			if (inputManager.IskeyPressed(SDLK_0))
 			{
-				isHDR = !isHDR;
+				isDebug = !isDebug;
+			}
+			if (inputManager.IskeyPressed(SDLK_9))
+			{
+				isBlur = !isBlur;
 			}
 
 			//create view matrix
@@ -305,7 +340,6 @@ namespace Bloom
 
 			//switch to screen frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
-			glClearColor(0.1, 0.1, 0.1, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);  //enable depth testing
 
@@ -317,7 +351,7 @@ namespace Bloom
 			glm::vec3 eyePos = camera.GetPosition();
 			objShader.SetUniformVec3("eyePos", eyePos);
 			objShader.SetUniformVec3("lightPos", pointLightPos);
-			objShader.SetUniformFloat("shininess", 64.0f);
+			objShader.SetUniformFloat("shininess", 32.0f);
 			objShader.SetUniformInt("isNormalReverse", false);
 
 			for (int i = 0; i < 4; i++)
@@ -378,22 +412,57 @@ namespace Bloom
 			}
 
 			lightShader.Unuse();
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glDisable(GL_DEPTH_TEST);
 			//end of rendering lights
+
+			//blur the bright image
+			bool isHo = true;
+			bool isFirst = true;
+
+			blurShader.Use();
+			blurShader.SetUniformInt("image", 1);
+			glActiveTexture(GL_TEXTURE1);
+			for (int i = 0; i < 10; i++)
+			{
+				glBindFramebuffer(GL_FRAMEBUFFER, effectFBO[isHo]);
+				blurShader.SetUniformInt("isHo", isHo);
+				glBindTexture(GL_TEXTURE_2D, isFirst ? screenTextureBuffers[1] : effectTextureBuffers[!isHo]);
+
+				glBindVertexArray(screenVAO);
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+				glBindVertexArray(0);
+
+				isHo = !isHo;
+				if (isFirst)
+				{
+					isFirst = false;
+				}
+
+			}
+			blurShader.Unuse();
+
+			//end of blurring bright image
 
 			//back to default framebuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glDisable(GL_DEPTH_TEST);
-			glClear(GL_COLOR_BUFFER_BIT);
 
 			screenShader.Use();
 			screenShader.SetUniformFloat("exposure", 1.0f);
-			screenShader.SetUniformInt("isHDR", isHDR);
+			screenShader.SetUniformInt("isDebug", isDebug);
+			screenShader.SetUniformInt("isBlur", isBlur);
 			screenShader.SetUniformInt("hdrSample", 1);
 			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, screenTextureBuffers[0]);
+			screenShader.SetUniformInt("blurSample", 2);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, effectTextureBuffers[!isHo]);
 
 			glBindVertexArray(screenVAO);
-			glBindTexture(GL_TEXTURE_2D, screenTextureBuffers[1]);
+
 			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
 
 			screenShader.Unuse();
 

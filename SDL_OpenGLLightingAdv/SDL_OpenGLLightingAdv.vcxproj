@@ -177,6 +177,8 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
   <ItemGroup>
     <None Include="Shaders\BlinnPhongFragmentShader.frag" />
     <None Include="Shaders\BlinnPhongVertexShader.vert" />
+    <None Include="Shaders\BloomBlurFragmentShader.frag" />
+    <None Include="Shaders\BloomBlurVertexShader.vert" />
     <None Include="Shaders\BloomLightFragmentShader.frag" />
     <None Include="Shaders\BloomLightVertexShader.vert" />
     <None Include="Shaders\BloomObjectFragmentShader.frag" />

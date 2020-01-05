@@ -8,7 +8,7 @@ void main()
 {
 	color = vec4(lightColor, 1.0f);
 
-	float brightness = dot(color.rgb, vec3(02126, 0.7152, 0.0722));
+	float brightness = dot(color.rgb, vec3(0.2126, 0.7152, 0.722));
 	if(brightness > 1.0)
 	{
 		brightColor = vec4(color.rgb, 1.0);

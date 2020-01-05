@@ -27,6 +27,10 @@ void BlinnPhongLighting()
 
 	vec3 lighting = vec3(0.0);
 
+	vec3 diffuse = vec3(0.0);
+	vec3 specular = vec3(0.0);
+	vec3 ambient = vec3(0.0);
+
 	for(int i = 0; i < 4; i++)
 	{
 		float distance = length(lights[i].position - fragPos);
@@ -36,59 +40,37 @@ void BlinnPhongLighting()
 
 		vec3 lightDir = normalize(lights[i].position - fragPos);
 		float diff = max(dot(norm, lightDir), 0.0);
-		vec3 diffuse = diff * vec3(texture(sample, texCoord));
+		diffuse += attenuation * diff * vec3(texture(sample, texCoord)) * lights[i].color;
 	
-		vec3 viewDir = normalize(eyePos - fragPos);
-		vec3 halfVector = normalize(lightDir + viewDir);
-		float spec = pow(max(dot(norm, halfVector), 0.0), shininess);
-		vec3 specular = spec * vec3(0.5);
+		if(dot(norm, lightDir) > 0.0)
+		{
+			vec3 viewDir = normalize(eyePos - fragPos);
+			vec3 halfVector = normalize(lightDir + viewDir);
+			float spec = pow(max(dot(norm, halfVector), 0.0), shininess);
+			specular += attenuation * spec * vec3(0.6) * lights[i].color;
+		}
 
 		float ambi = 0.1f;
-		vec3 ambient = ambi * vec3(texture(sample, texCoord));
-
-		vec3 effect = attenuation * (ambient + diffuse + specular) * lights[i].color;
-		
-		lighting += effect;
-		//float gc = 2.2f;
-		//effect = pow(effect, vec3(1.0 / gc));
+		ambient += attenuation * ambi * vec3(texture(sample, texCoord)) * lights[i].color;
 	}
 
-	finalColor = vec4(lighting, 1.0);
-}
+	vec3 effect = ambient + diffuse + specular;
 
-void HDRLighting()
-{
-	vec3 norm = normalize(normal);
-
-	vec3 lighting = vec3(0.0);
-
-	for(int i = 0; i < 4; i++)
+	float brightness = dot(effect.rgb, vec3(0.2126, 0.7152, 0.1722));
+	if(brightness > 10.0)
 	{
-		vec3 lightDir = normalize(lights[i].position - fragPos);
-		float diff = max(dot(norm, lightDir), 0.0);
-		vec3 diffuse = diff * lights[i].color * vec3(texture(sample, texCoord));
-		float distance = length(lights[i].position - fragPos);
-		//float attenuation = 1.0 / (1.0 + 0.02 * distance + 0.001 * distance * distance);
-		float attenuation = 1.0 / (distance * distance);
-		lighting += diffuse * attenuation;
-	}
-
-	finalColor = vec4(lighting, 1.0);
-}
-
-void main()
-{
-	BlinnPhongLighting();
-	//HDRLighting();
-
-	float brightness = dot(finalColor.rgb, vec3(0.2126, 0.7152, 0.0722));
-	if(brightness > 1.0)
-	{
-		brightColor = vec4(finalColor.rgb, 1.0);
+		brightColor = vec4(effect.rgb, 1.0);
 	}
 	else
 	{
 		brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 	}
+
+	finalColor = vec4(effect, 1.0);
+}
+
+void main()
+{
+	BlinnPhongLighting();
 }
 
