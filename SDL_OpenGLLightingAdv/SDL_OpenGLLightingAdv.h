@@ -52,3 +52,8 @@ namespace Bloom
 {
 	void Bloom();
 }
+
+namespace DeferredShading
+{
+	void DeferredShading();
+}

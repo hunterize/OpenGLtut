@@ -10,6 +10,7 @@ int main(int args, char** argv)
 	//NormalMapping::NormalMapping();
 	//ParallaxMapping::ParallaxMapping();
 	//HDR::HDR();
-	Bloom::Bloom();
+	//Bloom::Bloom();
+	DeferredShading::DeferredShading();
 	return 1;
 }

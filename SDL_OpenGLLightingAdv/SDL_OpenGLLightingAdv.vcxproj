@@ -149,6 +149,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
+    <ClCompile Include="DeferredShading.cpp" />
     <ClCompile Include="GammaCorrection.cpp" />
     <ClCompile Include="HDR.cpp" />
     <ClCompile Include="NormalMapping.cpp" />
