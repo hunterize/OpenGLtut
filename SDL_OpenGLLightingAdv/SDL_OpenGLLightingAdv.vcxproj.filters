@@ -228,5 +228,17 @@
     <None Include="Shaders\DeferredLightVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\DeferredGeometryFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredGeometryVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredScreenFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredScreenVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

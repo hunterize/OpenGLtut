@@ -157,11 +157,97 @@ namespace DeferredShading
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//end of crate vao
 
+		//vertices for screen rendering 
+		GLuint screenVAO = 0;
+		GLuint screenVBO = 0;
+
+		GLfloat screenVertices[] = {
+			//position          //uv
+			-1.0f, 1.0f,        0.0f, 1.0f,  //top left
+			-1.0f, -1.0f,       0.0f, 0.0f,  //bottom left
+			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
+			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
+			1.0f,  1.0f,        1.0f, 1.0f,  //top right
+			-1.0f, 1.0f,        0.0f, 1.0f   //top left
+		};
+
+		glGenBuffers(1, &screenVBO);
+		glGenVertexArrays(1, &screenVAO);
+
+		glBindVertexArray(screenVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), screenVertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)(sizeof(GLfloat) * 2));
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		//end of screen vertices
+
+		//config G-buffer
+		GLuint gBufferFBO;
+		GLuint gBufferRBO;
+		glGenFramebuffers(1, &gBufferFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
+
+		unsigned int gbPosition, gbNormal, gbAlbedo;
+
+		//position g-buffer
+		glGenTextures(1, &gbPosition);
+		glBindTexture(GL_TEXTURE_2D, gbPosition);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gbPosition, 0);
+
+		//normal g-buffer
+		glGenTextures(1, &gbNormal);
+		glBindTexture(GL_TEXTURE_2D, gbNormal);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gbNormal, 0);
+
+		//albedo g-buffer, use RGBA format, alpha channel is for specular intensity
+		glGenTextures(1, &gbAlbedo);
+		glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbAlbedo, 0);
+
+		unsigned int gbAttachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, gbAttachments);
+
+		glGenRenderbuffers(1, &gBufferRBO);
+		glBindRenderbuffer(GL_RENDERBUFFER, gBufferRBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gBufferRBO);
+
+		//check if the frame buffer with attachment is complete
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "Frame buffer is not complete!" << std::endl;
+			exit(0);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//end of configing g-buffer
+
 		//config shaders
 		CShader objShader;
-		objShader.AttachShader("Shaders/DeferredObjectVertexShader.vert", "Shaders/DeferredObjectFragmentShader.frag");
+		objShader.AttachShader("Shaders/DeferredGeometryVertexShader.vert", "Shaders/DeferredGeometryFragmentShader.frag");
 		CShader lightShader;
 		lightShader.AttachShader("Shaders/DeferredLightVertexShader.vert", "Shaders/DeferredLightFragmentShader.frag");
+		CShader screenShader;
+		screenShader.AttachShader("Shaders/DeferredScreenVertexShader.vert", "Shaders/DeferredScreenFragmentShader.frag");
 
 		GLTexture crateTexture = CSTexture::LoadImage("brickwall.jpg");
 		GLTexture crateNormal = CSTexture::LoadImage("brickwall_normal.jpg");
@@ -244,36 +330,28 @@ namespace DeferredShading
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
+			//bind g-buffer frame buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 			//render crates
 			objShader.Use();
 			objShader.SetUniformMat4("projection", projection);
 			objShader.SetUniformMat4("view", view);
 
-			glm::vec3 eyePos = camera.GetPosition();
-			objShader.SetUniformVec3("eyePos", eyePos);
-			objShader.SetUniformVec3("lightPos", pointLightPos);
-			objShader.SetUniformFloat("shininess", 128.0f);
-			objShader.SetUniformInt("isNormalReverse", false);
+			objShader.SetUniformInt("sample", 20);
+			glActiveTexture(GL_TEXTURE20);
+			glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
 
-			for (int i = 0; i < cubeLights.size(); i++)
-			{
-				objShader.SetUniformVec3("lights[" + std::to_string(i) + "].position", cubeLights[i].m_Position);
-				objShader.SetUniformVec3("lights[" + std::to_string(i) + "].color", cubeLights[i].m_color);
-			}
+			objShader.SetUniformInt("nmap", 21);
+			glActiveTexture(GL_TEXTURE21);
+			glBindTexture(GL_TEXTURE_2D, crateNormal.ID);
 
 			for (int i = 0; i < cratesPos.size(); i++)
 			{
 				glm::mat4 model;
 				model = glm::translate(model, cratesPos[i]);
 				model = glm::scale(model, glm::vec3(15.0f, 15.0f, 15.0f));
-
-				objShader.SetUniformInt("sample", 20);
-				glActiveTexture(GL_TEXTURE20);
-				glBindTexture(GL_TEXTURE_2D, crateTexture.ID);
-
-				objShader.SetUniformInt("nmap", 21);
-				glActiveTexture(GL_TEXTURE21);
-				glBindTexture(GL_TEXTURE_2D, crateNormal.ID);
 
 				objShader.SetUniformMat4("model", model);
 				glBindVertexArray(cubeVAO);
@@ -303,6 +381,33 @@ namespace DeferredShading
 			}
 			lightShader.Unuse();
 			//end of rendering lights
+
+			//switch to default framebuffer
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			//render screen 
+			screenShader.Use();
+
+			screenShader.SetUniformInt("gPosition", 10);
+			glActiveTexture(GL_TEXTURE10);
+			glBindTexture(GL_TEXTURE_2D, gbPosition);
+
+			screenShader.SetUniformInt("gNormal", 11);
+			glActiveTexture(GL_TEXTURE11);
+			glBindTexture(GL_TEXTURE_2D, gbNormal);
+
+			screenShader.SetUniformInt("gAlbedoSpecular", 12);
+			glActiveTexture(GL_TEXTURE12);
+			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+
+			glBindVertexArray(screenVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
+
+
+			screenShader.Unuse();
+
 
 			SDL_GL_SwapWindow(window);
 

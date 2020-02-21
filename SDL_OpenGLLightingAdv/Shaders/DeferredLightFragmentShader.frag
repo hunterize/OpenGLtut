@@ -1,9 +1,14 @@
 #version 330
 
+layout (location = 0) out vec3 gPosition;
+layout (location = 1) out vec3 gNormal;
+layout (location = 2) out vec4 gAlbedoSpecular;
+
 uniform vec3 lightColor;
-out vec4 color;
 
 void main()
 {
-	color = vec4(lightColor, 1.0f);
+	gPosition = vec3(1.0);
+	gNormal = vec3(1.0f);
+	gAlbedoSpecular.rgb = lightColor;
 }
