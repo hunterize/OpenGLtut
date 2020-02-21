@@ -216,5 +216,17 @@
     <None Include="Shaders\BloomBlurVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\DeferredObjectFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredObjectVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredLightFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredLightVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

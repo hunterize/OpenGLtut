@@ -68,7 +68,7 @@ namespace DeferredShading
 		glDebugMessageCallback(MessageCallback, 0);
 #endif // DEBUG
 
-		//initialize vertices for cube
+		//initialize vertices for game object
 		GLuint cubeVBO = 0;
 		GLuint cubeVAO = 0;
 		GLuint cubeEBO = 0;
@@ -157,8 +157,12 @@ namespace DeferredShading
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//end of crate vao
 
+		//config shaders
 		CShader objShader;
 		objShader.AttachShader("Shaders/DeferredObjectVertexShader.vert", "Shaders/DeferredObjectFragmentShader.frag");
+		CShader lightShader;
+		lightShader.AttachShader("Shaders/DeferredLightVertexShader.vert", "Shaders/DeferredLightFragmentShader.frag");
+
 		GLTexture crateTexture = CSTexture::LoadImage("brickwall.jpg");
 		GLTexture crateNormal = CSTexture::LoadImage("brickwall_normal.jpg");
 
@@ -167,10 +171,35 @@ namespace DeferredShading
 
 		glm::vec3 pointLightPos = glm::vec3(30.0f, 20.0f, 30.0f);
 
+		//1000 crates
+		std::vector<glm::vec3> cratesPos;
+		cratesPos.reserve(1000);
+
+		for (int i = 0; i < 10; i++)
+			for (int j = 0; j < 10; j++)
+				for(int k = 0; k < 10; k++)
+				{
+					glm::vec3 pos = glm::vec3(150.0f - 30.0f * i, 150.0f - 30.0f * j, 150.0f - 30.0f * k);
+					cratesPos.push_back(pos);
+				}
+
 		glm::vec3 obj[] = {
 			glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3(0.0f, 30.0f, 0.0f)
 		};
+
+		//1331 lights
+		std::vector<CLight> cubeLights;
+		cubeLights.reserve(1331);
+
+		for (int i = 0; i < 11; i++)
+			for (int j = 0; j < 11; j++)
+				for (int k = 0; k < 11; k++)
+				{
+					glm::vec3 pos = glm::vec3(165.0f - 30.0f * i, 165.0f - 30.0f * j, 165.0f - 30.0f * k);
+					glm::vec3 color = glm::vec3(0.09f + 0.09 * i, 0.09f + 0.09 * j, 0.09f + 0.09 * k);
+					cubeLights.push_back({ pos, color });
+				}
 
 		GLfloat exposure = 1.0f;
 		bool isDebug = false;
@@ -204,10 +233,6 @@ namespace DeferredShading
 				//update camera
 				camera.Update(inputManager, timespan);
 
-				glm::mat4 lightRotation;
-				lightRotation = glm::rotate(lightRotation, timespan * 0.3f, glm::vec3(0.0f, 1.0f, 0.0f));
-				pointLightPos = glm::vec3(lightRotation * glm::vec4(pointLightPos, 1.0));
-
 				lag -= MS_PER_FRAME;
 			}
 
@@ -230,10 +255,16 @@ namespace DeferredShading
 			objShader.SetUniformFloat("shininess", 128.0f);
 			objShader.SetUniformInt("isNormalReverse", false);
 
-			for (int i = 0; i < sizeof(obj) / sizeof(glm::vec3); i++)
+			for (int i = 0; i < cubeLights.size(); i++)
+			{
+				objShader.SetUniformVec3("lights[" + std::to_string(i) + "].position", cubeLights[i].m_Position);
+				objShader.SetUniformVec3("lights[" + std::to_string(i) + "].color", cubeLights[i].m_color);
+			}
+
+			for (int i = 0; i < cratesPos.size(); i++)
 			{
 				glm::mat4 model;
-				model = glm::translate(model, obj[i]);
+				model = glm::translate(model, cratesPos[i]);
 				model = glm::scale(model, glm::vec3(15.0f, 15.0f, 15.0f));
 
 				objShader.SetUniformInt("sample", 20);
@@ -251,7 +282,27 @@ namespace DeferredShading
 			}
 
 			objShader.Unuse();
-			//end of rendering normal scene
+			//end of rendering cubes
+
+			//render lights
+			lightShader.Use();
+			lightShader.SetUniformMat4("projection", projection);
+			lightShader.SetUniformMat4("view", view);
+
+			for (int i = 0; i < cubeLights.size(); i++)
+			{
+				glm::mat4 model;
+				model = glm::translate(model, cubeLights[i].m_Position);
+				model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+				lightShader.SetUniformMat4("model", model);
+				lightShader.SetUniformVec3("lightColor", cubeLights[i].m_color);
+
+				glBindVertexArray(cubeVAO);
+				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+			}
+			lightShader.Unuse();
+			//end of rendering lights
 
 			SDL_GL_SwapWindow(window);
 

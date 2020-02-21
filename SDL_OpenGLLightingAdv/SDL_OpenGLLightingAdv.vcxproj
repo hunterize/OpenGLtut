@@ -186,6 +186,10 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <None Include="Shaders\BloomObjectVertexShader.vert" />
     <None Include="Shaders\BloomScreenFragmentShader.frag" />
     <None Include="Shaders\BloomScreenVertexShader.vert" />
+    <None Include="Shaders\DeferredLightFragmentShader.frag" />
+    <None Include="Shaders\DeferredLightVertexShader.vert" />
+    <None Include="Shaders\DeferredObjectFragmentShader.frag" />
+    <None Include="Shaders\DeferredObjectVertexShader.vert" />
     <None Include="Shaders\GammaCorrectionFragmentShader.frag" />
     <None Include="Shaders\GammaCorrectionVertexShader.vert" />
     <None Include="Shaders\HDRScreenFragmentShader.frag" />
