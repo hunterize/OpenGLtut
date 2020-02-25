@@ -30,6 +30,7 @@ namespace DeferredShading
 	{
 		glm::vec3 m_Position;
 		glm::vec3 m_color;
+		GLfloat m_radius;
 	};
 
 	void DeferredShading()
@@ -244,8 +245,8 @@ namespace DeferredShading
 		//config shaders
 		CShader objShader;
 		objShader.AttachShader("Shaders/DeferredGeometryVertexShader.vert", "Shaders/DeferredGeometryFragmentShader.frag");
-		CShader lightShader;
-		lightShader.AttachShader("Shaders/DeferredLightVertexShader.vert", "Shaders/DeferredLightFragmentShader.frag");
+		//CShader lightShader;
+		//lightShader.AttachShader("Shaders/DeferredLightVertexShader.vert", "Shaders/DeferredLightFragmentShader.frag");
 		CShader screenShader;
 		screenShader.AttachShader("Shaders/DeferredScreenVertexShader.vert", "Shaders/DeferredScreenFragmentShader.frag");
 
@@ -278,13 +279,19 @@ namespace DeferredShading
 		std::vector<CLight> cubeLights;
 		cubeLights.reserve(1331);
 
+		const GLfloat constant = 1.0f;
+		const GLfloat linear = 0.7f;
+		const GLfloat quadratic = 1.8f;
+
 		for (int i = 0; i < 11; i++)
 			for (int j = 0; j < 11; j++)
 				for (int k = 0; k < 11; k++)
 				{
 					glm::vec3 pos = glm::vec3(165.0f - 30.0f * i, 165.0f - 30.0f * j, 165.0f - 30.0f * k);
 					glm::vec3 color = glm::vec3(0.09f + 0.09 * i, 0.09f + 0.09 * j, 0.09f + 0.09 * k);
-					cubeLights.push_back({ pos, color });
+					const GLfloat brightness = std::fmaxf(std::fmaxf(color.x, color.y), color.z);
+					GLfloat radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 0.1f) * brightness))) / (2.0f * quadratic);
+					cubeLights.push_back({ pos, color, radius });
 				}
 
 		GLfloat exposure = 1.0f;
@@ -330,6 +337,8 @@ namespace DeferredShading
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
+			glm::vec3 eyePos = camera.GetPosition();
+
 			//bind g-buffer frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -361,7 +370,7 @@ namespace DeferredShading
 
 			objShader.Unuse();
 			//end of rendering cubes
-
+/*
 			//render lights
 			lightShader.Use();
 			lightShader.SetUniformMat4("projection", projection);
@@ -381,13 +390,22 @@ namespace DeferredShading
 			}
 			lightShader.Unuse();
 			//end of rendering lights
-
-			//switch to default framebuffer
+*/
+//switch to default framebuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//render screen 
+			//render screen 		
+
 			screenShader.Use();
+
+			for (int i = 0; i < cubeLights.size(); i++)
+			{
+				screenShader.SetUniformVec3("lights[" + std::to_string(i) + "].position", cubeLights[i].m_Position);
+				screenShader.SetUniformVec3("lights[" + std::to_string(i) + "].color", cubeLights[i].m_color);
+				//std::cout << radius << std::endl;
+				screenShader.SetUniformFloat("lights[" + std::to_string(i) + "].radius", cubeLights[i].m_radius);
+			}
 
 			screenShader.SetUniformInt("gPosition", 10);
 			glActiveTexture(GL_TEXTURE10);
@@ -401,13 +419,15 @@ namespace DeferredShading
 			glActiveTexture(GL_TEXTURE12);
 			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
 
+			screenShader.SetUniformVec3("eyePos", eyePos);
+			screenShader.SetUniformFloat("shininess", 128.0f);
+
 			glBindVertexArray(screenVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glBindVertexArray(0);
 
 
 			screenShader.Unuse();
-
 
 			SDL_GL_SwapWindow(window);
 
