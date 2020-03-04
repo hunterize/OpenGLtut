@@ -162,7 +162,16 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bricks2.jpg" />
+    <Image Include="bricks2_disp.jpg" />
+    <Image Include="bricks2_normal.jpg" />
     <Image Include="crate.png" />
+    <Image Include="Earth\earthbump1k.jpg" />
+    <Image Include="Earth\earthcloudmap.jpg" />
+    <Image Include="Earth\earthcloudmaptrans.jpg" />
+    <Image Include="Earth\earthlights1k.jpg" />
+    <Image Include="Earth\earthmap1k.jpg" />
+    <Image Include="Earth\earthspec1k.jpg" />
     <Image Include="wood.png" />
   </ItemGroup>
   <ItemGroup>

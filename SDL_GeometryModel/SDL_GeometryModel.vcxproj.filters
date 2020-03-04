@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{bc1f69bb-2c1c-463a-9c90-48a12e07743f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Earth">
+      <UniqueIdentifier>{d2a02af0-69b3-4ff4-9a0c-38d3169aa373}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CCamera3D.cpp">
@@ -69,6 +72,33 @@
     </Image>
     <Image Include="crate.png">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bricks2_disp.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bricks2_normal.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bricks2.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Earth\earthbump1k.jpg">
+      <Filter>Resource Files\Earth</Filter>
+    </Image>
+    <Image Include="Earth\earthcloudmap.jpg">
+      <Filter>Resource Files\Earth</Filter>
+    </Image>
+    <Image Include="Earth\earthcloudmaptrans.jpg">
+      <Filter>Resource Files\Earth</Filter>
+    </Image>
+    <Image Include="Earth\earthlights1k.jpg">
+      <Filter>Resource Files\Earth</Filter>
+    </Image>
+    <Image Include="Earth\earthmap1k.jpg">
+      <Filter>Resource Files\Earth</Filter>
+    </Image>
+    <Image Include="Earth\earthspec1k.jpg">
+      <Filter>Resource Files\Earth</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

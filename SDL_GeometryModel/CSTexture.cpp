@@ -127,7 +127,7 @@ GLuint CSTexture::LoadCubeMaps(const std::vector<std::string>& faces)
 
 
 	//flip the texture
-	stbi_set_flip_vertically_on_load(false);
+	stbi_set_flip_vertically_on_load(true);
 
 	for (int i = 0; i < faces.size(); i++)
 	{
