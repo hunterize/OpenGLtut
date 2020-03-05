@@ -181,7 +181,7 @@ namespace Demo
 			sphereShader.SetUniformVec3("eyePos", eyePos);
 			sphereShader.SetUniformVec3("lightPos", lightPos);
 			sphereShader.SetUniformFloat("shininess", 64.0);
-			sphereShader.SetUniformFloat("heightScale", 0.02f);
+			sphereShader.SetUniformFloat("heightScale", 0.03f);
 
 			sphereShader.SetUniformInt("amap", 10);
 			glActiveTexture(GL_TEXTURE10);

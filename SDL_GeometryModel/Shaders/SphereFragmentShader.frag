@@ -16,6 +16,7 @@ uniform sampler2D amap;
 uniform sampler2D bmap;
 uniform sampler2D smap;
 
+//in world space
 void BlinnPhongLighting()
 {
 	vec3 lightDir = normalize(lightPos - fragPos);
@@ -114,19 +115,21 @@ vec2 ParallaxOcclusionMappingTextureHeight(vec2 textureCoord, vec3 viewDir)
 //in tangent space, without normal map
 void ParallaxMapping()
 {
-	vec3 eyePos_t = TBN * eyePos;
-	vec3 fragPos_t = TBN * fragPos;
-	vec3 lightPos_t = TBN * lightPos;
-	vec3 normal_t = TBN * normal;
+	mat3 M = transpose(TBN);
+
+	vec3 eyePos_t = M * eyePos;
+	vec3 fragPos_t = M * fragPos;
+	vec3 lightPos_t = M * lightPos;
+	vec3 normal_t = M * normal;
 
 	vec3 viewDir = normalize(eyePos_t - fragPos_t);
 	vec2 mappedTexCoord = ParallaxOcclusionMappingTextureHeight(texCoord, viewDir);
 
-	if(mappedTexCoord.x > 1.0 || mappedTexCoord.y > 1.0
-	|| mappedTexCoord.x < 0.0 || mappedTexCoord.y < 0.0)
-	{
-		discard;
-	}
+	//if(mappedTexCoord.x > 1.0 || mappedTexCoord.y > 1.0
+	//|| mappedTexCoord.x < 0.0 || mappedTexCoord.y < 0.0)
+	//{
+	//	discard;
+	//}
 	
 	vec3 lightDir = normalize(lightPos_t - fragPos_t);
 	float diff = max(dot(normal_t, lightDir), 0.0);
@@ -147,19 +150,20 @@ void ParallaxMapping()
 //in tangent space with normal map
 void ParallaxMapping_NormalMap()
 {
-	vec3 eyePos_t = TBN * eyePos;
-	vec3 fragPos_t = TBN * fragPos;
-	vec3 lightPos_t = TBN * lightPos;
-	//vec3 normal_t = TBN * normal;
+	mat3 M = transpose(TBN);
+
+	vec3 eyePos_t = M * eyePos;
+	vec3 fragPos_t = M * fragPos;
+	vec3 lightPos_t = M * lightPos;
 
 	vec3 viewDir = normalize(eyePos_t - fragPos_t);
 	vec2 mappedTexCoord = ParallaxOcclusionMappingTextureDepth(texCoord, viewDir);
 
-	if(mappedTexCoord.x > 1.0 || mappedTexCoord.y > 1.0
-	|| mappedTexCoord.x < 0.0 || mappedTexCoord.y < 0.0)
-	{
-		discard;
-	}
+	//if(mappedTexCoord.x > 1.0 || mappedTexCoord.y > 1.0
+	//|| mappedTexCoord.x < 0.0 || mappedTexCoord.y < 0.0)
+	//{
+	//	discard;
+	//}
 
 	vec3 normal_t = texture(smap, mappedTexCoord).rgb;
 	normal_t = normalize(normal_t * 2.0 - 1.0);
@@ -182,8 +186,8 @@ void ParallaxMapping_NormalMap()
 
 void main()
 {
-	BlinnPhongLighting();
-	//ParallaxMapping();
+	//BlinnPhongLighting();
+	ParallaxMapping();
 	//ParallaxMapping_NormalMap();
 }
 
