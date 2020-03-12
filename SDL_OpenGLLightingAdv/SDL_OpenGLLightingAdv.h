@@ -12,6 +12,7 @@
 #include "CInputManager.h"
 #include "CCamera3D.h"
 #include "CSTexture.h"
+#include "GeometryFactory.h"
 
 namespace BlinnPhongLighting
 {

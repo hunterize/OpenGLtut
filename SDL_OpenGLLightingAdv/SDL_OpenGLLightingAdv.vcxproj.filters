@@ -60,6 +60,9 @@
     <ClCompile Include="DeferredShading.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeometryFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeometryFactory.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +244,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\DeferredScreenVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredPointLightFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredPointLightVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

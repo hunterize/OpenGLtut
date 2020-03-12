@@ -151,6 +151,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="DeferredShading.cpp" />
     <ClCompile Include="GammaCorrection.cpp" />
+    <ClCompile Include="GeometryFactory.cpp" />
     <ClCompile Include="HDR.cpp" />
     <ClCompile Include="NormalMapping.cpp" />
     <ClCompile Include="ParallaxMapping.cpp" />
@@ -163,6 +164,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <ClInclude Include="CInputManager.h" />
     <ClInclude Include="CShader.h" />
     <ClInclude Include="CSTexture.h" />
+    <ClInclude Include="GeometryFactory.h" />
     <ClInclude Include="SDL_OpenGLLightingAdv.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
@@ -192,6 +194,8 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     <None Include="Shaders\DeferredLightVertexShader.vert" />
     <None Include="Shaders\DeferredObjectFragmentShader.frag" />
     <None Include="Shaders\DeferredObjectVertexShader.vert" />
+    <None Include="Shaders\DeferredPointLightFragmentShader.frag" />
+    <None Include="Shaders\DeferredPointLightVertexShader.vert" />
     <None Include="Shaders\DeferredScreenFragmentShader.frag" />
     <None Include="Shaders\DeferredScreenVertexShader.vert" />
     <None Include="Shaders\GammaCorrectionFragmentShader.frag" />

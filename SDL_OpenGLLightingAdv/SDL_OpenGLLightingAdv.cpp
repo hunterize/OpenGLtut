@@ -8,9 +8,9 @@ int main(int args, char** argv)
 	//ShadowMapping::ShadowMapping();
 	//PointShadow::PointShadow();
 	//NormalMapping::NormalMapping();
-	ParallaxMapping::ParallaxMapping();
+	//ParallaxMapping::ParallaxMapping();
 	//HDR::HDR();
 	//Bloom::Bloom();
-	//DeferredShading::DeferredShading();
+	DeferredShading::DeferredShading();
 	return 1;
 }

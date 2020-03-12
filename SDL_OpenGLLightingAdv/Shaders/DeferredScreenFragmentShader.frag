@@ -85,7 +85,7 @@ void BlinnPhongLightingMultiple()
 
 void main()
 {
-	//Debug(debugInfo);
+	//Debug(2);
 	BlinnPhongLightingMultiple();
 
 }

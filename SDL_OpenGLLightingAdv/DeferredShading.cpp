@@ -69,6 +69,13 @@ namespace DeferredShading
 		glDebugMessageCallback(MessageCallback, 0);
 #endif // DEBUG
 
+		int usize;
+		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &usize);
+		std::cout << "Max Vertex Uniform Components: " << usize << std::endl;
+		glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &usize);
+		std::cout << "Max Fragment Uniform Components: " << usize << std::endl;
+
+
 		//initialize vertices for game object
 		GLuint cubeVBO = 0;
 		GLuint cubeVAO = 0;
@@ -187,6 +194,50 @@ namespace DeferredShading
 		glBindVertexArray(0);
 		//end of screen vertices
 
+		//vertices for point light
+		GeometryFactory::GMesh plMesh;
+		GeometryFactory::GGenerator::GetSphere(30, 30, plMesh);
+
+		GLuint vaoPL;
+		GLuint vboPL;
+		GLuint eboPL;
+
+		glGenBuffers(1, &vboPL);
+		glGenBuffers(1, &eboPL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vboPL);
+		glBufferData(GL_ARRAY_BUFFER, plMesh.m_vertices.size() * sizeof(GeometryFactory::GVertex), &plMesh.m_vertices[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboPL);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, plMesh.m_indices.size() * sizeof(GLuint), &plMesh.m_indices[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//set attribute location for vertex arrays
+		glGenVertexArrays(1, &vaoPL);
+		glBindVertexArray(vaoPL);
+		glBindBuffer(GL_ARRAY_BUFFER, vboPL);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboPL);
+
+		//Attribute location = 0 in vertex shader
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryFactory::GVertex), (void*)0);
+		glEnableVertexAttribArray(0);
+		//Attribute location = 1 in vertex shader
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryFactory::GVertex), (void*)offsetof(GeometryFactory::GVertex, m_normal));
+		glEnableVertexAttribArray(1);
+		//Attribute location = 2 in vertex shader
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(GeometryFactory::GVertex), (void*)offsetof(GeometryFactory::GVertex, m_tangent));
+		glEnableVertexAttribArray(2);
+		//Attribute location = 3 in vertex shader
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(GeometryFactory::GVertex), (void*)offsetof(GeometryFactory::GVertex, m_texCoord));
+		glEnableVertexAttribArray(3);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//end of vertices for point light
+
 		//config G-buffer
 		GLuint gBufferFBO;
 		GLuint gBufferRBO;
@@ -247,8 +298,11 @@ namespace DeferredShading
 		objShader.AttachShader("Shaders/DeferredGeometryVertexShader.vert", "Shaders/DeferredGeometryFragmentShader.frag");
 		//CShader lightShader;
 		//lightShader.AttachShader("Shaders/DeferredLightVertexShader.vert", "Shaders/DeferredLightFragmentShader.frag");
-		CShader screenShader;
-		screenShader.AttachShader("Shaders/DeferredScreenVertexShader.vert", "Shaders/DeferredScreenFragmentShader.frag");
+		//CShader screenShader;
+		//screenShader.AttachShader("Shaders/DeferredScreenVertexShader.vert", "Shaders/DeferredScreenFragmentShader.frag");
+
+		CShader plShader;
+		plShader.AttachShader("Shaders/DeferredPointLightVertexShader.vert", "Shaders/DeferredPointLightFragmentShader.frag");
 
 		GLTexture crateTexture = CSTexture::LoadImage("brickwall.jpg");
 		GLTexture crateNormal = CSTexture::LoadImage("brickwall_normal.jpg");
@@ -288,9 +342,9 @@ namespace DeferredShading
 				for (int k = 0; k < 11; k++)
 				{
 					glm::vec3 pos = glm::vec3(165.0f - 30.0f * i, 165.0f - 30.0f * j, 165.0f - 30.0f * k);
-					glm::vec3 color = glm::vec3(0.09f + 0.09 * i, 0.09f + 0.09 * j, 0.09f + 0.09 * k);
+					glm::vec3 color = glm::vec3(0.09f + 0.09f * i, 0.09f + 0.09f * j, 0.09f + 0.09f * k);
 					const GLfloat brightness = std::fmaxf(std::fmaxf(color.x, color.y), color.z);
-					GLfloat radius = (-linear + std::sqrt(linear * linear - 4 * quadratic * (constant - (256.0f / 0.1f) * brightness))) / (2.0f * quadratic);
+					GLfloat radius = (-linear + std::sqrtf(linear * linear - 4.0f * quadratic * (constant - (256.0f / 0.1f) * brightness))) / (2.0f * quadratic);
 					cubeLights.push_back({ pos, color, radius });
 				}
 
@@ -305,7 +359,7 @@ namespace DeferredShading
 
 		while (isRunning)
 		{
-			glClearColor(0.1, 0.1, 0.1, 1.0);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);  //enable depth testing
 
@@ -391,10 +445,48 @@ namespace DeferredShading
 			lightShader.Unuse();
 			//end of rendering lights
 */
-//switch to default framebuffer
+			//switch to default framebuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
 
+			plShader.Use();
+
+			glm::vec3 lightPos = glm::vec3(0.0);
+
+			glm::mat4 model;
+			model = glm::translate(model, lightPos);
+			model = glm::scale(model, glm::vec3(30.0));
+
+			plShader.SetUniformMat4("model", model);
+			plShader.SetUniformMat4("view", view);
+			plShader.SetUniformMat4("projection", projection);
+
+			plShader.SetUniformVec3("uLightPos", lightPos);
+			plShader.SetUniformVec3("uEyePos", eyePos);
+			plShader.SetUniformFloat("shininess", 128.0f);
+			plShader.SetUniformVec2("uScreenSize", glm::vec2(screenWidth, screenHeight));
+
+
+			plShader.SetUniformInt("gPosition", 10);
+			glActiveTexture(GL_TEXTURE10);
+			glBindTexture(GL_TEXTURE_2D, gbPosition);
+
+			plShader.SetUniformInt("gNormal", 11);
+			glActiveTexture(GL_TEXTURE11);
+			glBindTexture(GL_TEXTURE_2D, gbNormal);
+
+			plShader.SetUniformInt("gAlbedoSpecular", 12);
+			glActiveTexture(GL_TEXTURE12);
+			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+
+			glBindVertexArray(vaoPL);
+			glDrawElements(GL_TRIANGLES, plMesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+
+			plShader.Unuse();
+
+			/*
 			//render screen 		
 
 			screenShader.Use();
@@ -426,8 +518,9 @@ namespace DeferredShading
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glBindVertexArray(0);
 
-
 			screenShader.Unuse();
+			*/
+
 
 			SDL_GL_SwapWindow(window);
 
