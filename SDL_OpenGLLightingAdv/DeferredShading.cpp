@@ -26,12 +26,40 @@ namespace DeferredShading
 			source, type, id, severity, message);
 	}
 
+	/*
+		const GLfloat constant = 1.0f;
+		const GLfloat linear = 0.7f;
+		const GLfloat quadratic = 1.8f;
+	*/
+
 	struct CLight
 	{
-		glm::vec3 m_Position;
+		glm::vec3 m_position;
 		glm::vec3 m_color;
 		GLfloat m_radius;
+		struct 
+		{
+			GLfloat constant = 1.0f;
+			GLfloat linear = 0.7f;
+			GLfloat quadratic = 0.08f;
+			GLfloat factor = 0.01f;
+		} m_attenuation;
 	};
+
+	int InitLightRadius(CLight& light)
+	{
+		const GLfloat brightness = std::fmaxf(std::fmaxf(light.m_color.x, light.m_color.y), light.m_color.z);
+		
+		light.m_attenuation.factor = brightness * 256.0f / 1.0f;
+		light.m_radius = (-light.m_attenuation.linear 
+			+ std::sqrtf(
+				light.m_attenuation.linear * light.m_attenuation.linear - 4.0f * light.m_attenuation.quadratic * (light.m_attenuation.constant - light.m_attenuation.factor))) 
+			/ (2.0f * light.m_attenuation.quadratic);
+
+
+		return 1;
+	}
+
 
 	void DeferredShading()
 	{
@@ -46,7 +74,7 @@ namespace DeferredShading
 
 		//initialize camera
 		CCamera3D camera(screenWidth, screenHeight, false,
-			glm::vec3(50.0f, 50.0f, 50.0f),
+			glm::vec3(180.0f, 180.0f, 180.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f));
 
 		camera.SetSpeed(10.0f);
@@ -341,11 +369,11 @@ namespace DeferredShading
 			for (int j = 0; j < 11; j++)
 				for (int k = 0; k < 11; k++)
 				{
-					glm::vec3 pos = glm::vec3(165.0f - 30.0f * i, 165.0f - 30.0f * j, 165.0f - 30.0f * k);
-					glm::vec3 color = glm::vec3(0.09f + 0.09f * i, 0.09f + 0.09f * j, 0.09f + 0.09f * k);
-					const GLfloat brightness = std::fmaxf(std::fmaxf(color.x, color.y), color.z);
-					GLfloat radius = (-linear + std::sqrtf(linear * linear - 4.0f * quadratic * (constant - (256.0f / 0.1f) * brightness))) / (2.0f * quadratic);
-					cubeLights.push_back({ pos, color, radius });
+					CLight light;
+					light.m_position = glm::vec3(165.0f - 30.0f * i, 165.0f - 30.0f * j, 165.0f - 30.0f * k); 
+					light.m_color	= glm::vec3(0.09f + 0.09f * i, 0.09f + 0.09f * j, 0.09f + 0.09f * k);
+					InitLightRadius(light);
+					cubeLights.push_back(light);
 				}
 
 		GLfloat exposure = 1.0f;
@@ -424,103 +452,62 @@ namespace DeferredShading
 
 			objShader.Unuse();
 			//end of rendering cubes
-/*
-			//render lights
-			lightShader.Use();
-			lightShader.SetUniformMat4("projection", projection);
-			lightShader.SetUniformMat4("view", view);
 
-			for (int i = 0; i < cubeLights.size(); i++)
-			{
-				glm::mat4 model;
-				model = glm::translate(model, cubeLights[i].m_Position);
-				model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-				lightShader.SetUniformMat4("model", model);
-				lightShader.SetUniformVec3("lightColor", cubeLights[i].m_color);
-
-				glBindVertexArray(cubeVAO);
-				glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-				glBindVertexArray(0);
-			}
-			lightShader.Unuse();
-			//end of rendering lights
-*/
 			//switch to default framebuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glEnable(GL_DEPTH_TEST);
+			//glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 
-			plShader.Use();
-
-			glm::vec3 lightPos = glm::vec3(0.0);
-
-			glm::mat4 model;
-			model = glm::translate(model, lightPos);
-			model = glm::scale(model, glm::vec3(30.0));
-
-			plShader.SetUniformMat4("model", model);
-			plShader.SetUniformMat4("view", view);
-			plShader.SetUniformMat4("projection", projection);
-
-			plShader.SetUniformVec3("uLightPos", lightPos);
-			plShader.SetUniformVec3("uEyePos", eyePos);
-			plShader.SetUniformFloat("shininess", 128.0f);
-			plShader.SetUniformVec2("uScreenSize", glm::vec2(screenWidth, screenHeight));
-
-
-			plShader.SetUniformInt("gPosition", 10);
-			glActiveTexture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, gbPosition);
-
-			plShader.SetUniformInt("gNormal", 11);
-			glActiveTexture(GL_TEXTURE11);
-			glBindTexture(GL_TEXTURE_2D, gbNormal);
-
-			plShader.SetUniformInt("gAlbedoSpecular", 12);
-			glActiveTexture(GL_TEXTURE12);
-			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
-
-			glBindVertexArray(vaoPL);
-			glDrawElements(GL_TRIANGLES, plMesh.m_indices.size(), GL_UNSIGNED_INT, 0);
-			glBindVertexArray(0);
-
-			plShader.Unuse();
-
-			/*
-			//render screen 		
-
-			screenShader.Use();
+			glm::vec3 lightPos = glm::vec3(165.0);
 
 			for (int i = 0; i < cubeLights.size(); i++)
 			{
-				screenShader.SetUniformVec3("lights[" + std::to_string(i) + "].position", cubeLights[i].m_Position);
-				screenShader.SetUniformVec3("lights[" + std::to_string(i) + "].color", cubeLights[i].m_color);
-				//std::cout << radius << std::endl;
-				screenShader.SetUniformFloat("lights[" + std::to_string(i) + "].radius", cubeLights[i].m_radius);
+				plShader.Use();
+				glm::mat4 model;
+				model = glm::translate(model, cubeLights[i].m_position);
+				model = glm::scale(model, glm::vec3(cubeLights[i].m_radius));
+
+				plShader.SetUniformMat4("model", model);
+				plShader.SetUniformMat4("view", view);
+				plShader.SetUniformMat4("projection", projection);
+				/*
+				plShader.SetUniformVec3("uLightPos", lightPos);
+				plShader.SetUniformVec3("uEyePos", eyePos);
+				plShader.SetUniformFloat("shininess", 128.0f);
+				plShader.SetUniformVec2("uScreenSize", glm::vec2(screenWidth, screenHeight));
+				*/
+				//plShader.SetUniformVec3("uLight.position", lightPos);
+				plShader.SetUniformVec3("uLight.position", cubeLights[i].m_position);
+				plShader.SetUniformVec3("uLight.color", cubeLights[i].m_color);
+				plShader.SetUniformFloat("uLight.attenuation.constant", cubeLights[i].m_attenuation.constant);
+				plShader.SetUniformFloat("uLight.attenuation.linear", cubeLights[i].m_attenuation.linear);
+				plShader.SetUniformFloat("uLight.attenuation.quadratic", cubeLights[i].m_attenuation.quadratic);
+				plShader.SetUniformFloat("uLight.attenuation.factor", cubeLights[i].m_attenuation.factor);
+
+				plShader.SetUniformVec3("uEyePos", eyePos);
+				plShader.SetUniformFloat("shininess", 128.0f);
+				plShader.SetUniformVec2("uScreenSize", glm::vec2(screenWidth, screenHeight));
+
+				plShader.SetUniformInt("gPosition", 10);
+				glActiveTexture(GL_TEXTURE10);
+				glBindTexture(GL_TEXTURE_2D, gbPosition);
+
+				plShader.SetUniformInt("gNormal", 11);
+				glActiveTexture(GL_TEXTURE11);
+				glBindTexture(GL_TEXTURE_2D, gbNormal);
+
+				plShader.SetUniformInt("gAlbedoSpecular", 12);
+				glActiveTexture(GL_TEXTURE12);
+				glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+
+				glBindVertexArray(vaoPL);
+				glDrawElements(GL_TRIANGLES, plMesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+
+				plShader.Unuse();
 			}
-
-			screenShader.SetUniformInt("gPosition", 10);
-			glActiveTexture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, gbPosition);
-
-			screenShader.SetUniformInt("gNormal", 11);
-			glActiveTexture(GL_TEXTURE11);
-			glBindTexture(GL_TEXTURE_2D, gbNormal);
-
-			screenShader.SetUniformInt("gAlbedoSpecular", 12);
-			glActiveTexture(GL_TEXTURE12);
-			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
-
-			screenShader.SetUniformVec3("eyePos", eyePos);
-			screenShader.SetUniformFloat("shininess", 128.0f);
-
-			glBindVertexArray(screenVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindVertexArray(0);
-
-			screenShader.Unuse();
-			*/
-
 
 			SDL_GL_SwapWindow(window);
 
