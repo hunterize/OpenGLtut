@@ -29,7 +29,7 @@ namespace DeferredShading
 	/*
 		const GLfloat constant = 1.0f;
 		const GLfloat linear = 0.7f;
-		const GLfloat quadratic = 1.8f;
+		const GLfloat quadratic = 0.08f;
 	*/
 
 	struct CLight
@@ -37,6 +37,8 @@ namespace DeferredShading
 		glm::vec3 m_position;
 		glm::vec3 m_color;
 		GLfloat m_radius;
+		GLfloat m_dIntensity = 0.3f;
+		GLfloat m_sIntensity = 0.6f;
 		struct 
 		{
 			GLfloat constant = 1.0f;
@@ -51,9 +53,10 @@ namespace DeferredShading
 		const GLfloat brightness = std::fmaxf(std::fmaxf(light.m_color.x, light.m_color.y), light.m_color.z);
 		
 		light.m_attenuation.factor = brightness * 256.0f / 1.0f;
-		light.m_radius = (-light.m_attenuation.linear 
-			+ std::sqrtf(
-				light.m_attenuation.linear * light.m_attenuation.linear - 4.0f * light.m_attenuation.quadratic * (light.m_attenuation.constant - light.m_attenuation.factor))) 
+		light.m_radius = (-light.m_attenuation.linear + 
+			std::sqrtf(
+				light.m_attenuation.linear * light.m_attenuation.linear - 
+				4.0f * light.m_attenuation.quadratic * (light.m_attenuation.constant - light.m_attenuation.factor))) 
 			/ (2.0f * light.m_attenuation.quadratic);
 
 
@@ -77,7 +80,7 @@ namespace DeferredShading
 			glm::vec3(180.0f, 180.0f, 180.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f));
 
-		camera.SetSpeed(10.0f);
+		camera.SetSpeed(30.0f);
 
 		window = SDL_CreateWindow("DeferredShading", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
@@ -424,6 +427,8 @@ namespace DeferredShading
 			//bind g-buffer frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_BLEND);
 
 			//render crates
 			objShader.Use();
@@ -456,11 +461,16 @@ namespace DeferredShading
 			//switch to default framebuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			//glEnable(GL_DEPTH_TEST);
+
+			glDisable(GL_DEPTH_TEST);
+
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 
-			glm::vec3 lightPos = glm::vec3(165.0);
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_ONE, GL_ONE);
+
 
 			for (int i = 0; i < cubeLights.size(); i++)
 			{
@@ -472,15 +482,11 @@ namespace DeferredShading
 				plShader.SetUniformMat4("model", model);
 				plShader.SetUniformMat4("view", view);
 				plShader.SetUniformMat4("projection", projection);
-				/*
-				plShader.SetUniformVec3("uLightPos", lightPos);
-				plShader.SetUniformVec3("uEyePos", eyePos);
-				plShader.SetUniformFloat("shininess", 128.0f);
-				plShader.SetUniformVec2("uScreenSize", glm::vec2(screenWidth, screenHeight));
-				*/
-				//plShader.SetUniformVec3("uLight.position", lightPos);
+
 				plShader.SetUniformVec3("uLight.position", cubeLights[i].m_position);
 				plShader.SetUniformVec3("uLight.color", cubeLights[i].m_color);
+				plShader.SetUniformFloat("uLight.dIntensity", cubeLights[i].m_dIntensity);
+				plShader.SetUniformFloat("uLight.sIntensity", cubeLights[i].m_sIntensity);
 				plShader.SetUniformFloat("uLight.attenuation.constant", cubeLights[i].m_attenuation.constant);
 				plShader.SetUniformFloat("uLight.attenuation.linear", cubeLights[i].m_attenuation.linear);
 				plShader.SetUniformFloat("uLight.attenuation.quadratic", cubeLights[i].m_attenuation.quadratic);
