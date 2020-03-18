@@ -44,7 +44,7 @@ namespace GeometryFactory
 			//add slight offset to the last vertex on a ring
 			int j = nslice;
 			GVertex vertex;
-			GLfloat delta = j * longit + 0.01;
+			GLfloat delta = j * longit + 0.00;
 
 			vertex.m_position.x = radius * glm::sin(i * lat) * glm::cos(delta);
 			vertex.m_position.y = radius * glm::cos(i * lat);

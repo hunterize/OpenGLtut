@@ -52,7 +52,7 @@ namespace DeferredShading
 	{
 		const GLfloat brightness = std::fmaxf(std::fmaxf(light.m_color.x, light.m_color.y), light.m_color.z);
 		
-		light.m_attenuation.factor = brightness * 256.0f / 1.0f;
+		light.m_attenuation.factor = brightness * 256.0f / 1.5f;
 		light.m_radius = (-light.m_attenuation.linear + 
 			std::sqrtf(
 				light.m_attenuation.linear * light.m_attenuation.linear - 
@@ -105,6 +105,8 @@ namespace DeferredShading
 		std::cout << "Max Vertex Uniform Components: " << usize << std::endl;
 		glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &usize);
 		std::cout << "Max Fragment Uniform Components: " << usize << std::endl;
+		glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &usize);
+		std::cout << "Stencil clear value: " << usize << std::endl;
 
 
 		//initialize vertices for game object
@@ -310,10 +312,11 @@ namespace DeferredShading
 		unsigned int gbAttachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 		glDrawBuffers(3, gbAttachments);
 
+		//set render buffer for depth and stencil
 		glGenRenderbuffers(1, &gBufferRBO);
 		glBindRenderbuffer(GL_RENDERBUFFER, gBufferRBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gBufferRBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, screenWidth, screenHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, gBufferRBO);
 
 		//check if the frame buffer with attachment is complete
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -332,6 +335,9 @@ namespace DeferredShading
 		//CShader screenShader;
 		//screenShader.AttachShader("Shaders/DeferredScreenVertexShader.vert", "Shaders/DeferredScreenFragmentShader.frag");
 
+		CShader stencilShader;
+		stencilShader.AttachShader("Shaders/DeferredStencilVertexShader.vert", "Shaders/DeferredStencilFragmentShader.frag");
+
 		CShader plShader;
 		plShader.AttachShader("Shaders/DeferredPointLightVertexShader.vert", "Shaders/DeferredPointLightFragmentShader.frag");
 
@@ -348,12 +354,16 @@ namespace DeferredShading
 		cratesPos.reserve(1000);
 
 		for (int i = 0; i < 10; i++)
+		{
 			for (int j = 0; j < 10; j++)
+			{
 				for(int k = 0; k < 10; k++)
 				{
 					glm::vec3 pos = glm::vec3(150.0f - 30.0f * i, 150.0f - 30.0f * j, 150.0f - 30.0f * k);
 					cratesPos.push_back(pos);
 				}
+			}
+		}
 
 		glm::vec3 obj[] = {
 			glm::vec3(0.0f, 0.0f, 0.0f),
@@ -368,8 +378,11 @@ namespace DeferredShading
 		const GLfloat linear = 0.7f;
 		const GLfloat quadratic = 1.8f;
 
+		/*
 		for (int i = 0; i < 11; i++)
+		{
 			for (int j = 0; j < 11; j++)
+			{
 				for (int k = 0; k < 11; k++)
 				{
 					CLight light;
@@ -378,6 +391,29 @@ namespace DeferredShading
 					InitLightRadius(light);
 					cubeLights.push_back(light);
 				}
+			}
+		}
+		*/
+
+		
+		{
+			CLight light;
+			light.m_position = glm::vec3(165.0f, 165.0f, 165.0 - 30.0);
+			light.m_color = glm::vec3(0.0, 0.0, 1.0f);
+			InitLightRadius(light);
+			cubeLights.push_back(light);
+
+			light.m_position = glm::vec3(165.0f - 30.0f, 165.0f, 165.0f);
+			light.m_color = glm::vec3(1.0f, 0.0, 0.0);
+			InitLightRadius(light);
+			cubeLights.push_back(light);
+
+			light.m_position = glm::vec3(165.0f, 165.0 - 30.0f, 165.0f);
+			light.m_color = glm::vec3(0.0f, 1.0f, 0.0f);
+			InitLightRadius(light);
+			cubeLights.push_back(light);
+		}
+		
 
 		GLfloat exposure = 1.0f;
 		bool isDebug = false;
@@ -391,8 +427,8 @@ namespace DeferredShading
 		while (isRunning)
 		{
 			glClearColor(0.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glEnable(GL_DEPTH_TEST);  //enable depth testing
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			//glEnable(GL_DEPTH_TEST);  //enable depth testing
 
 			Uint32 current = SDL_GetTicks();
 
@@ -424,10 +460,17 @@ namespace DeferredShading
 
 			glm::vec3 eyePos = camera.GetPosition();
 
+			//Geometry Pass
+
 			//bind g-buffer frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+			glDepthMask(GL_TRUE);
+			
+			glDisable(GL_STENCIL_TEST);
 			glDisable(GL_BLEND);
 
 			//render crates
@@ -458,14 +501,57 @@ namespace DeferredShading
 			objShader.Unuse();
 			//end of rendering cubes
 
-			//switch to default framebuffer
+			//Stencil Pass
+			//stencil pass is till on g-buffer framebuffer 
+
+			glDepthMask(GL_FALSE);
+			glDisable(GL_CULL_FACE);
+
+			glClear(GL_STENCIL_BUFFER_BIT);
+
+			glEnable(GL_STENCIL_TEST);
+			glStencilFunc(GL_ALWAYS, 0, 0xFF);
+			glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+			glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+			//iterate all lights to update stencil values 
+			for (int i = 0; i < cubeLights.size(); i++)
+			{
+				stencilShader.Use();
+
+				glm::mat4 model;
+				model = glm::translate(model, cubeLights[i].m_position);
+				model = glm::scale(model, glm::vec3(cubeLights[i].m_radius));
+
+				stencilShader.SetUniformMat4("model", model);
+				stencilShader.SetUniformMat4("view", view);
+				stencilShader.SetUniformMat4("projection", projection);
+
+				glBindVertexArray(vaoPL);
+				glDrawElements(GL_TRIANGLES, plMesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+				glBindVertexArray(0);
+
+				stencilShader.Unuse();
+			}
+			glDepthMask(GL_TRUE);
+
+
+			//Light Pass
+			//copy stencil and depth buffer from g buffer to default frame buffer
+			glEnable(GL_STENCIL_TEST);
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
 			glDisable(GL_DEPTH_TEST);
+			//glDepthMask(GL_TRUE);
 
 			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			glCullFace(GL_FRONT);
 
 			glEnable(GL_BLEND);
 			glBlendEquation(GL_FUNC_ADD);
@@ -515,12 +601,17 @@ namespace DeferredShading
 				plShader.Unuse();
 			}
 
+			glCullFace(GL_BACK);
+			glDisable(GL_STENCIL_TEST);
+
 			SDL_GL_SwapWindow(window);
 
+			
 			if (elapsed < 16)
 			{
 				SDL_Delay(16 - elapsed);
 			}
+			
 		}
 
 		SDL_GL_DeleteContext(context);

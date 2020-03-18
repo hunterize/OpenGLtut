@@ -252,5 +252,11 @@
     <None Include="Shaders\DeferredPointLightVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\DeferredStencilFragmentShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\DeferredStencilVertexShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
