@@ -52,7 +52,7 @@ namespace DeferredShading
 	{
 		const GLfloat brightness = std::fmaxf(std::fmaxf(light.m_color.x, light.m_color.y), light.m_color.z);
 		
-		light.m_attenuation.factor = brightness * 256.0f / 1.5f;
+		light.m_attenuation.factor = brightness * 256.0f / 1.0f;
 		light.m_radius = (-light.m_attenuation.linear + 
 			std::sqrtf(
 				light.m_attenuation.linear * light.m_attenuation.linear - 
@@ -277,7 +277,7 @@ namespace DeferredShading
 		glGenFramebuffers(1, &gBufferFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
 
-		unsigned int gbPosition, gbNormal, gbAlbedo;
+		unsigned int gbPosition, gbNormal, gbAlbedo, gbScene;
 
 		//position g-buffer
 		glGenTextures(1, &gbPosition);
@@ -309,8 +309,18 @@ namespace DeferredShading
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbAlbedo, 0);
 
-		unsigned int gbAttachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-		glDrawBuffers(3, gbAttachments);
+		//final scene g-buffer, use RGB format
+		glGenTextures(1, &gbScene);
+		glBindTexture(GL_TEXTURE_2D, gbScene);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gbScene, 0);
+
+		//unsigned int gbAttachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		//glDrawBuffers(3, gbAttachments);
 
 		//set render buffer for depth and stencil
 		glGenRenderbuffers(1, &gBufferRBO);
@@ -378,7 +388,7 @@ namespace DeferredShading
 		const GLfloat linear = 0.7f;
 		const GLfloat quadratic = 1.8f;
 
-		/*
+		
 		for (int i = 0; i < 11; i++)
 		{
 			for (int j = 0; j < 11; j++)
@@ -393,9 +403,9 @@ namespace DeferredShading
 				}
 			}
 		}
-		*/
-
 		
+
+		/*
 		{
 			CLight light;
 			light.m_position = glm::vec3(165.0f, 165.0f, 165.0 - 30.0);
@@ -413,7 +423,7 @@ namespace DeferredShading
 			InitLightRadius(light);
 			cubeLights.push_back(light);
 		}
-		
+		*/
 
 		GLfloat exposure = 1.0f;
 		bool isDebug = false;
@@ -460,18 +470,27 @@ namespace DeferredShading
 
 			glm::vec3 eyePos = camera.GetPosition();
 
+			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
+			glDrawBuffer(GL_COLOR_ATTACHMENT3);
+			glClear(GL_COLOR_BUFFER_BIT);
+
 			//Geometry Pass
 
 			//bind g-buffer frame buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+			//change draw buffers of G buffer
+			unsigned int gbAttachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+			glDrawBuffers(3, gbAttachments);
+
+			glDepthMask(GL_TRUE);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-			glDepthMask(GL_TRUE);
+			//glDepthFunc(GL_LESS);
 			
-			glDisable(GL_STENCIL_TEST);
-			glDisable(GL_BLEND);
+			//glDisable(GL_STENCIL_TEST);
+			//glDisable(GL_BLEND);
 
 			//render crates
 			objShader.Use();
@@ -498,25 +517,34 @@ namespace DeferredShading
 				glBindVertexArray(0);
 			}
 
+			glDepthMask(GL_FALSE);
+			
 			objShader.Unuse();
 			//end of rendering cubes
 
-			//Stencil Pass
-			//stencil pass is till on g-buffer framebuffer 
-
-			glDepthMask(GL_FALSE);
-			glDisable(GL_CULL_FACE);
-
-			glClear(GL_STENCIL_BUFFER_BIT);
-
 			glEnable(GL_STENCIL_TEST);
-			glStencilFunc(GL_ALWAYS, 0, 0xFF);
-			glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
-			glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
 
-			//iterate all lights to update stencil values 
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_ONE, GL_ONE);
+
+			//iterate all lights
 			for (int i = 0; i < cubeLights.size(); i++)
 			{
+				//Stencil Pass
+				//stencil pass is till on g-buffer framebuffer 
+				glDrawBuffer(GL_NONE);
+				glDisable(GL_CULL_FACE);
+				glClear(GL_STENCIL_BUFFER_BIT);
+
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GL_LESS);
+				glDepthMask(GL_FALSE);
+
+				glStencilFunc(GL_ALWAYS, 0, 0xFF);
+				glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+				glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+				
 				stencilShader.Use();
 
 				glm::mat4 model;
@@ -532,39 +560,20 @@ namespace DeferredShading
 				glBindVertexArray(0);
 
 				stencilShader.Unuse();
-			}
-			glDepthMask(GL_TRUE);
+				//glDepthMask(GL_TRUE);
 
+				//Light Pass
+				glDrawBuffer(GL_COLOR_ATTACHMENT3);
 
-			//Light Pass
-			//copy stencil and depth buffer from g buffer to default frame buffer
-			glEnable(GL_STENCIL_TEST);
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+				glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
-			glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-			glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+				glDisable(GL_DEPTH_TEST);
 
-			glDisable(GL_DEPTH_TEST);
-			//glDepthMask(GL_TRUE);
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_FRONT);
 
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_FRONT);
-
-			glEnable(GL_BLEND);
-			glBlendEquation(GL_FUNC_ADD);
-			glBlendFunc(GL_ONE, GL_ONE);
-
-
-			for (int i = 0; i < cubeLights.size(); i++)
-			{
 				plShader.Use();
-				glm::mat4 model;
-				model = glm::translate(model, cubeLights[i].m_position);
-				model = glm::scale(model, glm::vec3(cubeLights[i].m_radius));
-
 				plShader.SetUniformMat4("model", model);
 				plShader.SetUniformMat4("view", view);
 				plShader.SetUniformMat4("projection", projection);
@@ -599,10 +608,23 @@ namespace DeferredShading
 				glBindVertexArray(0);
 
 				plShader.Unuse();
+
+				glCullFace(GL_BACK);
+
+
 			}
 
-			glCullFace(GL_BACK);
+			glDisable(GL_BLEND);
 			glDisable(GL_STENCIL_TEST);
+
+			//glDisable(GL_STENCIL_TEST);
+
+			//swap to default frame buffer
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, gBufferFBO);
+			glReadBuffer(GL_COLOR_ATTACHMENT3);
+			glBlitFramebuffer(0, 0, screenWidth, screenHeight, 0, 0, screenWidth, screenHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 			SDL_GL_SwapWindow(window);
 

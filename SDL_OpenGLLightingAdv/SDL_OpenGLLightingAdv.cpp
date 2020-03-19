@@ -11,7 +11,7 @@ int main(int args, char** argv)
 	//ParallaxMapping::ParallaxMapping();
 	//HDR::HDR();
 	//Bloom::Bloom();
-	//DeferredShading::DeferredShading();
-	DeferredShadingFB0::DeferredShadingFB0();
+	DeferredShading::DeferredShading();
+	//DeferredShadingFB0::DeferredShadingFB0();
 	return 1;
 }
