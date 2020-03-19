@@ -58,3 +58,8 @@ namespace DeferredShading
 {
 	void DeferredShading();
 }
+
+namespace DeferredShadingFB0
+{
+	void DeferredShadingFB0();
+}

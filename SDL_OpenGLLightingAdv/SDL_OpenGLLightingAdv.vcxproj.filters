@@ -63,6 +63,9 @@
     <ClCompile Include="GeometryFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DeferredShadingFB0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SDL_OpenGLLightingAdv.h">
