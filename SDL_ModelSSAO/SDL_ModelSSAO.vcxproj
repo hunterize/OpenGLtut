@@ -20,10 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{47BCCB86-D4EA-40DF-BF4A-B1C6A9B9F36A}</ProjectGuid>
+    <ProjectGuid>{62657B6A-1488-4C1B-98DD-6EC5A6552DCE}</ProjectGuid>
     <RootNamespace>SDLOpenGLLightingAdv</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>SDL_GeometryModel</ProjectName>
+    <ProjectName>SDL_ModelSSAO</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -98,8 +98,7 @@
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
 xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
-xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"
-xcopy /y "$(ProjectDir)Earth\*.jpg" "$(Outdir)Earth\"</Command>
+xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,8 +118,7 @@ xcopy /y "$(ProjectDir)Earth\*.jpg" "$(Outdir)Earth\"</Command>
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
 xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
-xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"
-xcopy /y "$(ProjectDir)Earth\*.jpg" "$(Outdir)Earth\"</Command>
+xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -150,35 +148,24 @@ xcopy /y "$(ProjectDir)Earth\*.jpg" "$(Outdir)Earth\"</Command>
     <ClCompile Include="CInputManager.cpp" />
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
-    <ClCompile Include="Demo.cpp" />
-    <ClCompile Include="GeometryFactory.cpp" />
-    <ClCompile Include="SDL_GeometryModel.cpp" />
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="SDL_ModelSSAO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h" />
     <ClInclude Include="CInputManager.h" />
     <ClInclude Include="CShader.h" />
     <ClInclude Include="CSTexture.h" />
-    <ClInclude Include="GeometryFactory.h" />
-    <ClInclude Include="SDL_GeometryModel.h" />
+    <ClInclude Include="SDL_ModelSSAO.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="bricks2.jpg" />
-    <Image Include="bricks2_disp.jpg" />
-    <Image Include="bricks2_normal.jpg" />
     <Image Include="crate.png" />
-    <Image Include="Earth\earthbump1k.jpg" />
-    <Image Include="Earth\earthcloudmap.jpg" />
-    <Image Include="Earth\earthcloudmaptrans.jpg" />
-    <Image Include="Earth\earthlights1k.jpg" />
-    <Image Include="Earth\earthmap1k.jpg" />
-    <Image Include="Earth\earthspec1k.jpg" />
     <Image Include="wood.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\SphereFragmentShader.frag" />
-    <None Include="Shaders\SphereVertexShader.vert" />
+    <None Include="Shaders\DemoFragmentShader.frag" />
+    <None Include="Shaders\DemoVertexShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

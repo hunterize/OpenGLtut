@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2043
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_Tutorial_6", "SDL_Tutorial_6\SDL_Tutorial.vcxproj", "{FF43C84E-F6DD-490B-8D22-1978131D832D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_Tutorial_Shader", "SDL_Tutorial_Shader\SDL_Tutorial_Shader.vcxproj", "{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_Tutorial_Texture", "SDL_Tutorial_Texture\SDL_Tutorial_Texture.vcxproj", "{B34B46BE-09CF-4574-835C-A84955C8B30D}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLAPI", "SDL_OpenGLAPI\SDL_OpenGLAPI.vcxproj", "{C97E42CD-3308-4B3C-8B98-09DB16EE9220}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLGLSL", "SDL_OpenGLGLSL\SDL_OpenGLGLSL.vcxproj", "{4ED24230-01C7-463C-8196-1E62257F930D}"
@@ -43,30 +37,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Debug|x64.ActiveCfg = Debug|x64
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Debug|x64.Build.0 = Debug|x64
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Debug|x86.ActiveCfg = Debug|Win32
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Debug|x86.Build.0 = Debug|Win32
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Release|x64.ActiveCfg = Release|x64
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Release|x64.Build.0 = Release|x64
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Release|x86.ActiveCfg = Release|Win32
-		{FF43C84E-F6DD-490B-8D22-1978131D832D}.Release|x86.Build.0 = Release|Win32
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Debug|x64.ActiveCfg = Debug|x64
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Debug|x64.Build.0 = Debug|x64
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Debug|x86.ActiveCfg = Debug|Win32
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Debug|x86.Build.0 = Debug|Win32
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Release|x64.ActiveCfg = Release|x64
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Release|x64.Build.0 = Release|x64
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Release|x86.ActiveCfg = Release|Win32
-		{CF3B4CDB-339B-46C3-91C0-A4190FC63A60}.Release|x86.Build.0 = Release|Win32
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Debug|x64.ActiveCfg = Debug|x64
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Debug|x64.Build.0 = Debug|x64
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Debug|x86.ActiveCfg = Debug|Win32
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Debug|x86.Build.0 = Debug|Win32
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Release|x64.ActiveCfg = Release|x64
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Release|x64.Build.0 = Release|x64
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Release|x86.ActiveCfg = Release|Win32
-		{B34B46BE-09CF-4574-835C-A84955C8B30D}.Release|x86.Build.0 = Release|Win32
 		{C97E42CD-3308-4B3C-8B98-09DB16EE9220}.Debug|x64.ActiveCfg = Debug|x64
 		{C97E42CD-3308-4B3C-8B98-09DB16EE9220}.Debug|x64.Build.0 = Debug|x64
 		{C97E42CD-3308-4B3C-8B98-09DB16EE9220}.Debug|x86.ActiveCfg = Debug|Win32
