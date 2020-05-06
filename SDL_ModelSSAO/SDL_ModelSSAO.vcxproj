@@ -71,12 +71,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(solutiondir)Dependency\Include\GLEW\;$(solutiondir)Dependency\Include\sdl\;$(solutiondir)Dependency\Include\glm\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(solutiondir)Dependency\lib\glew\;$(solutiondir)Dependency\lib\sdl\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)Dependency\Include\GLEW\;$(solutiondir)Dependency\Include\sdl\;$(solutiondir)Dependency\Include\glm\;$(solutiondir)Dependency\Include\assimp\;$(solutiondir)Dependency\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(solutiondir)Dependency\lib\glew\;$(solutiondir)Dependency\lib\sdl\;$(solutiondir)Dependency\lib\assimp\debug\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(solutiondir)Dependency\Include\GLEW\;$(solutiondir)Dependency\Include\glm\;$(solutiondir)Dependency\Include\sdl\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(solutiondir)Dependency\lib\glew\;$(solutiondir)Dependency\lib\sdl\;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)Dependency\Include\GLEW\;$(solutiondir)Dependency\Include\glm\;$(solutiondir)Dependency\Include\sdl\;$(solutiondir)Dependency\Include\assimp\;$(solutiondir)Dependency\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(solutiondir)Dependency\lib\glew\;$(solutiondir)Dependency\lib\sdl\;$(solutiondir)Dependency\lib\assimp\release\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -90,7 +90,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>sdl2.lib;sdl2main.lib;sdl2test.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sdl2.lib;sdl2main.lib;sdl2test.lib;glew32.lib;opengl32.lib;assimp-vc140-mt.lib;IrrXML.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -98,7 +98,9 @@
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
 xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
-xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
+xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"
+xcopy /y /e /i "$(ProjectDir)GameResources" "$(Outdir)GameResources"
+xcopy /y "$(SolutionDir)Dependency\lib\assimp\release\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -110,7 +112,7 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
       <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>sdl2.lib;sdl2main.lib;sdl2test.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sdl2.lib;sdl2main.lib;sdl2test.lib;glew32.lib;opengl32.lib;assimp-vc140-mt.lib;IrrXML.lib;zlibstaticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -118,7 +120,9 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
 xcopy /y "$(SolutionDir)Dependency\lib\GLEW\glew32.dll" "$(OutDir)"
 xcopy /y /e "$(ProjectDir)Shaders\*.*" "$(Outdir)Shaders\"
 xcopy /y "$(ProjectDir)*.png" "$(Outdir)"
-xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
+xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"
+xcopy /y /e /i "$(ProjectDir)GameResources" "$(Outdir)GameResources"
+xcopy /y "$(SolutionDir)Dependency\lib\assimp\debug\assimp-vc140-mt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -146,26 +150,31 @@ xcopy /y "$(ProjectDir)*.jpg" "$(Outdir)"</Command>
   <ItemGroup>
     <ClCompile Include="CCamera3D.cpp" />
     <ClCompile Include="CInputManager.cpp" />
+    <ClCompile Include="CMesh.cpp" />
+    <ClCompile Include="CModel.cpp" />
     <ClCompile Include="CShader.cpp" />
     <ClCompile Include="CSTexture.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="CTexture.cpp" />
     <ClCompile Include="SDL_ModelSSAO.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCamera3D.h" />
     <ClInclude Include="CInputManager.h" />
+    <ClInclude Include="CMesh.h" />
+    <ClInclude Include="CModel.h" />
     <ClInclude Include="CShader.h" />
     <ClInclude Include="CSTexture.h" />
+    <ClInclude Include="CTexture.h" />
+    <ClInclude Include="CVertex.h" />
     <ClInclude Include="SDL_ModelSSAO.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="crate.png" />
-    <Image Include="wood.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Shaders\DemoFragmentShader.frag" />
     <None Include="Shaders\DemoVertexShader.vert" />
+    <None Include="Shaders\ModelFragmentShader.frag" />
+    <None Include="Shaders\ModelVertexShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
