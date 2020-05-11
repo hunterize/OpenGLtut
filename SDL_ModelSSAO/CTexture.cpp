@@ -9,7 +9,7 @@ unsigned int CTexture::LoadImage(const std::string& fileName)
 	glGenTextures(1, &ID);
 
 	//flip the texture
-	//stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(true);
 
 	unsigned char *imageData = NULL;
 	imageData = stbi_load(fileName.c_str(), &width, &height, &channel, 0);

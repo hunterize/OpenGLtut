@@ -68,9 +68,6 @@ namespace ModelSSAO
 		CShader demoShader;
 		demoShader.AttachShader("Shaders/DemoVertexShader.vert", "Shaders/DemoFragmentShader.frag");
 
-		GLTexture woodTexture = CSTexture::LoadImage("GameResources/textures/wood.png");
-		GLTexture crateTexture = CSTexture::LoadImage("GameResources/textures/crate.png");
-
 		//set floor vao and vbo
 		GLuint floorVBO = 0;
 		GLuint floorVAO = 0;
@@ -104,6 +101,7 @@ namespace ModelSSAO
 		CShader modelShader;
 		modelShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag");
 		CModel soldierModel("GameResources/nanosuit/nanosuit.obj");
+		CModel soldierModelMonoChrome("GameResources/nanosuit/nanosuit.obj");
 
 		glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -157,7 +155,7 @@ namespace ModelSSAO
 			demoShader.Use();
 			glm::mat4 floorModel;
 			floorModel = glm::translate(floorModel, floorPos);
-			floorModel = glm::scale(floorModel, glm::vec3(50.0f, 50.0f, 50.0f));
+			floorModel = glm::scale(floorModel, glm::vec3(100.0f, 50.0f, 50.0f));
 			demoShader.SetUniformMat4("model", floorModel);
 			demoShader.SetUniformMat4("view", view);
 			demoShader.SetUniformMat4("projection", projection);
@@ -185,8 +183,15 @@ namespace ModelSSAO
 			modelShader.SetUniformVec3("lightColor", lightColor);
 
 			modelShader.SetUniformFloat("shininess", shininess);
+			modelShader.SetUniformInt("col", 2);
 
 			soldierModel.Render(modelShader);
+
+			model = glm::translate(model, glm::vec3(-10.0f, 0.0f, 0.0f));
+			modelShader.SetUniformMat4("model", model);
+			modelShader.SetUniformInt("col", 1);
+			soldierModelMonoChrome.Render(modelShader);
+
 			modelShader.Unuse();
 
 
