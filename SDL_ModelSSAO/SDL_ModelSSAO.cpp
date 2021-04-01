@@ -65,37 +65,87 @@ namespace ModelSSAO
 		glDebugMessageCallback(MessageCallback, 0);
 #endif // DEBUG
 
-		CShader demoShader;
-		demoShader.AttachShader("Shaders/DemoVertexShader.vert", "Shaders/DemoFragmentShader.frag");
+		//initialize vertices for room
+		GLuint crateVBO = 0;
+		GLuint crateVAO = 0;
+		GLuint crateEBO = 0;
 
-		//set floor vao and vbo
-		GLuint floorVBO = 0;
-		GLuint floorVAO = 0;
-		GLfloat floorVertices[] = {
-			//position           //normal           //uv
-			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f,  //bottom left
-			0.5f, 0.0f, 0.5f,    0.0f, 1.0f, 0.0f,  1.0f, 0.0f,  //bottom right
-			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
-			0.5f, 0.0f, -0.5f,   0.0f, 1.0f, 0.0f,  1.0f, 1.0f,  //top right
-			-0.5f, 0.0f, -0.5f,  0.0f, 1.0f, 0.0f,	0.0f, 1.0f,	//top left
-			-0.5f, 0.0f, 0.5f,   0.0f, 1.0f, 0.0f,  0.0f, 0.0f  //bottom left
+		//the cube, counterclock wise vertices
+		GLfloat crateVertices[] = {
+			//Pos                 //normal              //texture coordinates
+			//front side
+			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 1.0f,	//top left			
+			//back side
+			0.5f, -0.5f, -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 0.0f,	//bottom left
+			-0.5f, -0.5f,  -0.5f,  0.0f, 0.0f, -1.0,	1.0f, 0.0f,	//bottom right
+			-0.5f, 0.5f,  -0.5f,  0.0f, 0.0f, -1.0,		1.0f, 1.0f,	//top right
+			0.5f, 0.5f,  -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 1.0f,	//top left			
+			//left side
+			-0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 0.0f,	//bottom left
+			-0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 0.0f,	//bottom right
+			-0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 1.0f,	//top left			
+			//right side
+			0.5f, -0.5f,  0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 1.0f,	//top right
+			0.5f, 0.5f,   0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 1.0f,	//top left			
+			//top side
+			-0.5f, 0.5f,  0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 0.0f,	//bottom left
+			0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,		1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 1.0f,	//top left			
+			//bottom side
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 0.0f,	//bottom right
+			0.5f,  -0.5f, 0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 1.0f,	//top right
+			-0.5f,  -0.5f, 0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 1.0f	//top left			
 		};
 
-		glGenBuffers(1, &floorVBO);
-		glGenVertexArrays(1, &floorVAO);
+		//verex indices
+		GLuint crateIndices[] = {
+			0, 1, 2, 2, 3, 0,
+			4, 5, 6, 6, 7, 4,
+			8, 9, 10, 10, 11, 8,
+			12, 13, 14, 14, 15, 12,
+			16, 17, 18, 18, 19, 16,
+			20, 21, 22, 22, 23, 20
+		};
 
-		glBindVertexArray(floorVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, floorVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(floorVertices), floorVertices, GL_STATIC_DRAW);
+		//set vao for cube
+		glGenBuffers(1, &crateVBO);
+		glGenBuffers(1, &crateEBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(crateVertices), crateVertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crateIndices), crateIndices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//set attribute location for vertex arrays
+		glGenVertexArrays(1, &crateVAO);
+		glBindVertexArray(crateVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
+
+		//Attribute location = 0 in vertex shader
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
 		glEnableVertexAttribArray(0);
+		//Attribute location = 1 in vertex shader
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
 		glEnableVertexAttribArray(1);
+		//Attribute location = 2 in vertex shader
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
 		glEnableVertexAttribArray(2);
+
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
-		//end of setting floor vao and vbo
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
 		CShader modelShader;
@@ -103,10 +153,14 @@ namespace ModelSSAO
 		CModel soldierModel("GameResources/nanosuit/nanosuit.obj");
 		CModel soldierModelMonoChrome("GameResources/nanosuit/nanosuit.obj");
 
+		CShader roomShader;
+		roomShader.AttachShader("Shaders/DemoVertexShader.vert", "Shaders/DemoFragmentShader.frag");
+
+
 		glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
-		glm::vec3 floorPos = glm::vec3(0.0f, -2.f, 0.0f);
+		glm::vec3 roomPos = glm::vec3(0.0f, 20.0f, 0.0f);
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -150,22 +204,19 @@ namespace ModelSSAO
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //set background color
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear color buffer
 
+			roomShader.Use();
+			glm::mat4 roomModel = glm::mat4(1.0f);
+			roomModel = glm::translate(roomModel, roomPos);
+			roomModel = glm::scale(roomModel, glm::vec3(50.0f, 50.0f, 50.0f));
+			roomShader.SetUniformMat4("model", roomModel);
+			roomShader.SetUniformMat4("view", view);
+			roomShader.SetUniformMat4("projection", projection);
 
-			//crate and floor use same shader
-			demoShader.Use();
-			glm::mat4 floorModel;
-			floorModel = glm::translate(floorModel, floorPos);
-			floorModel = glm::scale(floorModel, glm::vec3(100.0f, 50.0f, 50.0f));
-			demoShader.SetUniformMat4("model", floorModel);
-			demoShader.SetUniformMat4("view", view);
-			demoShader.SetUniformMat4("projection", projection);
-			//glBindTexture(GL_TEXTURE_2D, woodTexture.ID);
-
-			glBindVertexArray(floorVAO);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(crateVAO);
+			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
-			demoShader.Unuse();
+			roomShader.Unuse();
 
 			//render soldier
 			modelShader.Use();
