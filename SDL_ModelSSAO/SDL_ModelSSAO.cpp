@@ -73,17 +73,18 @@ namespace ModelSSAO
 		//the cube, counterclock wise vertices
 		GLfloat crateVertices[] = {
 			//Pos                 //normal              //texture coordinates
-			//front side
+			/*//front side
 			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 0.0f,	//bottom left
 			0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 0.0f,	//bottom right
 			0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 1.0f,	//top right
 			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 1.0f,	//top left			
+			*/
 			//back side
 			0.5f, -0.5f, -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 0.0f,	//bottom left
 			-0.5f, -0.5f,  -0.5f,  0.0f, 0.0f, -1.0,	1.0f, 0.0f,	//bottom right
 			-0.5f, 0.5f,  -0.5f,  0.0f, 0.0f, -1.0,		1.0f, 1.0f,	//top right
 			0.5f, 0.5f,  -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 1.0f,	//top left			
-			//left side
+			/*//left side
 			-0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 0.0f,	//bottom left
 			-0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 0.0f,	//bottom right
 			-0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 1.0f,	//top right
@@ -93,11 +94,13 @@ namespace ModelSSAO
 			0.5f, -0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 0.0f,	//bottom right
 			0.5f,  0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 1.0f,	//top right
 			0.5f, 0.5f,   0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 1.0f,	//top left			
-			//top side
+			*/
+			/*//top side
 			-0.5f, 0.5f,  0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 0.0f,	//bottom left
 			0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,		1.0f, 0.0f,	//bottom right
 			0.5f,  0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		1.0f, 1.0f,	//top right
 			-0.5f, 0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 1.0f,	//top left			
+			*/
 			//bottom side
 			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 0.0f,	//bottom left
 			0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 0.0f,	//bottom right
@@ -147,6 +150,102 @@ namespace ModelSSAO
 		glBindVertexArray(0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+		//vertices for screen rendering
+		GLuint screenVAO = 0;
+		GLuint screenVBO = 0;
+
+		GLfloat screenVertices[] = {
+			//position          //uv
+			-1.0f, 1.0f,        0.0f, 1.0f,  //top left
+			-1.0f, -1.0f,       0.0f, 0.0f,  //bottom left
+			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
+			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
+			1.0f,  1.0f,        1.0f, 1.0f,  //top right
+			-1.0f, 1.0f,        0.0f, 1.0f   //top left
+		};
+
+		glGenBuffers(1, &screenVBO);
+		glGenVertexArrays(1, &screenVAO);
+
+		glBindVertexArray(screenVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), screenVertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)(sizeof(GLfloat) * 2));
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		//end of screen vertices
+
+		//setup for G-buffer
+		GLuint gBufferFBO;
+		GLuint gBufferRBO;
+		glGenFramebuffers(1, &gBufferFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
+
+		unsigned int gbPosition;
+		unsigned int gbNormal;
+		unsigned int gbAlbedo;
+		unsigned int gbScene;
+
+		//position texture
+		glGenTextures(1, &gbPosition);
+		glBindTexture(GL_TEXTURE_2D, gbPosition);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gbPosition, 0);
+
+		//normal texture
+		glGenTextures(1, &gbNormal);
+		glBindTexture(GL_TEXTURE_2D, gbNormal);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gbNormal, 0);
+
+		//albedo texture, alpha channel is for specular intensity
+		glGenTextures(1, &gbAlbedo);
+		glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbAlbedo, 0);
+
+		//final scene g-buffer, use RGB format
+		glGenTextures(1, &gbScene);
+		glBindTexture(GL_TEXTURE_2D, gbScene);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gbScene, 0);
+
+		//set render buffer for depth and stencil
+		glGenRenderbuffers(1, &gBufferRBO);
+		glBindRenderbuffer(GL_RENDERBUFFER, gBufferRBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gBufferRBO);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "Frame buffer is not complete!" << std::endl;
+			exit(0);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		//end of setup for G-buffer
+
+
 
 		CShader modelShader;
 		modelShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag");
@@ -160,7 +259,7 @@ namespace ModelSSAO
 		glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
-		glm::vec3 roomPos = glm::vec3(0.0f, 20.0f, 0.0f);
+		glm::vec3 roomPos = glm::vec3(-5.0f, 11.5f, 0.0f);
 
 		//initial time tick
 		Uint32 previous = SDL_GetTicks();
@@ -207,7 +306,7 @@ namespace ModelSSAO
 			roomShader.Use();
 			glm::mat4 roomModel = glm::mat4(1.0f);
 			roomModel = glm::translate(roomModel, roomPos);
-			roomModel = glm::scale(roomModel, glm::vec3(50.0f, 50.0f, 50.0f));
+			roomModel = glm::scale(roomModel, glm::vec3(50.0f, 25.0f, 50.0f));
 			roomShader.SetUniformMat4("model", roomModel);
 			roomShader.SetUniformMat4("view", view);
 			roomShader.SetUniformMat4("projection", projection);

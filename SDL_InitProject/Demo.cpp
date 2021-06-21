@@ -36,6 +36,7 @@ namespace Demo
 		SDL_Init(SDL_INIT_EVERYTHING);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		SDL_GL_SetSwapInterval(0);
 
 		//initialize camera
 		CCamera3D camera(screenWidth, screenHeight, false,
@@ -46,7 +47,6 @@ namespace Demo
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
 		camera.SetSpeed(6.0f);
-
 		window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
 
@@ -209,7 +209,9 @@ namespace Demo
 
 			//update input
 			ProcessInput();
+			camera.Update(inputManager, (float) elapsed / 1000);
 
+			/*
 			while (lag >= MS_PER_FRAME)
 			{
 				//update game
@@ -222,7 +224,7 @@ namespace Demo
 			//synchronize the update and render
 			Uint32 step = lag % MS_PER_FRAME;
 			camera.Update(inputManager, (float)step / 1000);
-
+			*/
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
@@ -261,11 +263,11 @@ namespace Demo
 
 
 			SDL_GL_SwapWindow(window);
-
+			/*
 			if (elapsed < 16)
 			{
 				SDL_Delay(16 - elapsed);
-			}
+			}*/
 		}
 	
 		SDL_GL_DeleteContext(context);

@@ -91,5 +91,17 @@
     <None Include="Shaders\ModelVertexShader.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\GeometryPassVS.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\GeometryPassFS.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightingPass.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightingPass.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

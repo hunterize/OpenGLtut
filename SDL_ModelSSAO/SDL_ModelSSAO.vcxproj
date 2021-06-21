@@ -22,20 +22,20 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{62657B6A-1488-4C1B-98DD-6EC5A6552DCE}</ProjectGuid>
     <RootNamespace>SDLOpenGLLightingAdv</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>SDL_ModelSSAO</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -173,6 +173,10 @@ xcopy /y "$(SolutionDir)Dependency\lib\assimp\debug\assimp-vc140-mt.dll" "$(OutD
   <ItemGroup>
     <None Include="Shaders\DemoFragmentShader.frag" />
     <None Include="Shaders\DemoVertexShader.vert" />
+    <None Include="Shaders\GeometryPassFS.frag" />
+    <None Include="Shaders\GeometryPassVS.vert" />
+    <None Include="Shaders\LightingPass.frag" />
+    <None Include="Shaders\LightingPass.vert" />
     <None Include="Shaders\ModelFragmentShader.frag" />
     <None Include="Shaders\ModelVertexShader.vert" />
   </ItemGroup>

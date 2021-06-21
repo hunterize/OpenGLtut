@@ -444,14 +444,17 @@ namespace DeferredShading
 
 			Uint32 elapsed = current - previous;
 			previous = current;
-			lag += elapsed;
+			lag = elapsed;
+			//Uint32 lag = elapsed;
 
 			float timespan = (float)MS_PER_FRAME / 1000;
 
 			//update input
 			ProcessInput();
+			camera.Update(inputManager, (float)elapsed / 1000);
 
-			while (lag >= MS_PER_FRAME)
+			/*
+			if (lag >= MS_PER_FRAME)
 			{
 				//update game
 				//update camera
@@ -459,11 +462,14 @@ namespace DeferredShading
 
 				lag -= MS_PER_FRAME;
 			}
-
-			//synchronize the update and render
-			Uint32 step = lag % MS_PER_FRAME;
-			camera.Update(inputManager, (float)step / 1000);
-
+			else
+			{
+				//synchronize the update and render
+				Uint32 step = lag % MS_PER_FRAME;
+				camera.Update(inputManager, (float)step / 1000);
+				lag = 0;
+			}
+			*/
 
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
@@ -628,12 +634,12 @@ namespace DeferredShading
 
 			SDL_GL_SwapWindow(window);
 
-			
+			/*
 			if (elapsed < 16)
 			{
 				SDL_Delay(16 - elapsed);
 			}
-			
+			*/
 		}
 
 		SDL_GL_DeleteContext(context);
