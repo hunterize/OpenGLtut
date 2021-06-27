@@ -179,7 +179,7 @@ namespace ModelSSAO
 		glBindVertexArray(0);
 		//end of screen vertices
 
-		//setup for G-buffer
+		///setup for G-buffer
 		GLuint gBufferFBO;
 		GLuint gBufferRBO;
 		glGenFramebuffers(1, &gBufferFBO);
@@ -220,15 +220,8 @@ namespace ModelSSAO
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbAlbedo, 0);
 
-		//final scene g-buffer, use RGB format
-		glGenTextures(1, &gbScene);
-		glBindTexture(GL_TEXTURE_2D, gbScene);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, gbScene, 0);
+		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, attachments);
 
 		//set render buffer for depth and stencil
 		glGenRenderbuffers(1, &gBufferRBO);
@@ -243,22 +236,23 @@ namespace ModelSSAO
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		//end of setup for G-buffer
-
-
+		///end of setup for G-buffer
 
 		CShader modelShader;
-		modelShader.AttachShader("Shaders/ModelVertexShader.vert", "Shaders/ModelFragmentShader.frag");
+		modelShader.AttachShader("Shaders/GeometryPassVS.vert", "Shaders/GeometryPassFS.frag");
 		CModel soldierModel("GameResources/nanosuit/nanosuit.obj");
-		CModel soldierModelMonoChrome("GameResources/nanosuit/nanosuit.obj");
 
 		CShader roomShader;
-		roomShader.AttachShader("Shaders/DemoVertexShader.vert", "Shaders/DemoFragmentShader.frag");
+		roomShader.AttachShader("Shaders/GeometryPassWall.vert", "Shaders/GeometryPassWall.frag");
 
+		CShader lightingShader;
+		lightingShader.AttachShader("Shaders/LightingPass.vert", "Shaders/LightingPass.frag");
 
 		glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-
+		GLfloat linear = 0.01f;
+		GLfloat quadratic = 0.003f;
+		GLfloat shininess = 12.0f;
 		glm::vec3 roomPos = glm::vec3(-5.0f, 11.5f, 0.0f);
 
 		//initial time tick
@@ -297,12 +291,16 @@ namespace ModelSSAO
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 			glm::vec3 eyePos = camera.GetPosition();
-			float shininess = 128.0f;
+			float shininess = 12.0f;
 
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //set background color
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear color buffer
 
+			///geometry pass
+			glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			
 			roomShader.Use();
 			glm::mat4 roomModel = glm::mat4(1.0f);
 			roomModel = glm::translate(roomModel, roomPos);
@@ -310,40 +308,73 @@ namespace ModelSSAO
 			roomShader.SetUniformMat4("model", roomModel);
 			roomShader.SetUniformMat4("view", view);
 			roomShader.SetUniformMat4("projection", projection);
+			roomShader.SetUniformInt("isNormalInverted", 1);
 
 			glBindVertexArray(crateVAO);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
 
 			roomShader.Unuse();
-
+			
 			//render soldier
 			modelShader.Use();
+			modelShader.SetUniformMat4("view", view);
+			modelShader.SetUniformMat4("projection", projection);
+
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f));
 			model = glm::rotate(model, - 3.14159f / 2.0f, glm::vec3(1.0, 0.0, 0.0));
 			model = glm::scale(model, glm::vec3(1.0f));
 
 			modelShader.SetUniformMat4("model", model);
-			modelShader.SetUniformMat4("view", view);
-			modelShader.SetUniformMat4("projection", projection);
+			soldierModel.Render(modelShader);
 
-			modelShader.SetUniformVec3("eyePos", eyePos);
-			modelShader.SetUniformVec3("lightPos", lightPos);
-			modelShader.SetUniformVec3("lightColor", lightColor);
-
-			modelShader.SetUniformFloat("shininess", shininess);
-			modelShader.SetUniformInt("col", 2);
+			//second solider
+			model = glm::translate(model, glm::vec3(-10.0f, 0.0f, 0.0f));
+			modelShader.SetUniformMat4("model", model);
 
 			soldierModel.Render(modelShader);
 
-			model = glm::translate(model, glm::vec3(-10.0f, 0.0f, 0.0f));
-			modelShader.SetUniformMat4("model", model);
-			modelShader.SetUniformInt("col", 1);
-			soldierModelMonoChrome.Render(modelShader);
-
 			modelShader.Unuse();
 
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//end of geometry pass
+
+
+			///lighting pass on default framebuffer
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			
+			lightingShader.Use();
+			//light position in view space
+			glm::vec3 lightPosV = glm::vec3(view * glm::vec4(lightPos, 1.0));
+			lightingShader.SetUniformVec3("lightPos", lightPosV);
+			lightingShader.SetUniformVec3("lightColor", lightColor);
+			lightingShader.SetUniformFloat("shininess", shininess);
+			lightingShader.SetUniformFloat("linear", linear);
+			lightingShader.SetUniformFloat("quadratic", quadratic);
+
+			//bind geometry textures, the uniforms are already set as above
+			//set geometry textures uniform in lighting shader
+			lightingShader.SetUniformInt("gPosition", 10);
+			lightingShader.SetUniformInt("gNormal", 11);
+			lightingShader.SetUniformInt("gAlbedo", 12);
+
+			glActiveTexture(GL_TEXTURE10);
+			glBindTexture(GL_TEXTURE_2D, gbPosition);
+
+			glActiveTexture(GL_TEXTURE11);
+			glBindTexture(GL_TEXTURE_2D, gbNormal);
+
+			glActiveTexture(GL_TEXTURE12);
+			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+
+			glBindVertexArray(screenVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
+
+			lightingShader.Unuse();
+
+			//end of lighting pass
 
 			SDL_GL_SwapWindow(window);
 

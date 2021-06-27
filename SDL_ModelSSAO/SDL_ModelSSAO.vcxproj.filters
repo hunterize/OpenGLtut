@@ -103,5 +103,11 @@
     <None Include="Shaders\LightingPass.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\GeometryPassWall.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\GeometryPassWall.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
