@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2043
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_OpenGLAPI", "SDL_OpenGLAPI\SDL_OpenGLAPI.vcxproj", "{C97E42CD-3308-4B3C-8B98-09DB16EE9220}"
 EndProject
@@ -30,6 +30,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_GeometryModel", "SDL_GeometryModel\SDL_GeometryModel.vcxproj", "{47BCCB86-D4EA-40DF-BF4A-B1C6A9B9F36A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_ModelSSAO", "SDL_ModelSSAO\SDL_ModelSSAO.vcxproj", "{62657B6A-1488-4C1B-98DD-6EC5A6552DCE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_ModelDeferred", "SDL_ModelDeferred\SDL_ModelDeferred.vcxproj", "{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -151,6 +153,14 @@ Global
 		{62657B6A-1488-4C1B-98DD-6EC5A6552DCE}.Release|x64.Build.0 = Release|x64
 		{62657B6A-1488-4C1B-98DD-6EC5A6552DCE}.Release|x86.ActiveCfg = Release|Win32
 		{62657B6A-1488-4C1B-98DD-6EC5A6552DCE}.Release|x86.Build.0 = Release|Win32
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Debug|x64.ActiveCfg = Debug|x64
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Debug|x64.Build.0 = Debug|x64
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Debug|x86.ActiveCfg = Debug|Win32
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Debug|x86.Build.0 = Debug|Win32
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Release|x64.ActiveCfg = Release|x64
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Release|x64.Build.0 = Release|x64
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Release|x86.ActiveCfg = Release|Win32
+		{73605A0C-35DF-4D4B-A6DF-74FACE6CCC51}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
