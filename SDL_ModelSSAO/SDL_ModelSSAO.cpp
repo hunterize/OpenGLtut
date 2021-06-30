@@ -3,6 +3,26 @@
 namespace ModelSSAO
 {
 	void ProcessInput();
+	void InitializeCrateVertices();
+	void InitializeScreenVertices();
+	void SetupGbuffer();
+
+	//vertices for room rendering
+	GLuint crateVBO = 0;
+	GLuint crateVAO = 0;
+	GLuint crateEBO = 0;
+
+	//vertices for screen rendering
+	GLuint screenVAO = 0;
+	GLuint screenVBO = 0;
+
+	///setup for G-buffer
+	GLuint gBufferFBO;
+	GLuint gBufferRBO;
+	unsigned int gbPosition;
+	unsigned int gbNormal;
+	unsigned int gbAlbedo;
+	unsigned int gbScene;
 
 	bool isRunning = true;
 	int screenWidth = 1600;
@@ -10,7 +30,6 @@ namespace ModelSSAO
 	float fov = 45.0f;
 
 	CInputManager inputManager;
-
 	bool isFirstMove = true;
 
 	void GLAPIENTRY MessageCallback(GLenum source,
@@ -26,7 +45,6 @@ namespace ModelSSAO
 			source, type, id, severity, message);
 	}
 
-
 	void ModelSSAO()
 	{
 		//initial SDL
@@ -41,11 +59,12 @@ namespace ModelSSAO
 		CCamera3D camera(screenWidth, screenHeight, false,
 			glm::vec3(20.0f, 10.0f, 20.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f));
+		camera.SetSpeed(6.0f);
+		glm::mat4 view = camera.GetCameraMatrix();
+		glm::vec3 eyePos = camera.GetPosition();
 
 		//create projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
-
-		camera.SetSpeed(6.0f);
 
 		window = SDL_CreateWindow("ModelSSAO", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
@@ -65,178 +84,10 @@ namespace ModelSSAO
 		glDebugMessageCallback(MessageCallback, 0);
 #endif // DEBUG
 
-		//initialize vertices for room
-		GLuint crateVBO = 0;
-		GLuint crateVAO = 0;
-		GLuint crateEBO = 0;
-
-		//the cube, counterclock wise vertices
-		GLfloat crateVertices[] = {
-			//Pos                 //normal              //texture coordinates
-			/*//front side
-			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 0.0f,	//bottom left
-			0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 0.0f,	//bottom right
-			0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 1.0f,	//top right
-			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 1.0f,	//top left			
-			*/
-			//back side
-			0.5f, -0.5f, -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 0.0f,	//bottom left
-			-0.5f, -0.5f,  -0.5f,  0.0f, 0.0f, -1.0,	1.0f, 0.0f,	//bottom right
-			-0.5f, 0.5f,  -0.5f,  0.0f, 0.0f, -1.0,		1.0f, 1.0f,	//top right
-			0.5f, 0.5f,  -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 1.0f,	//top left			
-			/*//left side
-			-0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 0.0f,	//bottom left
-			-0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 0.0f,	//bottom right
-			-0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 1.0f,	//top right
-			-0.5f, 0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 1.0f,	//top left			
-			//right side
-			0.5f, -0.5f,  0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 0.0f,	//bottom left
-			0.5f, -0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 0.0f,	//bottom right
-			0.5f,  0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 1.0f,	//top right
-			0.5f, 0.5f,   0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 1.0f,	//top left			
-			*/
-			/*//top side
-			-0.5f, 0.5f,  0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 0.0f,	//bottom left
-			0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,		1.0f, 0.0f,	//bottom right
-			0.5f,  0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		1.0f, 1.0f,	//top right
-			-0.5f, 0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 1.0f,	//top left			
-			*/
-			//bottom side
-			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 0.0f,	//bottom left
-			0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 0.0f,	//bottom right
-			0.5f,  -0.5f, 0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 1.0f,	//top right
-			-0.5f,  -0.5f, 0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 1.0f	//top left			
-		};
-
-		//verex indices
-		GLuint crateIndices[] = {
-			0, 1, 2, 2, 3, 0,
-			4, 5, 6, 6, 7, 4,
-			8, 9, 10, 10, 11, 8,
-			12, 13, 14, 14, 15, 12,
-			16, 17, 18, 18, 19, 16,
-			20, 21, 22, 22, 23, 20
-		};
-
-		//set vao for cube
-		glGenBuffers(1, &crateVBO);
-		glGenBuffers(1, &crateEBO);
-
-		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(crateVertices), crateVertices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crateIndices), crateIndices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		//set attribute location for vertex arrays
-		glGenVertexArrays(1, &crateVAO);
-		glBindVertexArray(crateVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
-
-		//Attribute location = 0 in vertex shader
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
-		glEnableVertexAttribArray(0);
-		//Attribute location = 1 in vertex shader
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
-		glEnableVertexAttribArray(1);
-		//Attribute location = 2 in vertex shader
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
-		glEnableVertexAttribArray(2);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		//vertices for screen rendering
-		GLuint screenVAO = 0;
-		GLuint screenVBO = 0;
-
-		GLfloat screenVertices[] = {
-			//position          //uv
-			-1.0f, 1.0f,        0.0f, 1.0f,  //top left
-			-1.0f, -1.0f,       0.0f, 0.0f,  //bottom left
-			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
-			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
-			1.0f,  1.0f,        1.0f, 1.0f,  //top right
-			-1.0f, 1.0f,        0.0f, 1.0f   //top left
-		};
-
-		glGenBuffers(1, &screenVBO);
-		glGenVertexArrays(1, &screenVAO);
-
-		glBindVertexArray(screenVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), screenVertices, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)(sizeof(GLfloat) * 2));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		//end of screen vertices
-
-		///setup for G-buffer
-		GLuint gBufferFBO;
-		GLuint gBufferRBO;
-		glGenFramebuffers(1, &gBufferFBO);
-		glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
-
-		unsigned int gbPosition;
-		unsigned int gbNormal;
-		unsigned int gbAlbedo;
-		unsigned int gbScene;
-
-		//position texture
-		glGenTextures(1, &gbPosition);
-		glBindTexture(GL_TEXTURE_2D, gbPosition);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gbPosition, 0);
-
-		//normal texture
-		glGenTextures(1, &gbNormal);
-		glBindTexture(GL_TEXTURE_2D, gbNormal);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gbNormal, 0);
-
-		//albedo texture, alpha channel is for specular intensity
-		glGenTextures(1, &gbAlbedo);
-		glBindTexture(GL_TEXTURE_2D, gbAlbedo);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbAlbedo, 0);
-
-		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-		glDrawBuffers(3, attachments);
-
-		//set render buffer for depth and stencil
-		glGenRenderbuffers(1, &gBufferRBO);
-		glBindRenderbuffer(GL_RENDERBUFFER, gBufferRBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gBufferRBO);
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			std::cout << "Frame buffer is not complete!" << std::endl;
-			exit(0);
-		}
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		///end of setup for G-buffer
+		//initialize vertices
+		InitializeCrateVertices();
+		InitializeScreenVertices();
+		SetupGbuffer();
 
 		CShader modelShader;
 		modelShader.AttachShader("Shaders/GeometryPassVS.vert", "Shaders/GeometryPassFS.frag");
@@ -250,8 +101,8 @@ namespace ModelSSAO
 
 		glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 		glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-		GLfloat linear = 0.01f;
-		GLfloat quadratic = 0.003f;
+		GLfloat linear = 0.0001f;
+		GLfloat quadratic = 0.00002f;
 		GLfloat shininess = 12.0f;
 		glm::vec3 roomPos = glm::vec3(-5.0f, 11.5f, 0.0f);
 
@@ -289,9 +140,8 @@ namespace ModelSSAO
 			camera.Update(inputManager, (float)step / 1000);
 
 			//create view matrix
-			glm::mat4 view = camera.GetCameraMatrix();
-			glm::vec3 eyePos = camera.GetPosition();
-			float shininess = 12.0f;
+			view = camera.GetCameraMatrix();
+			eyePos = camera.GetPosition();
 
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f); //set background color
@@ -313,7 +163,6 @@ namespace ModelSSAO
 			glBindVertexArray(crateVAO);
 			glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 			glBindVertexArray(0);
-
 			roomShader.Unuse();
 			
 			//render soldier
@@ -325,21 +174,17 @@ namespace ModelSSAO
 			model = glm::translate(model, glm::vec3(0.0f, 0.0f, 10.0f));
 			model = glm::rotate(model, - 3.14159f / 2.0f, glm::vec3(1.0, 0.0, 0.0));
 			model = glm::scale(model, glm::vec3(1.0f));
-
 			modelShader.SetUniformMat4("model", model);
 			soldierModel.Render(modelShader);
 
 			//second solider
 			model = glm::translate(model, glm::vec3(-10.0f, 0.0f, 0.0f));
 			modelShader.SetUniformMat4("model", model);
-
 			soldierModel.Render(modelShader);
-
 			modelShader.Unuse();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			//end of geometry pass
-
 
 			///lighting pass on default framebuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -353,18 +198,15 @@ namespace ModelSSAO
 			lightingShader.SetUniformFloat("linear", linear);
 			lightingShader.SetUniformFloat("quadratic", quadratic);
 
-			//bind geometry textures, the uniforms are already set as above
-			//set geometry textures uniform in lighting shader
+			//bind geometry textures, set geometry textures uniform in lighting shader
 			lightingShader.SetUniformInt("gPosition", 10);
 			lightingShader.SetUniformInt("gNormal", 11);
 			lightingShader.SetUniformInt("gAlbedo", 12);
 
 			glActiveTexture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, gbPosition);
-
 			glActiveTexture(GL_TEXTURE11);
 			glBindTexture(GL_TEXTURE_2D, gbNormal);
-
 			glActiveTexture(GL_TEXTURE12);
 			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
 
@@ -373,7 +215,6 @@ namespace ModelSSAO
 			glBindVertexArray(0);
 
 			lightingShader.Unuse();
-
 			//end of lighting pass
 
 			SDL_GL_SwapWindow(window);
@@ -383,9 +224,7 @@ namespace ModelSSAO
 				SDL_Delay(16 - elapsed);
 			}
 		}
-
 		SDL_GL_DeleteContext(context);
-
 	}
 
 	void ProcessInput()
@@ -444,5 +283,169 @@ namespace ModelSSAO
 		{
 			isRunning = false;
 		}
+	}
+
+	void InitializeCrateVertices()
+	{
+		//the cube, counterclock wise vertices
+		GLfloat crateVertices[] = {
+			//Pos                 //normal              //texture coordinates
+			/*//front side
+			-0.5f, -0.5f, 0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  0.5f,   0.0f, 0.0f, 1.0f,		0.0f, 1.0f,	//top left
+			*/
+			//back side
+			0.5f, -0.5f, -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 0.0f,	//bottom left
+			-0.5f, -0.5f,  -0.5f,  0.0f, 0.0f, -1.0,	1.0f, 0.0f,	//bottom right
+			-0.5f, 0.5f,  -0.5f,  0.0f, 0.0f, -1.0,		1.0f, 1.0f,	//top right
+			0.5f, 0.5f,  -0.5f,   0.0f, 0.0f, -1.0,		0.0f, 1.0f,	//top left			
+			/*//left side
+			-0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 0.0f,	//bottom left
+			-0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 0.0f,	//bottom right
+			-0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,	1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  -0.5f,  -1.0f, 0.0f, 0.0f,	0.0f, 1.0f,	//top left
+			//right side
+			0.5f, -0.5f,  0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  -0.5f,  1.0f, 0.0f, 0.0f,		1.0f, 1.0f,	//top right
+			0.5f, 0.5f,   0.5f,   1.0f, 0.0f, 0.0f,		0.0f, 1.0f,	//top left
+			*/
+			/*//top side
+			-0.5f, 0.5f,  0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 0.0f,	//bottom left
+			0.5f,  0.5f,  0.5f,   0.0f, 1.0f, 0.0f,		1.0f, 0.0f,	//bottom right
+			0.5f,  0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		1.0f, 1.0f,	//top right
+			-0.5f, 0.5f,  -0.5f,  0.0f, 1.0f, 0.0f,		0.0f, 1.0f,	//top left
+			*/
+			//bottom side
+			-0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 0.0f,	//bottom left
+			0.5f, -0.5f, -0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 0.0f,	//bottom right
+			0.5f,  -0.5f, 0.5f,   0.0f, -1.0f, 0.0f,	1.0f, 1.0f,	//top right
+			-0.5f,  -0.5f, 0.5f,  0.0f, -1.0f, 0.0f,	0.0f, 1.0f	//top left			
+		};
+
+		//verex indices
+		GLuint crateIndices[] = {
+			0, 1, 2, 2, 3, 0,
+			4, 5, 6, 6, 7, 4,
+			8, 9, 10, 10, 11, 8,
+			12, 13, 14, 14, 15, 12,
+			16, 17, 18, 18, 19, 16,
+			20, 21, 22, 22, 23, 20
+		};
+
+		//set vao for cube
+		glGenBuffers(1, &crateVBO);
+		glGenBuffers(1, &crateEBO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(crateVertices), crateVertices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(crateIndices), crateIndices, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		//set attribute location for vertex arrays
+		glGenVertexArrays(1, &crateVAO);
+		glBindVertexArray(crateVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, crateVBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, crateEBO);
+
+		//Attribute location = 0 in vertex shader
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)0);
+		glEnableVertexAttribArray(0);
+		//Attribute location = 1 in vertex shader
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 3));
+		glEnableVertexAttribArray(1);
+		//Attribute location = 2 in vertex shader
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 8, (void*)(sizeof(GLfloat) * 6));
+		glEnableVertexAttribArray(2);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	}
+
+	void InitializeScreenVertices()
+	{
+		GLfloat screenVertices[] = {
+			//position          //uv
+			-1.0f, 1.0f,        0.0f, 1.0f,  //top left
+			-1.0f, -1.0f,       0.0f, 0.0f,  //bottom left
+			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
+			1.0f,  -1.0f,       1.0f, 0.0f,  //bottom right
+			1.0f,  1.0f,        1.0f, 1.0f,  //top right
+			-1.0f, 1.0f,        0.0f, 1.0f   //top left
+		};
+
+		glGenBuffers(1, &screenVBO);
+		glGenVertexArrays(1, &screenVAO);
+
+		glBindVertexArray(screenVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(screenVertices), screenVertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (void*)(sizeof(GLfloat) * 2));
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		//end of screen vertices
+	}
+
+	void SetupGbuffer()
+	{
+		glGenFramebuffers(1, &gBufferFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, gBufferFBO);
+
+		//position texture
+		glGenTextures(1, &gbPosition);
+		glBindTexture(GL_TEXTURE_2D, gbPosition);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gbPosition, 0);
+
+		//normal texture
+		glGenTextures(1, &gbNormal);
+		glBindTexture(GL_TEXTURE_2D, gbNormal);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, screenWidth, screenHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gbNormal, 0);
+
+		//albedo texture, alpha channel is for specular intensity
+		glGenTextures(1, &gbAlbedo);
+		glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, screenWidth, screenHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gbAlbedo, 0);
+
+		unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, attachments);
+
+		//set render buffer for depth and stencil
+		glGenRenderbuffers(1, &gBufferRBO);
+		glBindRenderbuffer(GL_RENDERBUFFER, gBufferRBO);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenWidth, screenHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gBufferRBO);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "Frame buffer is not complete!" << std::endl;
+			exit(0);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }

@@ -29,7 +29,7 @@ void Lighting()
 	vec3 halfVector = normalize(viewDir + lightDir);
 
 	//ambient
-	vec3 ambient = 0.25 * vec3(albedo);
+	vec3 ambient = 0.325 * vec3(albedo);
 
 	//diffuse
 	float diff = max(dot(normal, lightDir), 0.0);
@@ -47,7 +47,7 @@ void Lighting()
 	float distance = length(lightPos - position);
 	float attenuation = 1.0 / (1.0 + linear * distance + quadratic * distance * distance);
 
-	vec3 effect = ambient + (diffuse + specular) * lightColor;
+	vec3 effect = ambient + attenuation * (diffuse + specular) * lightColor;
 
 	color = vec4(effect, 1.0);
 	//color = vec4(specu, 1.0);
