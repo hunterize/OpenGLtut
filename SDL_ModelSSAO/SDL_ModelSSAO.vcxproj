@@ -181,6 +181,8 @@ xcopy /y "$(SolutionDir)Dependency\lib\assimp\debug\assimp-vc140-mt.dll" "$(OutD
     <None Include="Shaders\LightingPass.vert" />
     <None Include="Shaders\ModelFragmentShader.frag" />
     <None Include="Shaders\ModelVertexShader.vert" />
+    <None Include="Shaders\SSAOPass.frag" />
+    <None Include="Shaders\SSAOPass.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

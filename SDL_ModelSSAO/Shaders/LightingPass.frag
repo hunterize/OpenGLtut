@@ -6,6 +6,7 @@ out vec4 color;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedo;
+uniform sampler2D aoTexture;
  
  //light position in view space
 uniform vec3 lightPos;
@@ -20,7 +21,8 @@ void Lighting()
 	vec3 position = texture(gPosition, texCoord).rgb;
 
 	vec3 normal = texture(gNormal, texCoord).rgb;
-	vec3 albedo = texture(gAlbedo, texCoord).rgb;
+	//vec3 albedo = texture(gAlbedo, texCoord).rgb;
+	vec3 albedo = vec3(0.85);
 	vec3 specu = vec3(texture(gAlbedo, texCoord).a);
 
 	//eye position is 0.0 in view space
@@ -50,8 +52,6 @@ void Lighting()
 	vec3 effect = ambient + attenuation * (diffuse + specular) * lightColor;
 
 	color = vec4(effect, 1.0);
-	//color = vec4(specu, 1.0);
-
 }
 
 void Debug(int id)
@@ -61,6 +61,7 @@ void Debug(int id)
 	vec3 normal = normalize(texture(gNormal, texCoord).rgb);
 	normal = (normal + 1.0) / 2.0f;
 	vec3 albedo = texture(gAlbedo, texCoord).rgb;
+	vec3 ao = vec3(texture(aoTexture, texCoord).r);
 
 	switch(id)
 	{
@@ -73,6 +74,8 @@ void Debug(int id)
 		case 2:
 		color = vec4(albedo, 1.0);
 		break;
+		case 3:
+		color = vec4(ao, 1.0);
 		default:
 		break;
 	}
@@ -80,7 +83,7 @@ void Debug(int id)
 
 void main()
 {
-	Lighting();
-	//Debug(0);
+	//Lighting();
+	Debug(3);
 }
 

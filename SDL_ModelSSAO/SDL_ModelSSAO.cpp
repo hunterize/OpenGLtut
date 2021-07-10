@@ -6,6 +6,10 @@ namespace ModelSSAO
 	void InitializeCrateVertices();
 	void InitializeScreenVertices();
 	void SetupGbuffer();
+	void SetupSSAOBuffer();
+	void GenerateSamples();
+	void GenerateNoiseTexture();
+
 
 	//vertices for room rendering
 	GLuint crateVBO = 0;
@@ -23,6 +27,12 @@ namespace ModelSSAO
 	unsigned int gbNormal;
 	unsigned int gbAlbedo;
 	unsigned int gbScene;
+
+	//setup for SSAO frame buffer
+	GLuint	ssaoBufferFBO;
+	unsigned int ssaoTexture;
+	unsigned int noiseTexture;
+	std::vector<glm::vec3> ssaoSamples;
 
 	bool isRunning = true;
 	int screenWidth = 1600;
@@ -87,7 +97,12 @@ namespace ModelSSAO
 		//initialize vertices
 		InitializeCrateVertices();
 		InitializeScreenVertices();
+		//setup G-buffer
 		SetupGbuffer();
+		//setup SSAO framebuffer
+		SetupSSAOBuffer();
+		GenerateSamples();
+		GenerateNoiseTexture();
 
 		CShader modelShader;
 		modelShader.AttachShader("Shaders/GeometryPassVS.vert", "Shaders/GeometryPassFS.frag");
@@ -95,6 +110,9 @@ namespace ModelSSAO
 
 		CShader roomShader;
 		roomShader.AttachShader("Shaders/GeometryPassWall.vert", "Shaders/GeometryPassWall.frag");
+
+		CShader ssaoShader;
+		ssaoShader.AttachShader("Shaders/SSAOPass.vert", "Shaders/SSAOPass.frag");
 
 		CShader lightingShader;
 		lightingShader.AttachShader("Shaders/LightingPass.vert", "Shaders/LightingPass.frag");
@@ -179,12 +197,43 @@ namespace ModelSSAO
 
 			//second solider
 			model = glm::translate(model, glm::vec3(-10.0f, 0.0f, 0.0f));
-			modelShader.SetUniformMat4("model", model);
+			modelShader.SetUniformMat4("model", model);			
 			soldierModel.Render(modelShader);
 			modelShader.Unuse();
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			//end of geometry pass
+
+			///SSAO pass
+			glBindFramebuffer(GL_FRAMEBUFFER, ssaoBufferFBO);
+			glClear(GL_COLOR_BUFFER_BIT);
+			ssaoShader.Use();
+
+			//transfer samples array to ssao shader
+			for (int i = 0; i < 64; i++)
+			{
+				ssaoShader.SetUniformVec3("samples[" + std::to_string(i) + "]", ssaoSamples[i]);
+			}
+			ssaoShader.SetUniformMat4("projection", projection);
+
+			ssaoShader.SetUniformInt("gPosition", 20);
+			ssaoShader.SetUniformInt("gNormal", 21);
+			ssaoShader.SetUniformInt("noiseTexture", 22);
+
+			glActiveTexture(GL_TEXTURE20);
+			glBindTexture(GL_TEXTURE_2D, gbPosition);
+			glActiveTexture(GL_TEXTURE21);
+			glBindTexture(GL_TEXTURE_2D, gbNormal);
+			glActiveTexture(GL_TEXTURE22);
+			glBindTexture(GL_TEXTURE_2D, noiseTexture);
+
+			glBindVertexArray(screenVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
+
+			ssaoShader.Unuse();
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			///end of SSAO pass
 
 			///lighting pass on default framebuffer
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -202,6 +251,7 @@ namespace ModelSSAO
 			lightingShader.SetUniformInt("gPosition", 10);
 			lightingShader.SetUniformInt("gNormal", 11);
 			lightingShader.SetUniformInt("gAlbedo", 12);
+			lightingShader.SetUniformInt("aoTexture", 13);
 
 			glActiveTexture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, gbPosition);
@@ -209,6 +259,8 @@ namespace ModelSSAO
 			glBindTexture(GL_TEXTURE_2D, gbNormal);
 			glActiveTexture(GL_TEXTURE12);
 			glBindTexture(GL_TEXTURE_2D, gbAlbedo);
+			glActiveTexture(GL_TEXTURE13);
+			glBindTexture(GL_TEXTURE_2D, ssaoTexture);
 
 			glBindVertexArray(screenVAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -447,5 +499,82 @@ namespace ModelSSAO
 			exit(0);
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void SetupSSAOBuffer()
+	{
+		glGenFramebuffers(1, &ssaoBufferFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, ssaoBufferFBO);
+
+		//SSAO texture only has ssao value, just one texture as default draw buffer
+		glGenTextures(1, &ssaoTexture);
+		glBindTexture(GL_TEXTURE_2D, ssaoTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, screenWidth, screenHeight, 0, GL_RED, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoTexture, 0);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			std::cout << "Frame buffer is not complete!" << std::endl;
+			exit(0);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	//lerp funciton for intepolation 
+	float lerp(float x, float y, float z)
+	{
+		return x + z * (y - x);
+	}
+
+	void GenerateSamples()
+	{
+		//random points in tangent space, z: {0.0, 1.0}
+		std::default_random_engine rEngine;
+		std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);
+
+		//generate samples around the pixel
+		for (int i = 0; i < 64; i++)
+		{
+			//x, y: {-1.0, 1.0}, z: {0.0, 1.0}
+			glm::vec3 sample(randomFloats(rEngine) * 2.0 - 1.0, randomFloats(rEngine) * 2.0 - 1.0, randomFloats(rEngine));
+			sample = glm::normalize(sample);
+			sample *= randomFloats(rEngine);
+			
+			//scale the sample to be more closer to the pixel
+			float scale = float(i) / 64.0;
+			scale = lerp(0.1f, 1.0f, scale * scale);
+			sample *= scale;
+
+			ssaoSamples.push_back(sample);
+		}
+
+	}
+
+	void GenerateNoiseTexture()
+	{
+		//generate random value {0.0, 1.0}
+		std::default_random_engine rEngine;
+		std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);
+
+		//generate 4x4 noise(rotation) vector, vector rotates around z axis in tangent space
+		std::vector<glm::vec3> ssaoNoise;
+		for (int i = 0; i < 16; i++)
+		{
+			glm::vec3 noise(randomFloats(rEngine) * 2.0 - 1.0, randomFloats(rEngine) * 2.0 - 1.0, 0.0f);
+			ssaoNoise.push_back(noise);
+		}
+
+		//genearate a 16 pixels texture (4x4)
+		glGenTextures(1, &noiseTexture);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 }

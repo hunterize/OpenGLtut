@@ -7,6 +7,7 @@
 #include <gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <random>
 
 #include "CShader.h"
 #include "CInputManager.h"
