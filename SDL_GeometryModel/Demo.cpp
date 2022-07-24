@@ -80,7 +80,9 @@ namespace Demo
 
 		glm::vec3 spherePos = glm::vec3(0.0, 0.0, 0.0);
 		glm::vec3 lightPos = glm::vec3(100.0);
-		GLfloat radius = 10.0f;
+		GLfloat radius = 6.0f;
+		GLfloat sphereAngel = 0.0f;
+		GLfloat rotateSpeed = 0.25f;
 
 		GeometryFactory::GMesh sphereMesh;
 		GeometryFactory::GGenerator::GetSphere(100, 100, sphereMesh);
@@ -154,6 +156,7 @@ namespace Demo
 				//update game
 				//update camera
 				camera.Update(inputManager, timespan);
+				sphereAngel += rotateSpeed * timespan;
 
 				lag -= MS_PER_FRAME;
 			}
@@ -161,6 +164,7 @@ namespace Demo
 			//synchronize the update and render
 			Uint32 step = lag % MS_PER_FRAME;
 			camera.Update(inputManager, (float)step / 1000);
+			sphereAngel += rotateSpeed * (float)step / 1000;
 
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
@@ -175,13 +179,14 @@ namespace Demo
 			glm::mat4 sphereModel;
 			sphereModel = glm::translate(sphereModel, spherePos);
 			sphereModel = glm::scale(sphereModel, glm::vec3(2 * radius));
+			sphereModel = glm::rotate(sphereModel, sphereAngel, glm::vec3(0.0f, 1.0f, 0.0f));
 			sphereShader.SetUniformMat4("model", sphereModel);
 			sphereShader.SetUniformMat4("view", view);
 			sphereShader.SetUniformMat4("projection", projection);
 			sphereShader.SetUniformVec3("eyePos", eyePos);
 			sphereShader.SetUniformVec3("lightPos", lightPos);
-			sphereShader.SetUniformFloat("shininess", 64.0);
-			sphereShader.SetUniformFloat("heightScale", 0.03f);
+			sphereShader.SetUniformFloat("shininess", 32.0);
+			sphereShader.SetUniformFloat("heightScale", 0.02f);
 
 			sphereShader.SetUniformInt("amap", 10);
 			glActiveTexture(GL_TEXTURE10);
