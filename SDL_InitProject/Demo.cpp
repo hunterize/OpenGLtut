@@ -237,7 +237,7 @@ namespace Demo
 			demoShader.Use();
 			glm::mat4 floorModel;
 			floorModel = glm::translate(floorModel, floorPos);
-			floorModel = glm::scale(floorModel, glm::vec3(10.0f, 10.0f, 10.0f));
+			floorModel = glm::scale(floorModel, glm::vec3(200.0f, 10.0f, 200.0f));
 			demoShader.SetUniformMat4("model", floorModel);
 			demoShader.SetUniformMat4("view", view);
 			demoShader.SetUniformMat4("projection", projection);

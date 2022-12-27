@@ -138,7 +138,7 @@ void ParallaxMapping()
 
 	vec3 halfVector = normalize(lightDir + viewDir);
 	float spec = pow(max(dot(normal_t, halfVector), 0.0), shininess);
-	vec3 specular = spec * vec3(texture(smap, mappedTexCoord)) * vec3(1.0);
+	vec3 specular = spec * vec3(texture(smap, mappedTexCoord)) * diffuse;
 
 	float ambi = 0.1f;
 	vec3 ambient = ambi * vec3(texture(amap, mappedTexCoord));
@@ -184,10 +184,21 @@ void ParallaxMapping_NormalMap()
 	//color = vec4(vec3(mappedTexCoord.x), 1.0);
 }
 
+void Debug()
+{
+	vec3 diffuse = vec3(texture(amap, texCoord));
+	vec3 specular = vec3(1.0);
+	vec3 height = vec3(texture(bmap, texCoord));
+	
+	color = vec4(height, 1.0);
+}
+
 void main()
 {
 	//BlinnPhongLighting();
 	ParallaxMapping();
 	//ParallaxMapping_NormalMap();
+
+	//Debug();
 }
 

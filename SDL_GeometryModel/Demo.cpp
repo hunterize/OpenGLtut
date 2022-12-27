@@ -39,13 +39,13 @@ namespace Demo
 
 		//initialize camera
 		CCamera3D camera(screenWidth, screenHeight, false,
-			glm::vec3(20.0f, 20.0f, 20.0f),
+			glm::vec3(90.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f));
 
 		//create projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
-		camera.SetSpeed(6.0f);
+		camera.SetSpeed(8.0f);
 
 		window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 		context = SDL_GL_CreateContext(window);
@@ -70,9 +70,9 @@ namespace Demo
 		CShader sphereShader;
 		sphereShader.AttachShader("Shaders/SphereVertexShader.vert", "Shaders/SphereFragmentShader.frag");
 
-		GLTexture albedoTexture = CSTexture::LoadImage("earth/earthmap1k.jpg");
+		GLTexture albedoTexture = CSTexture::LoadImage("earth/albedo_4.jpg");
 		GLTexture specularTexture = CSTexture::LoadImage("earth/earthspec1k.jpg");
-		GLTexture bumpTexture = CSTexture::LoadImage("earth/earthbump1k.jpg");
+		GLTexture bumpTexture = CSTexture::LoadImage("earth/height_4.jpg");
 
 		//GLTexture albedoTexture = CSTexture::LoadImage("bricks2.jpg");
 		//GLTexture specularTexture = CSTexture::LoadImage("bricks2_normal.jpg");
@@ -80,12 +80,12 @@ namespace Demo
 
 		glm::vec3 spherePos = glm::vec3(0.0, 0.0, 0.0);
 		glm::vec3 lightPos = glm::vec3(100.0);
-		GLfloat radius = 6.0f;
+		GLfloat radius = 60.0f;
 		GLfloat sphereAngel = 0.0f;
-		GLfloat rotateSpeed = 0.25f;
+		GLfloat rotateSpeed = 0.01f;
 
 		GeometryFactory::GMesh sphereMesh;
-		GeometryFactory::GGenerator::GetSphere(100, 100, sphereMesh);
+		GeometryFactory::GGenerator::GetSphere(1000, 1000, sphereMesh);
 
 		GLuint vaoSphere;
 		GLuint vboSphere;
@@ -185,8 +185,8 @@ namespace Demo
 			sphereShader.SetUniformMat4("projection", projection);
 			sphereShader.SetUniformVec3("eyePos", eyePos);
 			sphereShader.SetUniformVec3("lightPos", lightPos);
-			sphereShader.SetUniformFloat("shininess", 32.0);
-			sphereShader.SetUniformFloat("heightScale", 0.02f);
+			sphereShader.SetUniformFloat("shininess", 8.0);
+			sphereShader.SetUniformFloat("heightScale", 0.005f);
 
 			sphereShader.SetUniformInt("amap", 10);
 			glActiveTexture(GL_TEXTURE10);
