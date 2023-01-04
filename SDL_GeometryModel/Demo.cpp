@@ -39,8 +39,8 @@ namespace Demo
 
 		//initialize camera
 		CCamera3D camera(screenWidth, screenHeight, false,
-			glm::vec3(90.0f),
-			glm::vec3(-1.0f, -1.0f, -1.0f));
+			glm::vec3(100.f, 0.0f, 100.f),
+			glm::vec3(-1.0, 0.0, -1.0f));
 
 		//create projection matrix
 		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
@@ -79,7 +79,7 @@ namespace Demo
 		//GLTexture bumpTexture = CSTexture::LoadImage("bricks2_disp.jpg");
 
 		glm::vec3 spherePos = glm::vec3(0.0, 0.0, 0.0);
-		glm::vec3 lightPos = glm::vec3(100.0);
+		glm::vec3 lightPos = glm::vec3(1000.0, 0.0, 1000.0);
 		GLfloat radius = 60.0f;
 		GLfloat sphereAngel = 0.0f;
 		GLfloat rotateSpeed = 0.01f;
@@ -179,6 +179,7 @@ namespace Demo
 			glm::mat4 sphereModel;
 			sphereModel = glm::translate(sphereModel, spherePos);
 			sphereModel = glm::scale(sphereModel, glm::vec3(2 * radius));
+			//sphereModel = glm::rotate(sphereModel, 0.5f * 3.14f / 180.0f, glm::vec3(-1.0, 0.0, 1.0));
 			sphereModel = glm::rotate(sphereModel, sphereAngel, glm::vec3(0.0f, 1.0f, 0.0f));
 			sphereShader.SetUniformMat4("model", sphereModel);
 			sphereShader.SetUniformMat4("view", view);

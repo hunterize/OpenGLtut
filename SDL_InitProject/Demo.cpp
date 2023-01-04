@@ -38,19 +38,50 @@ namespace Demo
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetSwapInterval(0);
 
-		//initialize camera
-		CCamera3D camera(screenWidth, screenHeight, false,
-			glm::vec3(20.0f, 10.0f, 20.0f),
-			glm::vec3(-1.0f, -1.0f, -1.0f));
 
-		//create projection matrix
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
-
-		camera.SetSpeed(6.0f);
 		window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+		
+		SDL_DisplayMode dm;
+
+#ifdef DEBUG
+		int display_mode_count;
+		std::cout << "Number of Video Displays: " << SDL_GetNumVideoDisplays() << std::endl;
+		display_mode_count = SDL_GetNumDisplayModes(0);
+		std::cout << "Number of Display Modes: " << display_mode_count << std::endl;
+		for (int i = 0; i < display_mode_count; i++)
+		{
+			SDL_GetDisplayMode(0, i, &dm);
+			std::cout << "Display Mode #" << i << std::endl;
+			std::cout << "Width: " << dm.w << std::endl;
+			std::cout << "Height: " << dm.h << std::endl;
+			std::cout << "FreshRate: " << dm.refresh_rate << std::endl;
+		}
+		
+#endif
+
+		//set native fullscreen display mode
+		//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+		SDL_GetDisplayMode(0, 0, &dm);
+		std::cout << dm.w << " - " << dm.h << std::endl;
+		SDL_SetWindowDisplayMode(window, &dm);
+		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
+#ifdef DEBUG
+		SDL_GetCurrentDisplayMode(0, &dm);
+		std::cout << "Current Display Mode - " << std::endl;
+		std::cout << "Width: " << dm.w << std::endl;
+		std::cout << "Height: " << dm.h << std::endl;
+		std::cout << "FreshRate: " << dm.refresh_rate << std::endl;
+#endif
+
+		//update screen width and height
+		screenWidth = dm.w;
+		screenHeight = dm.h;
+
 		context = SDL_GL_CreateContext(window);
 
 		SDL_ShowCursor(0);
+
 
 		GLenum error = glewInit();
 		if (error != GLEW_OK)
@@ -64,6 +95,18 @@ namespace Demo
 		glEnable(GL_DEBUG_OUTPUT);
 		glDebugMessageCallback(MessageCallback, 0);
 #endif // DEBUG
+
+
+		//initialize camera
+		CCamera3D camera(screenWidth, screenHeight, false,
+			glm::vec3(20.0f, 10.0f, 20.0f),
+			glm::vec3(-1.0f, -1.0f, -1.0f));
+
+		//create projection matrix
+		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
+
+		camera.SetSpeed(3.0f);
+
 
 		CShader demoShader;
 		demoShader.AttachShader("Shaders/DemoVertexShader.vert", "Shaders/DemoFragmentShader.frag");
@@ -211,7 +254,7 @@ namespace Demo
 			ProcessInput();
 			camera.Update(inputManager, (float) elapsed / 1000);
 
-			/*
+			
 			while (lag >= MS_PER_FRAME)
 			{
 				//update game
@@ -224,7 +267,7 @@ namespace Demo
 			//synchronize the update and render
 			Uint32 step = lag % MS_PER_FRAME;
 			camera.Update(inputManager, (float)step / 1000);
-			*/
+			
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
 
@@ -237,7 +280,7 @@ namespace Demo
 			demoShader.Use();
 			glm::mat4 floorModel;
 			floorModel = glm::translate(floorModel, floorPos);
-			floorModel = glm::scale(floorModel, glm::vec3(200.0f, 10.0f, 200.0f));
+			floorModel = glm::scale(floorModel, glm::vec3(30.0f, 30.0f, 30.0f));
 			demoShader.SetUniformMat4("model", floorModel);
 			demoShader.SetUniformMat4("view", view);
 			demoShader.SetUniformMat4("projection", projection);
@@ -263,11 +306,13 @@ namespace Demo
 
 
 			SDL_GL_SwapWindow(window);
+			
 			/*
 			if (elapsed < 16)
 			{
 				SDL_Delay(16 - elapsed);
-			}*/
+			}
+			*/
 		}
 	
 		SDL_GL_DeleteContext(context);
