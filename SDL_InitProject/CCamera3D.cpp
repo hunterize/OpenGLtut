@@ -93,6 +93,12 @@ glm::mat4 CCamera3D::GetReverseCameraMatrix()
 	return glm::lookAt(m_cPosition, m_cPosition - m_cFront, m_cUp);
 }
 
+void CCamera3D::UpdateScreen(float screenWidth, float screenHeight)
+{
+	m_fScreenWidth = screenWidth;
+	m_fScreenHeight = screenHeight;
+}
+
 void CCamera3D::Update(const CInputManager& input, float timeSpan)
 {
 

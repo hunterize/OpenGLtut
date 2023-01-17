@@ -22,6 +22,7 @@ public:
 	glm::mat4 GetReverseCameraMatrix();
 
 	void Update(const CInputManager& input, float timeSpan);
+	void UpdateScreen(float screenWidth, float screenHeight);
 	void SetSpeed(float speed);
 	void SetSensitivity(float se) { m_fSensitivity = se; }
 	glm::vec3 GetPosition() const { return m_cPosition; } 

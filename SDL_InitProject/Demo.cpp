@@ -4,10 +4,21 @@ namespace Demo
 {
 	void ProcessInput();
 
+	const int DEFAULT_SCREENWIDTH = 1600;
+	const int DEFAULT_SCREENHEIGHT = 900;
+
 	bool isRunning = true;
-	int screenWidth = 1600;
-	int screenHeight = 900;
+	int screenWidth = DEFAULT_SCREENWIDTH;
+	int screenHeight = DEFAULT_SCREENHEIGHT;
 	float fov = 45.0f;
+
+	SDL_Window* window = nullptr;
+	SDL_GLContext context = nullptr;
+	bool isFullscreen = false;
+
+	SDL_SysWMinfo wInfo;
+	HMONITOR hMonitor = NULL;
+	DEVICE_SCALE_FACTOR sFactor;
 
 	CInputManager inputManager;
 
@@ -30,59 +41,52 @@ namespace Demo
 	void Demo()
 	{
 		//initial SDL
-		SDL_Window* window = nullptr;
-		SDL_GLContext context = nullptr;
-
 		SDL_Init(SDL_INIT_EVERYTHING);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetSwapInterval(0);
 
 
-		window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
-		
-		SDL_DisplayMode dm;
-
-#ifdef DEBUG
-		int display_mode_count;
-		std::cout << "Number of Video Displays: " << SDL_GetNumVideoDisplays() << std::endl;
-		display_mode_count = SDL_GetNumDisplayModes(0);
-		std::cout << "Number of Display Modes: " << display_mode_count << std::endl;
-		for (int i = 0; i < display_mode_count; i++)
-		{
-			SDL_GetDisplayMode(0, i, &dm);
-			std::cout << "Display Mode #" << i << std::endl;
-			std::cout << "Width: " << dm.w << std::endl;
-			std::cout << "Height: " << dm.h << std::endl;
-			std::cout << "FreshRate: " << dm.refresh_rate << std::endl;
-		}
-		
-#endif
-
-		//set native fullscreen display mode
-		//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-		SDL_GetDisplayMode(0, 0, &dm);
-		std::cout << dm.w << " - " << dm.h << std::endl;
-		SDL_SetWindowDisplayMode(window, &dm);
-		SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
-
-#ifdef DEBUG
-		SDL_GetCurrentDisplayMode(0, &dm);
-		std::cout << "Current Display Mode - " << std::endl;
-		std::cout << "Width: " << dm.w << std::endl;
-		std::cout << "Height: " << dm.h << std::endl;
-		std::cout << "FreshRate: " << dm.refresh_rate << std::endl;
-#endif
-
-		//update screen width and height
-		screenWidth = dm.w;
-		screenHeight = dm.h;
+		window = SDL_CreateWindow("Demo", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
 
 		context = SDL_GL_CreateContext(window);
 
 		SDL_ShowCursor(0);
 
+#ifdef DEBUG
+		float ddpi, hdpi, vdpi;
+		if (SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi) != 0)
+		{
+			std::cout << "Failed to get display dpi - " << SDL_GetError() << std::endl;
+		}
+		else
+		{
+			std::cout << "Display DPI - " << std::endl;
+			std::cout << "ddpi: " << ddpi << std::endl;
+			std::cout << "hdpi: " << hdpi << std::endl;
+			std::cout << "vdpi: " << vdpi << std::endl;
+		}		
 
+		SDL_VERSION(&wInfo.version);
+		if (SDL_GetWindowWMInfo(window, &wInfo))
+		{
+			hMonitor = MonitorFromWindow(wInfo.info.win.window, MONITOR_DEFAULTTONEAREST);
+			std::cout << "Monitor Handle: " << hMonitor << std::endl;
+			if (!GetScaleFactorForMonitor(hMonitor, &sFactor))
+			{
+				std::cout << "Monitor Scale Factor is: " << sFactor << std::endl;
+			}
+			else
+			{
+				std::cout << "GetScalFactorForMonitor failed: " << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << SDL_GetError() << std::endl;
+		}
+#endif
+		
 		GLenum error = glewInit();
 		if (error != GLEW_OK)
 		{
@@ -101,9 +105,6 @@ namespace Demo
 		CCamera3D camera(screenWidth, screenHeight, false,
 			glm::vec3(20.0f, 10.0f, 20.0f),
 			glm::vec3(-1.0f, -1.0f, -1.0f));
-
-		//create projection matrix
-		glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
 		camera.SetSpeed(3.0f);
 
@@ -252,6 +253,9 @@ namespace Demo
 
 			//update input
 			ProcessInput();
+
+			//update camera
+			camera.UpdateScreen(screenWidth, screenHeight);
 			camera.Update(inputManager, (float) elapsed / 1000);
 
 			
@@ -270,6 +274,9 @@ namespace Demo
 			
 			//create view matrix
 			glm::mat4 view = camera.GetCameraMatrix();
+
+			//create projection matrix
+			glm::mat4 projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 1000.0f);
 
 			glEnable(GL_DEPTH_TEST);  //enable depth testing to the frame buffer
 			glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //set background color
@@ -338,9 +345,18 @@ namespace Demo
 				switch (event.window.event)
 				{
 				case SDL_WINDOWEVENT_SHOWN:
-					SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+					std::cout << "window show event" << std::endl;
+					if (isFullscreen)
+					{
+						SDL_WarpMouseGlobal(screenWidth / 2, screenHeight / 2);
+					}
+					else
+					{
+						SDL_WarpMouseInWindow(window, screenWidth / 2, screenHeight / 2);
+					}
 					break;
 				case SDL_WINDOWEVENT_LEAVE:
+					std::cout << "window exit event" << std::endl;
 					isFirstMove = true;
 					break;
 				default:
@@ -359,13 +375,28 @@ namespace Demo
 			case SDL_MOUSEMOTION:
 				if (isFirstMove)
 				{
-					SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+					if (isFullscreen)
+					{
+						SDL_WarpMouseGlobal(screenWidth / 2, screenHeight / 2);
+					}
+					else
+					{
+						SDL_WarpMouseInWindow(window, screenWidth / 2, screenHeight / 2);
+					}
 					isFirstMove = false;
 				}
 				else
 				{
 					inputManager.SetMouseCoord(event.motion.x, event.motion.y);
-					SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+					
+					if (isFullscreen)
+					{
+						SDL_WarpMouseGlobal(screenWidth / 2, screenHeight / 2);
+					}
+					else
+					{
+						SDL_WarpMouseInWindow(window, screenWidth / 2, screenHeight / 2);
+					}
 				}
 				break;
 			}
@@ -374,6 +405,70 @@ namespace Demo
 		if (inputManager.IskeyPressed(SDLK_ESCAPE))
 		{
 			isRunning = false;
+		}
+
+		if (inputManager.IskeyPressed(SDLK_F2))
+		{
+			isFullscreen = !isFullscreen;
+
+			if (isFullscreen)
+			{
+				SDL_DisplayMode dm;
+#ifdef DEBUG
+				int display_mode_count;
+				std::cout << "Number of Video Displays: " << SDL_GetNumVideoDisplays() << std::endl;
+				display_mode_count = SDL_GetNumDisplayModes(0);
+				std::cout << "Number of Display Modes: " << display_mode_count << std::endl;
+				for (int i = 0; i < display_mode_count; i++)
+				{
+					SDL_GetDisplayMode(0, i, &dm);
+					std::cout << "Display Mode #" << i << std::endl;
+					std::cout << "Width: " << dm.w << std::endl;
+					std::cout << "Height: " << dm.h << std::endl;
+					std::cout << "FreshRate: " << dm.refresh_rate << std::endl;
+				}
+
+#endif
+
+				//set native fullscreen display mode
+				SDL_GetDisplayMode(0, 0, &dm);
+				SDL_SetWindowDisplayMode(window, &dm);
+				SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+#ifdef DEBUG
+				SDL_GetCurrentDisplayMode(0, &dm);
+				std::cout << "Current Display Mode - " << std::endl;
+				std::cout << "Width: " << dm.w << std::endl;
+				std::cout << "Height: " << dm.h << std::endl;
+				std::cout << "FreshRate: " << dm.refresh_rate << std::endl;				
+
+				SDL_Rect rec;
+				SDL_GetDisplayBounds(0, &rec);
+				std::cout << "Display Bounds Rectangular - " << std::endl;
+				std::cout << "Position.x: " << rec.x << std::endl;
+				std::cout << "Position.y: " << rec.y << std::endl;
+				std::cout << "Rec.Width: " << rec.w << std::endl;
+				std::cout << "Rec.Height: " << rec.h << std::endl;
+#endif
+
+				//update screen width and height
+				screenWidth = dm.w;
+				screenHeight = dm.h;
+
+				SDL_WarpMouseGlobal(screenWidth / 2, screenHeight / 2);
+			}
+			else
+			{
+				SDL_SetWindowFullscreen(window, NULL);
+				screenWidth = DEFAULT_SCREENWIDTH;
+				screenHeight = DEFAULT_SCREENHEIGHT;
+
+				SDL_WarpMouseInWindow(window, screenWidth / 2, screenHeight / 2);
+			}
+
+			//isFirstMove = false;
+			glViewport(0, 0, screenWidth, screenHeight);
+
 		}
 	}
 }

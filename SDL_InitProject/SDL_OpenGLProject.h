@@ -1,5 +1,10 @@
 #pragma once
 
+#define WINDOWS_IGNORE_PACKING_MISMATCH
+#include <SDL_syswm.h>
+#include <ShellScalingApi.h>
+#undef LoadImage
+
 #include <SDL.h>
 #include <glew.h>
 #include <glm.hpp>
