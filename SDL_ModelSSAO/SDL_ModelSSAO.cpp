@@ -378,6 +378,7 @@ namespace ModelSSAO
 		};
 
 		//verex indices
+		/*
 		GLuint crateIndices[] = {
 			0, 1, 2, 2, 3, 0,
 			4, 5, 6, 6, 7, 4,
@@ -385,6 +386,11 @@ namespace ModelSSAO
 			12, 13, 14, 14, 15, 12,
 			16, 17, 18, 18, 19, 16,
 			20, 21, 22, 22, 23, 20
+		};
+		*/
+		GLuint crateIndices[] = {
+			0,1,2,2,3,0,
+			4,5,6,6,7,4
 		};
 
 		//set vao for cube
